@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Buttons</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f0f0f0;
+    }
+    .test-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .test-btn:hover {
+      background: #5a6fd8;
+    }
+    .result {
+      margin: 10px 0;
+      padding: 10px;
+      background: white;
+      border-radius: 5px;
+      border-left: 4px solid #667eea;
+    }
+  </style>
+</head>
+<body>
+  <h1>Button Test Page</h1>
+  <p>This page tests if JavaScript functions are working correctly.</p>
+  
+  <button class="test-btn" onclick="testCreate()">Test Create Meeting</button>
+  <button class="test-btn" onclick="testJoin()">Test Join Meeting</button>
+  <button class="test-btn" onclick="testCopy()">Test Copy Function</button>
+  
+  <div id="results"></div>
+  
+  <script>
+    console.log('Test page loaded!');
+    
+    function addResult(message) {
+      const results = document.getElementById('results');
+      const div = document.createElement('div');
+      div.className = 'result';
+      div.textContent = new Date().toLocaleTimeString() + ': ' + message;
+      results.appendChild(div);
+    }
+    
+    function testCreate() {
+      console.log('Test create clicked!');
+      addResult('Create Meeting button clicked - Function working!');
+      
+      // Test if we can access the main functions
+      if (typeof window.createMeeting === 'function') {
+        addResult('✓ createMeeting function is available');
+      } else {
+        addResult('✗ createMeeting function is NOT available');
+      }
+    }
+    
+    function testJoin() {
+      console.log('Test join clicked!');
+      addResult('Join Meeting button clicked - Function working!');
+      
+      if (typeof window.joinMeeting === 'function') {
+        addResult('✓ joinMeeting function is available');
+      } else {
+        addResult('✗ joinMeeting function is NOT available');
+      }
+    }
+    
+    function testCopy() {
+      console.log('Test copy clicked!');
+      addResult('Copy button clicked - Function working!');
+      
+      if (typeof window.copyToClipboard === 'function') {
+        addResult('✓ copyToClipboard function is available');
+      } else {
+        addResult('✗ copyToClipboard function is NOT available');
+      }
+    }
+    
+    // Test if main script is loaded
+    setTimeout(() => {
+      if (typeof window.createMeeting === 'function') {
+        addResult('✓ Main script functions are loaded');
+      } else {
+        addResult('✗ Main script functions are NOT loaded - there might be an error in index.js');
+      }
+    }, 500);
+  </script>
+  
+  <!-- Try to load the main script -->
+  <script src="index.js"></script>
+</body>
+</html>
