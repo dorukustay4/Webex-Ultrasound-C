@@ -153,6 +153,3 @@ logs
 # Temporary files
 *.tmp
 *.temp
-
-# Webex-Ultrasound-Annotator directory
-Webex-Ultrasound-Annotator/
