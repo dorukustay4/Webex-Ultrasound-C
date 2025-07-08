@@ -18,20 +18,20 @@
           <path d="M12 10L20 16L12 22V10Z" fill="white"/>
           <defs>
             <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#667eea"/>
-              <stop offset="1" stop-color="#764ba2"/>
+              <stop stop-color="#3b82f6"/>
+              <stop offset="1" stop-color="#10b981"/>
             </linearGradient>
           </defs>
         </svg>
-        <h1>Webex Annotator</h1>
+        <h1 class="gradient-text">Webex Annotator Pro</h1>
       </div>
     </header>
 
     <main class="main-content">
       <div class="meeting-section">
-        <div class="card">
-          <h2>Ready to Connect?</h2>
-          <p>Create a new meeting or join an existing one</p>
+        <div class="card glass glow">
+          <h2> Setting up</h2>
+          <p>Create a new meeting or join an existing one with advanced annotation capabilities</p>
           <div class="button-group">
             <button class="create-btn" onclick="createMeeting()">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -114,9 +114,23 @@
           </div>
           <!-- Annotation Area with VIA -->
           <div class="video-cell">
-            <h3>Annotation Area</h3>
-            <div id="via-annotation-area">
-              <!-- VIA will be embedded here -->
+            <h3>Image Annotation</h3>
+            <div id="via-annotation-area" class="via-container">
+              <div class="via-toolbar">
+                <button class="via-tool-btn" id="via-rect-tool" onclick="setAnnotationTool('rect')">Rectangle</button>
+                <button class="via-tool-btn" id="via-circle-tool" onclick="setAnnotationTool('circle')">Circle</button>
+                <button class="via-tool-btn" id="via-polygon-tool" onclick="setAnnotationTool('polygon')">Polygon</button>
+                <button class="via-tool-btn" id="via-point-tool" onclick="setAnnotationTool('point')">Point</button>
+                <button class="via-tool-btn" id="via-clear-tool" onclick="clearAnnotations()">Clear</button>
+                <button class="via-tool-btn" id="via-save-tool" onclick="saveAnnotations()">Save</button>
+                <button class="via-tool-btn" id="via-load-tool" onclick="loadImage()">Load Image</button>
+              </div>
+              <div class="via-canvas-container">
+                <canvas id="via-canvas" class="via-canvas"></canvas>
+                <div class="via-annotation-list" id="annotation-list">
+                  <div style="font-weight: bold; margin-bottom: 5px;">Annotations:</div>
+                </div>
+              </div>
             </div>
             <img id="screenshot-image" style="display:none; max-width:100%; margin-top:10px;" />
           </div>

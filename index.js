@@ -841,9 +841,396 @@ async function embedVIA() {
   }
 }
 
-// Initialize all video windows and VIA on page load
-window.addEventListener('DOMContentLoaded', async () => {
-  await setupWebcams();
-  await setupHDMIFeed();
-  await embedVIA();
+// VIA Annotation System Implementation
+class VIAAnnotationTool {
+  constructor() {
+    this.canvas = null;
+    this.ctx = null;
+    this.currentTool = 'rect';
+    this.isDrawing = false;
+    this.startX = 0;
+    this.startY = 0;
+    this.annotations = [];
+    this.currentAnnotation = null;
+    this.annotationCounter = 0;
+    this.loadedImage = null;
+    this.polygonPoints = [];
+    
+    this.init();
+  }
+  
+  init() {
+    this.canvas = document.getElementById('via-canvas');
+    if (!this.canvas) return;
+    
+    this.ctx = this.canvas.getContext('2d');
+    this.resizeCanvas();
+    
+    // Event listeners
+    this.canvas.addEventListener('mousedown', this.startDrawing.bind(this));
+    this.canvas.addEventListener('mousemove', this.draw.bind(this));
+    this.canvas.addEventListener('mouseup', this.stopDrawing.bind(this));
+    this.canvas.addEventListener('click', this.handleClick.bind(this));
+    
+    window.addEventListener('resize', this.resizeCanvas.bind(this));
+    
+    // Set default tool
+    this.setTool('rect');
+  }
+  
+  resizeCanvas() {
+    const container = this.canvas.parentElement;
+    this.canvas.width = container.clientWidth - 20;
+    this.canvas.height = container.clientHeight - 20;
+    this.redraw();
+  }
+  
+  setTool(tool) {
+    this.currentTool = tool;
+    this.polygonPoints = [];
+    
+    // Update tool button states
+    document.querySelectorAll('.via-tool-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`via-${tool}-tool`)?.classList.add('active');
+    
+    // Update cursor
+    switch (tool) {
+      case 'rect':
+      case 'circle':
+      case 'polygon':
+        this.canvas.style.cursor = 'crosshair';
+        break;
+      case 'point':
+        this.canvas.style.cursor = 'crosshair';
+        break;
+      default:
+        this.canvas.style.cursor = 'default';
+    }
+  }
+  
+  startDrawing(e) {
+    const rect = this.canvas.getBoundingClientRect();
+    this.startX = e.clientX - rect.left;
+    this.startY = e.clientY - rect.top;
+    
+    if (this.currentTool === 'polygon' || this.currentTool === 'point') {
+      return; // Handle in handleClick
+    }
+    
+    this.isDrawing = true;
+    this.currentAnnotation = {
+      id: ++this.annotationCounter,
+      type: this.currentTool,
+      startX: this.startX,
+      startY: this.startY,
+      endX: this.startX,
+      endY: this.startY,
+      label: `${this.currentTool} ${this.annotationCounter}`
+    };
+  }
+  
+  draw(e) {
+    if (!this.isDrawing) return;
+    
+    const rect = this.canvas.getBoundingClientRect();
+    const currentX = e.clientX - rect.left;
+    const currentY = e.clientY - rect.top;
+    
+    this.currentAnnotation.endX = currentX;
+    this.currentAnnotation.endY = currentY;
+    
+    this.redraw();
+    this.drawCurrentAnnotation();
+  }
+  
+  stopDrawing() {
+    if (!this.isDrawing) return;
+    
+    this.isDrawing = false;
+    if (this.currentAnnotation) {
+      this.annotations.push(this.currentAnnotation);
+      this.updateAnnotationList();
+      this.currentAnnotation = null;
+    }
+  }
+  
+  handleClick(e) {
+    const rect = this.canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    if (this.currentTool === 'point') {
+      const annotation = {
+        id: ++this.annotationCounter,
+        type: 'point',
+        x: x,
+        y: y,
+        label: `Point ${this.annotationCounter}`
+      };
+      this.annotations.push(annotation);
+      this.updateAnnotationList();
+      this.redraw();
+    } else if (this.currentTool === 'polygon') {
+      this.polygonPoints.push({ x, y });
+      this.redraw();
+      this.drawPolygonPreview();
+    }
+  }
+  
+  drawCurrentAnnotation() {
+    if (!this.currentAnnotation) return;
+    
+    this.ctx.strokeStyle = '#3b82f6';
+    this.ctx.lineWidth = 2;
+    this.ctx.setLineDash([5, 5]);
+    
+    const { startX, startY, endX, endY, type } = this.currentAnnotation;
+    
+    if (type === 'rect') {
+      this.ctx.strokeRect(startX, startY, endX - startX, endY - startY);
+    } else if (type === 'circle') {
+      const radius = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+      this.ctx.beginPath();
+      this.ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+      this.ctx.stroke();
+    }
+    
+    this.ctx.setLineDash([]);
+  }
+  
+  drawPolygonPreview() {
+    if (this.polygonPoints.length < 2) return;
+    
+    this.ctx.strokeStyle = '#3b82f6';
+    this.ctx.lineWidth = 2;
+    this.ctx.setLineDash([5, 5]);
+    this.ctx.beginPath();
+    
+    this.ctx.moveTo(this.polygonPoints[0].x, this.polygonPoints[0].y);
+    for (let i = 1; i < this.polygonPoints.length; i++) {
+      this.ctx.lineTo(this.polygonPoints[i].x, this.polygonPoints[i].y);
+    }
+    
+    this.ctx.stroke();
+    this.ctx.setLineDash([]);
+  }
+  
+  finishPolygon() {
+    if (this.polygonPoints.length < 3) return;
+    
+    const annotation = {
+      id: ++this.annotationCounter,
+      type: 'polygon',
+      points: [...this.polygonPoints],
+      label: `Polygon ${this.annotationCounter}`
+    };
+    
+    this.annotations.push(annotation);
+    this.polygonPoints = [];
+    this.updateAnnotationList();
+    this.redraw();
+  }
+  
+  redraw() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    // Draw loaded image if any
+    if (this.loadedImage) {
+      this.ctx.drawImage(this.loadedImage, 0, 0, this.canvas.width, this.canvas.height);
+    }
+    
+    // Draw all annotations
+    this.annotations.forEach(annotation => {
+      this.drawAnnotation(annotation);
+    });
+    
+    // Draw polygon preview
+    if (this.currentTool === 'polygon' && this.polygonPoints.length > 0) {
+      this.drawPolygonPreview();
+    }
+  }
+  
+  drawAnnotation(annotation) {
+    this.ctx.strokeStyle = '#10b981';
+    this.ctx.fillStyle = 'rgba(16, 185, 129, 0.2)';
+    this.ctx.lineWidth = 2;
+    
+    switch (annotation.type) {
+      case 'rect':
+        const width = annotation.endX - annotation.startX;
+        const height = annotation.endY - annotation.startY;
+        this.ctx.fillRect(annotation.startX, annotation.startY, width, height);
+        this.ctx.strokeRect(annotation.startX, annotation.startY, width, height);
+        break;
+        
+      case 'circle':
+        const radius = Math.sqrt(Math.pow(annotation.endX - annotation.startX, 2) + Math.pow(annotation.endY - annotation.startY, 2));
+        this.ctx.beginPath();
+        this.ctx.arc(annotation.startX, annotation.startY, radius, 0, 2 * Math.PI);
+        this.ctx.fill();
+        this.ctx.stroke();
+        break;
+        
+      case 'polygon':
+        if (annotation.points && annotation.points.length > 2) {
+          this.ctx.beginPath();
+          this.ctx.moveTo(annotation.points[0].x, annotation.points[0].y);
+          for (let i = 1; i < annotation.points.length; i++) {
+            this.ctx.lineTo(annotation.points[i].x, annotation.points[i].y);
+          }
+          this.ctx.closePath();
+          this.ctx.fill();
+          this.ctx.stroke();
+        }
+        break;
+        
+      case 'point':
+        this.ctx.fillStyle = '#10b981';
+        this.ctx.beginPath();
+        this.ctx.arc(annotation.x, annotation.y, 5, 0, 2 * Math.PI);
+        this.ctx.fill();
+        break;
+    }
+    
+    // Draw label
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.font = '12px Inter';
+    this.ctx.fillText(annotation.label, annotation.startX || annotation.x, (annotation.startY || annotation.y) - 10);
+  }
+  
+  updateAnnotationList() {
+    const listContainer = document.getElementById('annotation-list');
+    if (!listContainer) return;
+    
+    listContainer.innerHTML = '<div style="font-weight: bold; margin-bottom: 5px;">Annotations:</div>';
+    
+    this.annotations.forEach(annotation => {
+      const item = document.createElement('div');
+      item.className = 'annotation-item';
+      item.textContent = annotation.label;
+      item.onclick = () => this.selectAnnotation(annotation.id);
+      listContainer.appendChild(item);
+    });
+  }
+  
+  selectAnnotation(id) {
+    const annotation = this.annotations.find(a => a.id === id);
+    if (annotation) {
+      console.log('Selected annotation:', annotation);
+    }
+  }
+  
+  clearAnnotations() {
+    this.annotations = [];
+    this.polygonPoints = [];
+    this.annotationCounter = 0;
+    this.updateAnnotationList();
+    this.redraw();
+  }
+  
+  saveAnnotations() {
+    const data = {
+      annotations: this.annotations,
+      timestamp: new Date().toISOString(),
+      canvasSize: { width: this.canvas.width, height: this.canvas.height }
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'annotations.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+  
+  loadImageFromFile(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        this.loadedImage = img;
+        this.redraw();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+  
+  loadImageFromScreenshot() {
+    const screenshotImg = document.getElementById('screenshot-image');
+    if (screenshotImg && screenshotImg.src) {
+      const img = new Image();
+      img.onload = () => {
+        this.loadedImage = img;
+        this.redraw();
+      };
+      img.src = screenshotImg.src;
+    }
+  }
+}
+
+// Global VIA instance
+let viaAnnotationTool = null;
+
+// Global functions for HTML buttons
+window.setAnnotationTool = function(tool) {
+  if (viaAnnotationTool) {
+    viaAnnotationTool.setTool(tool);
+  }
+};
+
+window.clearAnnotations = function() {
+  if (viaAnnotationTool) {
+    viaAnnotationTool.clearAnnotations();
+  }
+};
+
+window.saveAnnotations = function() {
+  if (viaAnnotationTool) {
+    viaAnnotationTool.saveAnnotations();
+  }
+};
+
+window.loadImage = function() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (file && viaAnnotationTool) {
+      viaAnnotationTool.loadImageFromFile(file);
+    }
+  };
+  input.click();
+};
+
+// Enhanced screenshot function to integrate with VIA
+window.takeScreenshot = function() {
+  const video = document.getElementById('hdmi-feed-video');
+  const img = document.getElementById('screenshot-image');
+  if (!video || !img) return;
+  
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const dataURL = canvas.toDataURL('image/png');
+  img.src = dataURL;
+  img.style.display = 'block';
+  
+  // Load into VIA annotation tool
+  if (viaAnnotationTool) {
+    viaAnnotationTool.loadImageFromScreenshot();
+  }
+  
+  console.log('Screenshot taken and loaded into annotation tool');
+};
+
+// Initialize VIA on page load
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    viaAnnotationTool = new VIAAnnotationTool();
+  }, 100);
 });
