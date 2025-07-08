@@ -479,7 +479,7 @@ window.toggleVideo = function() {
   console.log('Toggle video clicked');
   
   const videoBtn = document.getElementById('video-btn');
-  const localVideo = document.getElementById('local-video');
+  const localVideo = document.getElementById('local-doctor-video');
   
   if (isVideoEnabled) {
     // Turn off video
@@ -530,7 +530,7 @@ window.toggleScreenShare = async function() {
   console.log('Toggle screen share clicked');
   
   const screenBtn = document.getElementById('screen-btn');
-  const remoteVideo = document.getElementById('remote-video');
+  const remoteVideo = document.getElementById('remote-doctor-video');
   
   if (!isScreenSharing) {
     try {
