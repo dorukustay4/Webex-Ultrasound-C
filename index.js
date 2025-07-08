@@ -147,8 +147,6 @@ window.joinMeeting = async function () {
   console.log('Join meeting button clicked!');
   
   const joinBtn = document.querySelector('.join-btn');
-  const videoElement = document.getElementById('remote-video');
-  const placeholder = document.querySelector('.video-placeholder');
   
   if (!joinBtn) {
     console.error('Join button not found!');
@@ -167,6 +165,10 @@ window.joinMeeting = async function () {
     }
 
     console.log('Joining meeting:', destination);
+    
+    // Initialize media devices and get camera access
+    await initializeMedia();
+    
     const meeting = await webex.meetings.create(destination);
     await meeting.join();
     currentMeeting = meeting;
@@ -175,13 +177,11 @@ window.joinMeeting = async function () {
     meeting.on('media:ready', (media) => {
       console.log('Media ready:', media);
       if (media.type === 'remoteVideo') {
-        // For testing, just show a colored background
-        if (videoElement) {
-          videoElement.style.background = 'linear-gradient(45deg, #667eea, #764ba2)';
-          videoElement.classList.add('active');
-        }
-        if (placeholder) {
-          placeholder.classList.add('hidden');
+        const remoteDoctorVideo = document.getElementById('remote-doctor-video');
+        if (remoteDoctorVideo) {
+          // In a real app, this would be the actual remote stream
+          remoteDoctorVideo.style.background = 'linear-gradient(45deg, #667eea, #764ba2)';
+          remoteDoctorVideo.style.display = 'block';
         }
       }
     });
@@ -329,11 +329,21 @@ async function initializeMedia() {
         audio: true
       });
       
-      // Display local video
-      const localVideo = document.getElementById('local-video');
-      if (localVideo) {
-        localVideo.srcObject = localStream;
-        localVideo.classList.remove('hidden');
+      // Display local video in the "Local Doctor & Patient" section
+      const localDoctorVideo = document.getElementById('local-doctor-video');
+      if (localDoctorVideo) {
+        localDoctorVideo.srcObject = localStream;
+        localDoctorVideo.style.display = 'block';
+        console.log('Local video stream connected');
+      }
+      
+      // For demo purposes, also show in remote doctor section
+      const remoteDoctorVideo = document.getElementById('remote-doctor-video');
+      if (remoteDoctorVideo) {
+        // In a real app, this would be a different stream from the remote doctor
+        remoteDoctorVideo.srcObject = localStream;
+        remoteDoctorVideo.style.display = 'block';
+        console.log('Remote video stream connected (demo)');
       }
       
       // Enumerate available devices
@@ -342,11 +352,18 @@ async function initializeMedia() {
       console.log('Media initialized successfully');
     } else {
       console.warn('Media devices not supported');
-      // For testing, show mock local video
-      const localVideo = document.getElementById('local-video');
-      if (localVideo) {
-        localVideo.style.background = 'linear-gradient(45deg, #4299e1, #3182ce)';
-        localVideo.classList.remove('hidden');
+      // For testing, show mock videos
+      const localDoctorVideo = document.getElementById('local-doctor-video');
+      const remoteDoctorVideo = document.getElementById('remote-doctor-video');
+      
+      if (localDoctorVideo) {
+        localDoctorVideo.style.background = 'linear-gradient(45deg, #4299e1, #3182ce)';
+        localDoctorVideo.style.display = 'block';
+      }
+      
+      if (remoteDoctorVideo) {
+        remoteDoctorVideo.style.background = 'linear-gradient(45deg, #10b981, #059669)';
+        remoteDoctorVideo.style.display = 'block';
       }
     }
   } catch (error) {
