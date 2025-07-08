@@ -604,8 +604,8 @@ window.leaveMeeting = async function() {
     stopLocalStream();
     
     // Reset video elements
-    const remoteVideo = document.getElementById('remote-video');
-    const localVideo = document.getElementById('local-video');
+    const remoteVideo = document.getElementById('remote-doctor-video');
+    const localVideo = document.getElementById('local-doctor-video');
     const placeholder = document.querySelector('.video-placeholder');
     
     if (remoteVideo) {
@@ -738,7 +738,7 @@ function stopLocalStream() {
     localStream = null;
   }
   
-  const localVideo = document.getElementById('local-video');
+  const localVideo = document.getElementById('local-doctor-video');
   if (localVideo) {
     localVideo.srcObject = null;
     localVideo.classList.add('hidden');
