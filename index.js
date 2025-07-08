@@ -1251,3 +1251,41 @@ document.addEventListener('DOMContentLoaded', () => {
     viaAnnotationTool = new VIAAnnotationTool();
   }, 100);
 });
+
+// Test Camera Function
+window.testCamera = async function() {
+  console.log('Test camera button clicked!');
+  
+  try {
+    // Request camera access
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: false
+    });
+    
+    console.log('Camera access granted!');
+    
+    // Display the stream in both video elements
+    const localDoctorVideo = document.getElementById('local-doctor-video');
+    const remoteDoctorVideo = document.getElementById('remote-doctor-video');
+    
+    if (localDoctorVideo) {
+      localDoctorVideo.srcObject = stream;
+      localDoctorVideo.style.display = 'block';
+      console.log('Local doctor video connected');
+    }
+    
+    if (remoteDoctorVideo) {
+      // Clone the stream for the remote video (just for testing)
+      remoteDoctorVideo.srcObject = stream;
+      remoteDoctorVideo.style.display = 'block';
+      console.log('Remote doctor video connected');
+    }
+    
+    alert('Camera test successful! You should see your video in both video windows.');
+    
+  } catch (error) {
+    console.error('Camera test failed:', error);
+    alert('Camera test failed: ' + error.message + '\n\nPlease make sure:\n1. Your camera is connected\n2. You granted camera permission\n3. No other app is using the camera');
+  }
+};
