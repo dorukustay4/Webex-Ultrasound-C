@@ -1,4 +1,4 @@
-// Enhanced Webex Annotator with full meeting features
+// Enhanced Webex Annotator with full meeting features and authentication
 console.log('JavaScript file loaded successfully!');
 
 // Meeting state variables
@@ -755,6 +755,79 @@ function updateParticipantCount(count) {
       span.textContent = count.toString();
     }
   }
+}
+
+// Check authentication on page load
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM loaded, checking authentication...');
+  
+  // Check if user is authenticated
+  const authMode = localStorage.getItem('webex_auth_mode');
+  
+  if (authMode === 'authenticated' && window.isAuthenticated && window.isAuthenticated()) {
+    // User is authenticated, show user info
+    showUserInfo();
+  } else if (authMode === 'guest') {
+    // User is in guest mode, continue normally
+    console.log('Running in guest mode');
+  } else {
+    // No authentication, redirect to login
+    console.log('No authentication found, redirecting to login...');
+    window.location.href = 'login.html';
+    return;
+  }
+  
+  // Continue with normal app initialization
+  initializeApp();
+});
+
+// Show user information in header
+function showUserInfo() {
+  const userInfo = window.getCurrentUser && window.getCurrentUser();
+  
+  if (userInfo) {
+    console.log('Showing user info for:', userInfo.displayName);
+    
+    const userInfoDiv = document.getElementById('user-info');
+    const userNameSpan = document.getElementById('user-name');
+    const userEmailSpan = document.getElementById('user-email');
+    const userAvatarImg = document.getElementById('user-avatar-img');
+    
+    if (userInfoDiv && userNameSpan && userEmailSpan && userAvatarImg) {
+      userNameSpan.textContent = userInfo.displayName || 'Unknown User';
+      userEmailSpan.textContent = userInfo.emails?.[0] || 'No email';
+      userAvatarImg.src = userInfo.avatar || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23667eea"><circle cx="12" cy="12" r="12"/><text x="12" y="16" text-anchor="middle" fill="white" font-size="10">' + (userInfo.displayName?.charAt(0) || 'U') + '</text></svg>';
+      userInfoDiv.style.display = 'flex';
+    }
+  }
+}
+
+// Initialize app
+function initializeApp() {
+  console.log('Initializing app...');
+  
+  // Test button existence
+  const createBtn = document.querySelector('.create-btn');
+  if (createBtn) {
+    console.log('✓ Create button found');
+  } else {
+    console.error('✗ Create button NOT found');
+  }
+  
+  // Test function existence
+  if (typeof window.createMeeting === 'function') {
+    console.log('✓ createMeeting function is available');
+  } else {
+    console.error('✗ createMeeting function is NOT available');
+  }
+  
+  if (typeof window.joinMeeting === 'function') {
+    console.log('✓ joinMeeting function is available');
+  } else {
+    console.error('✗ joinMeeting function is NOT available');
+  }
+  
+  console.log('App initialization complete');
 }
 
 // Test if DOM is ready

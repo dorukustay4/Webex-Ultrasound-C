@@ -25,6 +25,22 @@
         </svg>
         <h1 class="gradient-text">Webex Annotator Pro</h1>
       </div>
+      
+      <!-- User Info Section -->
+      <div class="user-info" id="user-info" style="display: none;">
+        <div class="user-avatar" id="user-avatar">
+          <img id="user-avatar-img" src="" alt="User Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+        </div>
+        <div class="user-details">
+          <span class="user-name" id="user-name">User Name</span>
+          <span class="user-email" id="user-email">user@example.com</span>
+        </div>
+        <button class="logout-btn" onclick="logout()" title="Sign Out">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 3H5C3.89543 3 3 3.89543 3 5V15C3 16.1046 3.89543 17 5 17H9M13 7L17 11M17 11L13 15M17 11H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
     </header>
 
     <main class="main-content">
@@ -145,6 +161,7 @@
     </main>
   </div>
 
+  <script src="auth.js"></script>
   <script src="index.js"></script>
 </body>
 </html>
