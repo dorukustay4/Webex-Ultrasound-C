@@ -4,7 +4,7 @@ console.log('Auth.js loaded successfully!');
 // Webex OAuth Configuration
 const WEBEX_CONFIG = {
   // Replace these with your actual Webex Integration credentials
-  clientId: 'YOUR_CLIENT_ID_HERE', // Get this from developer.webex.com/my-apps
+  clientId: 'C97348067c381458de8ac4de0f6fb00227f607050d698c5161dabbb1e0ee579f8', // Get this from developer.webex.com/my-apps
   redirectUri: window.location.origin + '/auth-callback.html', // Must be registered in your integration
   scope: 'spark:messages_read spark:messages_write spark:rooms_read spark:people_read meeting:schedules_read meeting:schedules_write',
   
@@ -55,23 +55,20 @@ window.loginWithWebex = async function() {
       throw new Error('Webex Integration not configured. Please set your Client ID in auth.js');
     }
     
-    // Generate state and PKCE parameters for security
+    // Generate state parameter for security
     const state = generateState();
-    const { codeVerifier, codeChallenge } = await generatePKCE();
     
-    // Store PKCE verifier and state in localStorage for later use
-    localStorage.setItem('webex_code_verifier', codeVerifier);
+    // Store state in localStorage for later verification
     localStorage.setItem('webex_state', state);
     
-    // Build authorization URL
+    // Build authorization URL (using implicit flow for browser-only apps)
     const authParams = new URLSearchParams({
-      response_type: 'code',
+      response_type: 'token',  // Changed from 'code' to 'token'
       client_id: WEBEX_CONFIG.clientId,
       redirect_uri: WEBEX_CONFIG.redirectUri,
       scope: WEBEX_CONFIG.scope,
-      state: state,
-      code_challenge: codeChallenge,
-      code_challenge_method: 'S256'
+      state: state
+      // Removed PKCE params as they're not needed for implicit flow
     });
     
     const authUrl = `${WEBEX_CONFIG.authUrl}?${authParams.toString()}`;
@@ -162,41 +159,55 @@ async function getUserInfo(accessToken) {
 
 // Handle OAuth callback (should be called from auth-callback.html)
 window.handleOAuthCallback = async function() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const code = urlParams.get('code');
-  const state = urlParams.get('state');
-  const error = urlParams.get('error');
+  // For implicit flow, the token is in the URL fragment (after #)
+  const hashParams = new URLSearchParams(window.location.hash.substring(1));
+  const accessToken = hashParams.get('access_token');
+  const state = hashParams.get('state');
+  const error = hashParams.get('error');
   
-  if (error) {
-    console.error('OAuth error:', error);
-    alert('Authentication failed: ' + error);
+  // Also check URL parameters (in case of error)
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlError = urlParams.get('error');
+  
+  if (error || urlError) {
+    console.error('OAuth error:', error || urlError);
+    alert('Authentication failed: ' + (error || urlError));
     window.location.href = 'login.html';
     return;
   }
   
-  if (!code) {
-    console.error('No authorization code received');
-    alert('Authentication failed: No authorization code received');
+  if (!accessToken) {
+    console.error('No access token received');
+    alert('Authentication failed: No access token received');
+    window.location.href = 'login.html';
+    return;
+  }
+  
+  // Verify state parameter
+  const storedState = localStorage.getItem('webex_state');
+  if (state !== storedState) {
+    console.error('Invalid state parameter');
+    alert('Authentication failed: Invalid state parameter. Possible CSRF attack.');
     window.location.href = 'login.html';
     return;
   }
   
   try {
-    // Exchange code for access token
-    const tokenData = await exchangeCodeForToken(code, state);
+    // Get user information using the access token
+    const userInfo = await getUserInfo(accessToken);
     
-    // Get user information
-    const userInfo = await getUserInfo(tokenData.access_token);
-    
-    // Store authentication data
-    localStorage.setItem('webex_access_token', tokenData.access_token);
-    localStorage.setItem('webex_refresh_token', tokenData.refresh_token);
+    // Store authentication data (note: implicit flow doesn't provide refresh token)
+    localStorage.setItem('webex_access_token', accessToken);
     localStorage.setItem('webex_user_info', JSON.stringify(userInfo));
     localStorage.setItem('webex_auth_mode', 'authenticated');
-    localStorage.setItem('webex_token_expires', Date.now() + (tokenData.expires_in * 1000));
+    
+    // Get expires_in from hash params
+    const expiresIn = hashParams.get('expires_in');
+    if (expiresIn) {
+      localStorage.setItem('webex_token_expires', Date.now() + (parseInt(expiresIn) * 1000));
+    }
     
     // Clean up temporary storage
-    localStorage.removeItem('webex_code_verifier');
     localStorage.removeItem('webex_state');
     
     console.log('Authentication successful!', userInfo);
@@ -205,7 +216,7 @@ window.handleOAuthCallback = async function() {
     window.location.href = 'index.html';
     
   } catch (error) {
-    console.error('Token exchange failed:', error);
+    console.error('Failed to get user info:', error);
     alert('Authentication failed: ' + error.message);
     window.location.href = 'login.html';
   }
