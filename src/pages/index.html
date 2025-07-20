@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ultrasound Webex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo" style="margin-left: 5rem;">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="16" fill="url(#gradient)"/>
+          <path d="M12 10L20 16L12 22V10Z" fill="white"/>
+          <defs>
+            <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#3b82f6"/>
+              <stop offset="1" stop-color="#10b981"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <h1 class="gradient-text">Ultrasound Webex</h1>
+      </div>
+      
+      <!-- User Info Section -->
+      <div class="user-info" id="user-info" style="display: none;">
+        <div class="user-avatar" id="user-avatar">
+          <img id="user-avatar-img" src="" alt="User Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+        </div>
+        <div class="user-details">
+          <span class="user-name" id="user-name">User Name</span>
+          <span class="user-email" id="user-email">user@example.com</span>
+        </div>
+        <button class="logout-btn" onclick="logout()" title="Sign Out">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 3H5C3.89543 3 3 3.89543 3 5V15C3 16.1046 3.89543 17 5 17H9M13 7L17 11M17 11L13 15M17 11H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <!-- Navigation link to home -->
+      <a href="home.html" class="nav-link" style="position: absolute; top: 1rem; left: 1rem; color: #3b82f6; text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; z-index: 1000;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 2L3 7V18C3 18.5523 3.44772 19 4 19H7V14H13V19H16C16.5523 19 17 18.5523 17 18V7L10 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Home
+      </a>
+
+      <!-- Meeting Setup Section -->
+      <div class="meeting-section">
+        <div class="card">
+          <h2>Meeting Setup</h2>
+          <p>Create a new meeting or join an existing one</p>
+          <div class="button-group">
+            <button class="create-btn" onclick="createMeeting()">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Create Meeting
+            </button>
+            <button class="join-btn" onclick="joinMeeting()">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 8V6C15 3.79086 13.2091 2 11 2H9C6.79086 2 5 3.79086 5 6V8M3 10C3 8.89543 3.89543 8 5 8H15C16.1046 8 17 8.89543 17 10V16C17 17.1046 16.1046 18 15 18H5C3.89543 18 3 17.1046 3 16V10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Join Meeting
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Medical Consultation 2x2 Grid -->
+      <div class="video-section">
+        <div class="video-grid">
+          <!-- Local Doctor + Patient Window -->
+          <div class="video-participant local-room">
+            <video id="local-video" autoplay muted></video>
+            <div class="participant-placeholder">
+              <div class="avatar">👨‍⚕️</div>
+              <p>Local Doctor & Patient</p>
+            </div>
+            <div class="participant-info">Dr. Johnson & Patient - Local Room</div>
+          </div>
+          
+          <!-- Remote Expert Window -->
+          <div class="video-participant remote-expert">
+            <video id="remote-expert-video" autoplay></video>
+            <div class="participant-placeholder">
+              <div class="avatar">🔬</div>
+              <p>Remote Expert</p>
+            </div>
+            <div class="participant-info">Dr. Sarah Martinez - Ultrasound Specialist</div>
+          </div>
+          
+          <!-- Live Ultrasound Stream -->
+          <div class="video-participant ultrasound-feed">
+            <video id="ultrasound-video" autoplay muted></video>
+            <div class="participant-placeholder">
+              <div class="avatar">🔊</div>
+              <p>Live Ultrasound</p>
+            </div>
+            <div class="participant-info">Ultrasound Stream - Real-time Feed</div>
+            <div class="stream-controls">
+              <button class="capture-btn" onclick="captureUltrasoundFrame()" title="Capture Frame for Annotation">
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M4 4C2.89543 4 2 4.89543 2 6V14C2 15.1046 2.89543 16 4 16H16C17.1046 16 18 15.1046 18 14V6C18 4.89543 17.1046 4 16 4H13L11 2H9L7 4H4Z"/>
+                  <circle cx="10" cy="10" r="3" fill="white"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Annotation Window -->
+          <div class="video-participant annotation-workspace">
+            <div class="annotation-container">
+              <div class="annotation-toolbar">
+                <button class="tool-btn active" data-tool="select" title="Select">
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M2 2L18 10L8 12L2 18V2Z"/>
+                  </svg>
+                </button>
+                <button class="tool-btn" data-tool="circle" title="Circle">
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="10" cy="10" r="8"/>
+                  </svg>
+                </button>
+                <button class="tool-btn" data-tool="rectangle" title="Rectangle">
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="14" height="14"/>
+                  </svg>
+                </button>
+                <button class="tool-btn" data-tool="arrow" title="Arrow">
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 2L15 7H12V18H8V7H5L10 2Z"/>
+                  </svg>
+                </button>
+                <button class="tool-btn" data-tool="text" title="Text">
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M6 4H14V6H12V16H8V6H6V4Z"/>
+                  </svg>
+                </button>
+                <button class="tool-btn clear-btn" onclick="clearAnnotations()" title="Clear All">
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M6 6L14 14M6 14L14 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="annotation-canvas-container">
+                <canvas id="annotation-canvas" width="400" height="300"></canvas>
+                <div class="annotation-placeholder" id="annotation-placeholder">
+                  <div class="placeholder-content">
+                    <svg width="48" height="48" viewBox="0 0 20 20" fill="currentColor" opacity="0.3">
+                      <path d="M13.586 3.586C14.367 2.805 15.633 2.805 16.414 3.586C17.195 4.367 17.195 5.633 16.414 6.414L15.621 7.207L12.793 4.379L13.586 3.586ZM11.379 5.793L3 14.172V17H5.828L14.207 8.621L11.379 5.793Z"/>
+                    </svg>
+                    <p>Capture ultrasound frame to annotate</p>
+                  </div>
+                </div>
+              </div>
+              <div class="annotation-info">
+                <span class="annotation-count">No annotations</span>
+                <button class="save-btn" onclick="saveAnnotations()" title="Save Annotations">
+                  <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M5 3V7H15V3H17V17H3V3H5ZM7 9V15H13V9H7Z"/>
+                  </svg>
+                  Save
+                </button>
+              </div>
+            </div>
+            <div class="participant-info">Annotation Workspace - Expert Tools</div>
+          </div>        </div>
+        
+      </div>
+      
+      <!-- Call Controls Bar -->
+      <div class="call-controls-bar">
+        <div class="controls-left">
+          <button class="control-btn" id="mute-btn" onclick="toggleMute()" title="Mute/Unmute">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 1C10.3431 1 9 2.34315 9 4V12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12V4C15 2.34315 13.6569 1 12 1Z"/>
+              <path d="M19 10V12C19 16.4183 15.4183 20 11 20H10C9.44772 20 9 20.4477 9 21C9 21.5523 9.44772 22 10 22H11C16.5228 22 21 17.5228 21 12V10C21 9.44772 20.5523 9 20 9C19.4477 9 19 9.44772 19 10Z"/>
+            </svg>
+            <span>Mute</span>
+          </button>
+          
+          <button class="control-btn" id="video-btn" onclick="toggleVideo()" title="Start/Stop Video">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23 7L16 12L23 17V7Z"/>
+              <path d="M3 5C1.89543 5 1 5.89543 1 7V17C1 18.1046 1.89543 19 3 19H13C14.1046 19 15 18.1046 15 17V7C15 5.89543 14.1046 5 13 5H3Z"/>
+            </svg>
+            <span>Video</span>
+          </button>
+        </div>
+        
+        <div class="controls-center">
+          <div class="call-timer" id="call-timer">00:00:00</div>
+          <div class="participant-count">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"/>
+              <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z"/>
+            </svg>
+            2 participants
+          </div>
+        </div>
+        
+        <div class="controls-right">
+          <button class="control-btn" id="share-btn" onclick="shareScreen()" title="Share Screen">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18 8H20C21.1046 8 22 8.89543 22 10V20C22 21.1046 21.1046 22 20 22H4C2.89543 22 2 21.1046 2 20V10C2 8.89543 2.89543 8 4 8H6V6C6 3.79086 7.79086 2 10 2H14C16.2091 2 18 3.79086 18 6V8Z"/>
+              <path d="M12 5L8 9H11V13H13V9H16L12 5Z"/>
+            </svg>
+            <span>Share</span>
+          </button>
+          
+          <button class="control-btn" id="chat-btn" onclick="toggleChat()" title="Chat">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM6 9H18V11H6V9ZM14 14H6V12H14V14ZM18 8H6V6H18V8Z"/>
+            </svg>
+            <span>Chat</span>
+          </button>
+          
+          <button class="control-btn" id="settings-btn" onclick="openSettings()" title="Settings">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19.14,12.94C19.18,12.64 19.2,12.33 19.2,12C19.2,11.68 19.18,11.36 19.13,11.06L21.16,9.48C21.34,9.34 21.39,9.07 21.28,8.87L19.36,5.55C19.24,5.33 18.99,5.26 18.77,5.33L16.38,6.29C15.93,5.93 15.45,5.64 14.92,5.43L14.5,2.89C14.46,2.65 14.25,2.47 14,2.47H10.03C9.78,2.47 9.57,2.65 9.53,2.89L9.11,5.43C8.58,5.64 8.1,5.93 7.65,6.29L5.26,5.33C5.04,5.26 4.79,5.33 4.67,5.55L2.74,8.87C2.62,9.08 2.66,9.34 2.86,9.48L4.89,11.06C4.84,11.36 4.8,11.69 4.8,12C4.8,12.31 4.82,12.64 4.87,12.94L2.84,14.52C2.66,14.66 2.61,14.93 2.72,15.13L4.64,18.45C4.76,18.67 5.01,18.74 5.23,18.67L7.62,17.71C8.07,18.07 8.55,18.36 9.08,18.57L9.5,21.11C9.54,21.35 9.75,21.53 10,21.53H13.97C14.22,21.53 14.43,21.35 14.47,21.11L14.89,18.57C15.42,18.36 15.9,18.07 16.35,17.71L18.74,18.67C18.96,18.74 19.21,18.67 19.33,18.45L21.26,15.13C21.37,14.91 21.32,14.66 21.12,14.52L19.14,12.94ZM12,15.6C10.02,15.6 8.4,13.98 8.4,12C8.4,10.02 10.02,8.4 12,8.4C13.98,8.4 15.6,10.02 15.6,12C15.6,13.98 13.98,15.6 12,15.6Z"/>
+            </svg>
+            <span>Settings</span>
+          </button>
+          
+          <button class="control-btn danger" id="end-call-btn" onclick="endCall()" title="End Call">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6.62,10.79C8.06,13.62 10.38,15.94 13.21,17.38L15.41,15.18C15.68,14.91 16.08,14.82 16.43,14.93C17.55,15.3 18.75,15.5 20,15.5C20.55,15.5 21,15.95 21,16.5V20C21,20.55 20.55,21 20,21C10.61,21 3,13.39 3,4C3,3.45 3.45,3 4,3H7.5C8.05,3 8.5,3.45 8.5,4C8.5,5.25 8.7,6.45 9.07,7.57C9.18,7.92 9.09,8.32 8.82,8.59L6.62,10.79Z"/>
+              <path d="M19 10L21 8L19 6" stroke="currentColor" stroke-width="2" fill="none"/>
+            </svg>
+            <span>End Call</span>
+          </button>
+        </div>
+      </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../scripts/auth.js"></script>
+  <script type="module" src="../scripts/index.js"></script>
+</body>
+</html>

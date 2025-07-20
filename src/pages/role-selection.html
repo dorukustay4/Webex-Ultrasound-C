@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ultrasound Webex - Role Selection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/style.css">
+  <link rel="stylesheet" href="../styles/role-selection-style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo" style="margin-left: 5rem;">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="16" fill="url(#gradient)"/>
+          <path d="M12 10L20 16L12 22V10Z" fill="white"/>
+          <defs>
+            <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#3b82f6"/>
+              <stop offset="1" stop-color="#10b981"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <h1 class="gradient-text">Ultrasound Webex</h1>
+      </div>
+    </header>
+
+    <main class="main-content role-selection-main">
+      <!-- Navigation link to home -->
+      <a href="home.html" class="nav-link" style="position: absolute; top: 1rem; left: 1rem; color: #3b82f6; text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; z-index: 1000;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 2L3 7V18C3 18.5523 3.44772 19 4 19H7V14H13V19H16C16.5523 19 17 18.5523 17 18V7L10 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Home
+      </a>
+
+      <div class="role-selection-container">
+        <div class="selection-header">
+          <h1>Select Your Role</h1>
+          <p>Choose your role to join the ultrasound consultation</p>
+          <div class="call-info">
+            <span class="call-id">Call ID: <strong id="display-call-id">Loading...</strong></span>
+            <span class="participants-status" id="participants-status">Checking availability...</span>
+          </div>
+        </div>
+
+        <div class="roles-grid">
+          <!-- Local Doctor Role -->
+          <div class="role-card" id="local-doctor-card" data-role="local-doctor">
+            <div class="role-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L18 7C17.5 7 17 7.2 16.6 7.6L15 9.2V11.8L16.6 13.4C17 13.8 17.5 14 18 14L21 14V12H19L17.8 10.8L19 9.6L21 9ZM10.5 7.5C10.1 7.1 9.6 6.9 9.1 6.9H4.9C4.4 6.9 3.9 7.1 3.5 7.5S2.9 8.4 2.9 8.9V10.1C2.9 10.6 3.1 11.1 3.5 11.5L5.1 13.1C5.3 13.3 5.6 13.4 5.9 13.4S6.5 13.3 6.7 13.1C6.9 12.9 7 12.6 7 12.3S6.9 11.7 6.7 11.5L5.9 10.7L5.1 9.9L5.9 9.1H8.1L8.9 9.9L8.1 10.7L7.3 11.5C7.1 11.7 7 12 7 12.3S7.1 12.9 7.3 13.1C7.5 13.3 7.8 13.4 8.1 13.4S8.7 13.3 8.9 13.1L10.5 11.5C10.9 11.1 11.1 10.6 11.1 10.1V8.9C11.1 8.4 10.9 7.9 10.5 7.5Z"/>
+                <path d="M12 7.5C11.2 7.5 10.5 8.2 10.5 9S11.2 10.5 12 10.5 13.5 9.8 13.5 9 12.8 7.5 12 7.5ZM12 22C6.5 22 2 17.5 2 12S6.5 2 12 2 22 6.5 22 12 17.5 22 12 22Z"/>
+              </svg>
+            </div>
+            <div class="role-content">
+              <h3>Local Doctor</h3>
+              <p>Conduct the examination with patient present in the local room</p>
+              <div class="role-features">
+                <span class="feature">🏥 On-site examination</span>
+                <span class="feature">👨‍⚕️ Patient interaction</span>
+                <span class="feature">🔊 Ultrasound operation</span>
+              </div>
+            </div>
+            <div class="role-status">
+              <span class="status-badge available" id="local-doctor-status">Available</span>
+            </div>
+            <div class="role-overlay" id="local-doctor-overlay" style="display: none;">
+              <div class="overlay-content">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                <span>Role Taken</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Remote Expert Role -->
+          <div class="role-card" id="remote-expert-card" data-role="remote-expert">
+            <div class="role-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2zM9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6z"/>
+              </svg>
+            </div>
+            <div class="role-content">
+              <h3>Remote Expert</h3>
+              <p>Provide specialized guidance and expertise remotely</p>
+              <div class="role-features">
+                <span class="feature">🔬 Expert consultation</span>
+                <span class="feature">📋 Clinical guidance</span>
+                <span class="feature">✍️ Annotation tools</span>
+              </div>
+            </div>
+            <div class="role-status">
+              <span class="status-badge available" id="remote-expert-status">Available</span>
+            </div>
+            <div class="role-overlay" id="remote-expert-overlay" style="display: none;">
+              <div class="overlay-content">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                <span>Role Taken</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="selection-actions">
+          <button class="cancel-btn" onclick="goBack()">Cancel</button>
+          <button class="join-btn" id="join-btn" disabled onclick="joinWithRole()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+            Join Call
+          </button>
+        </div>
+
+        <div class="loading-overlay" id="loading-overlay" style="display: none;">
+          <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Joining call...</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../scripts/role-selection.js"></script>
+</body>
+</html>

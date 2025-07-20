@@ -5,7 +5,27 @@ console.log('Auth.js loaded successfully!');
 const WEBEX_CONFIG = {
   // Replace these with your actual Webex Integration credentials
   clientId: 'C97348067c381458de8ac4de0f6fb00227f607050d698c5161dabbb1e0ee579f8', // Get this from developer.webex.com/my-apps
-  redirectUri: window.location.origin + '/auth-callback.html', // Must be registered in your integration
+  
+  // Dynamic redirect URI based on environment
+  get redirectUri() {
+    // For development environments, use localhost with appropriate port
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      // Common development ports
+      if (window.location.port === '3000') {
+        return 'http://localhost:3000/auth-callback.html'; // Vite/React dev server
+      } else if (window.location.port === '5173') {
+        return 'http://localhost:5173/auth-callback.html'; // Vite default port
+      } else if (window.location.port === '5500') {
+        return 'http://127.0.0.1:5500/auth-callback.html'; // Live Server
+      } else {
+        return `${window.location.origin}/auth-callback.html`; // Dynamic for other ports
+      }
+    }
+    
+    // For production or other environments
+    return `${window.location.origin}/auth-callback.html`;
+  },
+  
   scope: 'spark:messages_read spark:messages_write spark:rooms_read spark:people_read meeting:schedules_read meeting:schedules_write',
   
   // OAuth endpoints
@@ -104,7 +124,7 @@ window.continueAsGuest = function() {
   localStorage.removeItem('webex_user_info');
   
   // Redirect to main app
-  window.location.href = 'index.html';
+  window.location.href = 'home.html';
 };
 
 // Exchange authorization code for access token
@@ -213,7 +233,7 @@ window.handleOAuthCallback = async function() {
     console.log('Authentication successful!', userInfo);
     
     // Redirect to main app
-    window.location.href = 'index.html';
+    window.location.href = 'home.html';
     
   } catch (error) {
     console.error('Failed to get user info:', error);
@@ -293,4 +313,4 @@ window.makeWebexAPICall = async function(endpoint, options = {}) {
   return await response.json();
 };
 
-console.log('Auth.js configuration loaded. Please set your Webex Client ID in WEBEX_CONFIG.');
+console.log('Auth.js configuration loaded. Please set your Webex Client ID in WEBEX_CONFIG for Ultrasound Webex.');
