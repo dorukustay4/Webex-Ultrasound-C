@@ -1,5 +1,12 @@
-// Enhanced Ultrasound Webex Annotator with REAL Webex SDK
-import { initializeWebexSDK, webexMeetings, isWebexInitialized, createGlobalWebexObject } from './webex-sdk.js';
+// Enhanced Ultrasound Webex Annotator with BROWSER-COMPATIBLE Webex SDK
+import { 
+  initializeWebexSDK, 
+  webexMeetings, 
+  isWebexInitialized, 
+  createGlobalWebexObject,
+  getScreenShareStream,
+  startQualityMonitoring 
+} from './webex-sdk-browser.js';
 
 console.log('JavaScript file loaded successfully!');
 
@@ -28,10 +35,22 @@ let webex = null;
 async function setupWebexSDK() {
   try {
     console.log('🔧 Setting up Webex SDK...');
+    
+    // Check if we have an access token
+    const accessToken = localStorage.getItem('webex_access_token');
+    if (!accessToken) {
+      console.log('⚠️ No access token found. User needs to authenticate first.');
+      return false;
+    }
+    
     await initializeWebexSDK();
     
     // Create global webex object for backward compatibility with existing code
     webex = createGlobalWebexObject();
+    
+    // Load available devices
+    availableDevices = await webex.getDevices();
+    console.log('🎥 Available devices:', availableDevices);
     
     console.log('✅ Webex SDK setup complete');
     return true;
@@ -241,8 +260,6 @@ window.joinCreatedMeeting = async function () {
   }
   
   const joinCreatedBtn = document.querySelector('.join-created-btn');
-  const videoElement = document.getElementById('remote-video');
-  const placeholder = document.querySelector('.video-placeholder');
   
   if (!joinCreatedBtn) {
     console.error('Join created button not found!');
@@ -256,40 +273,37 @@ window.joinCreatedMeeting = async function () {
   try {
     console.log('Joining created meeting:', createdMeetingInfo);
     
-    // Use real SDK to join meeting
-    const meeting = await webex.meetings.join(createdMeetingInfo.sipUri);
+    // Use enhanced SDK to join meeting with full media setup
+    const meeting = await webex.meetings.join(createdMeetingInfo.sipUri, {
+      sendAudio: true,
+      sendVideo: true,
+      receiveAudio: true,
+      receiveVideo: true
+    });
+    
     currentMeeting = meeting;
-
-    // Display remote media
-    if (meeting.on) {
-      meeting.on('media:ready', (media) => {
-        console.log('Media ready:', media);
-        if (media.type === 'remoteVideo' && videoElement) {
-          videoElement.style.background = 'linear-gradient(45deg, #48bb78, #38a169)';
-          videoElement.classList.add('active');
-        }
-        if (placeholder) {
-          placeholder.classList.add('hidden');
-        }
-      });
-    }
-
+    
+    // Start quality monitoring
+    startQualityMonitoring(meeting);
+    
     // Update button state
     joinCreatedBtn.innerHTML = `
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" fill="currentColor"/>
       </svg>
-      Joined Meeting
+      Connected to Meeting
     `;
     joinCreatedBtn.classList.remove('loading');
     
-    // Update participant count
-    updateParticipantCount(1);
+    console.log('✅ Successfully joined and connected to meeting');
     
   } catch (error) {
     console.error('Failed to join created meeting:', error);
     resetJoinCreatedButton();
-    alert('Failed to join the created meeting. Please try again.');
+    
+    // Show more specific error message
+    const errorMsg = error.message || 'Failed to join the meeting';
+    alert(`Failed to join meeting: ${errorMsg}\n\nPlease check:\n- Your internet connection\n- Meeting ID is correct\n- You have camera/microphone permissions`);
   }
 };
 
@@ -498,5 +512,148 @@ function initializeApp() {
   
   console.log('App initialization complete');
 }
+
+// Media Control Functions
+window.toggleAudio = async function() {
+  if (!currentMeeting || !webex) return;
+  
+  try {
+    const isUnmuted = await webex.meetings.toggleAudio();
+    isAudioEnabled = isUnmuted;
+    
+    // Update UI button state
+    const audioBtn = document.querySelector('.control-btn[data-action="audio"]');
+    if (audioBtn) {
+      audioBtn.classList.toggle('muted', !isUnmuted);
+      audioBtn.querySelector('span').textContent = isUnmuted ? 'Mute' : 'Unmute';
+    }
+    
+    console.log(`🔊 Audio ${isUnmuted ? 'unmuted' : 'muted'}`);
+    return isUnmuted;
+    
+  } catch (error) {
+    console.error('❌ Failed to toggle audio:', error);
+  }
+};
+
+window.toggleVideo = async function() {
+  if (!currentMeeting || !webex) return;
+  
+  try {
+    const isUnmuted = await webex.meetings.toggleVideo();
+    isVideoEnabled = isUnmuted;
+    
+    // Update UI button state
+    const videoBtn = document.querySelector('.control-btn[data-action="video"]');
+    if (videoBtn) {
+      videoBtn.classList.toggle('video-off', !isUnmuted);
+      videoBtn.querySelector('span').textContent = isUnmuted ? 'Stop Video' : 'Start Video';
+    }
+    
+    console.log(`📹 Video ${isUnmuted ? 'unmuted' : 'muted'}`);
+    return isUnmuted;
+    
+  } catch (error) {
+    console.error('❌ Failed to toggle video:', error);
+  }
+};
+
+window.toggleScreenShare = async function() {
+  if (!currentMeeting) return;
+  
+  try {
+    if (!isScreenSharing) {
+      // Start screen sharing
+      const screenStream = await getScreenShareStream();
+      
+      // Replace video track with screen share
+      if (currentMeeting.shareScreen) {
+        await currentMeeting.shareScreen(screenStream);
+      }
+      
+      isScreenSharing = true;
+      console.log('🖥️ Screen sharing started');
+      
+    } else {
+      // Stop screen sharing
+      if (currentMeeting.stopScreenShare) {
+        await currentMeeting.stopScreenShare();
+      }
+      
+      isScreenSharing = false;
+      console.log('🖥️ Screen sharing stopped');
+    }
+    
+    // Update UI button state
+    const shareBtn = document.querySelector('.control-btn[data-action="share"]');
+    if (shareBtn) {
+      shareBtn.classList.toggle('active', isScreenSharing);
+      shareBtn.querySelector('span').textContent = isScreenSharing ? 'Stop Share' : 'Share Screen';
+    }
+    
+    return isScreenSharing;
+    
+  } catch (error) {
+    console.error('❌ Failed to toggle screen share:', error);
+  }
+};
+
+window.leaveMeeting = async function() {
+  if (!currentMeeting || !webex) return;
+  
+  try {
+    await webex.meetings.leave();
+    
+    // Reset state
+    currentMeeting = null;
+    isVideoEnabled = true;
+    isAudioEnabled = true;
+    isScreenSharing = false;
+    
+    console.log('👋 Left meeting successfully');
+    
+  } catch (error) {
+    console.error('❌ Failed to leave meeting:', error);
+  }
+};
+
+// Device Management Functions
+window.switchCamera = async function(deviceId) {
+  if (!webex) return;
+  
+  try {
+    await webex.switchCamera(deviceId);
+    console.log('📹 Camera switched successfully');
+  } catch (error) {
+    console.error('❌ Failed to switch camera:', error);
+  }
+};
+
+window.switchMicrophone = async function(deviceId) {
+  if (!webex) return;
+  
+  try {
+    await webex.switchMicrophone(deviceId);
+    console.log('🎤 Microphone switched successfully');
+  } catch (error) {
+    console.error('❌ Failed to switch microphone:', error);
+  }
+};
+
+// Global functions for UI callbacks
+window.updateMeetingState = function(state) {
+  console.log('📊 Meeting state updated:', state);
+  // Update UI based on meeting state
+};
+
+window.updateNetworkQuality = function(quality) {
+  console.log('📶 Network quality:', quality);
+  // Update network quality indicator in UI
+};
+
+window.showMeetingError = function(message) {
+  console.error('❌ Meeting error:', message);
+  alert(`Meeting Error: ${message}`);
+};
 
 console.log('All functions defined successfully!');

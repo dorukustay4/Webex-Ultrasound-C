@@ -12,18 +12,18 @@ const WEBEX_CONFIG = {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       // Common development ports
       if (window.location.port === '3000') {
-        return 'http://localhost:3000/auth-callback.html'; // Vite/React dev server
+        return 'http://localhost:3000/src/pages/auth-callback.html'; // Vite/React dev server
       } else if (window.location.port === '5173') {
-        return 'http://localhost:5173/auth-callback.html'; // Vite default port
+        return 'http://localhost:5173/src/pages/auth-callback.html'; // Vite default port
       } else if (window.location.port === '5500') {
-        return 'http://127.0.0.1:5500/auth-callback.html'; // Live Server
+        return 'http://127.0.0.1:5500/src/pages/auth-callback.html'; // Live Server
       } else {
-        return `${window.location.origin}/auth-callback.html`; // Dynamic for other ports
+        return `${window.location.origin}/src/pages/auth-callback.html`; // Dynamic for other ports
       }
     }
     
     // For production or other environments
-    return `${window.location.origin}/auth-callback.html`;
+    return `${window.location.origin}/src/pages/auth-callback.html`;
   },
   
   scope: 'spark:messages_read spark:messages_write spark:rooms_read spark:people_read meeting:schedules_read meeting:schedules_write',
@@ -81,6 +81,10 @@ window.loginWithWebex = async function() {
     // Store state in localStorage for later verification
     localStorage.setItem('webex_state', state);
     
+    // Debug: Log the redirect URI being used
+    console.log('Redirect URI being used:', WEBEX_CONFIG.redirectUri);
+    console.log('Current location:', window.location.href);
+    
     // Build authorization URL (using implicit flow for browser-only apps)
     const authParams = new URLSearchParams({
       response_type: 'token',  // Changed from 'code' to 'token'
@@ -93,7 +97,7 @@ window.loginWithWebex = async function() {
     
     const authUrl = `${WEBEX_CONFIG.authUrl}?${authParams.toString()}`;
     
-    console.log('Redirecting to:', authUrl);
+    console.log('Full auth URL:', authUrl);
     
     // Redirect to Webex OAuth page
     window.location.href = authUrl;
