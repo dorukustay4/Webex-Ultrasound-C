@@ -153,3 +153,29 @@ logs
 # Temporary files
 *.tmp
 *.temp
+
+# Demo and Development files
+**/demo-setup.js
+**/demo-auth-override.js
+**/emergency-demo-redirect.js
+**/smart-demo-mode.js
+**/auth-mode-switcher.js
+**/csrf-state-fix.js
+**/simple-real-auth-fix.js
+**/ultra-simple-real-auth.js
+**/mock-*.js
+**/*-demo.js
+**/*-test.js
+**/webex-dev-helper.js
+
+# Webex credentials (security)
+**/*credentials*.js
+**/*config*.js
+!**/webex-config.example.js
+
+# Meeting recordings and temp files
+recordings/
+temp-recordings/
+*.mp4
+*.webm
+*.mkv

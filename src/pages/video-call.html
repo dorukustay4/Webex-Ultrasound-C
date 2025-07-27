@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Call - Ultrasound Webex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .video-call-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: relative;
+    }
+
+    /* 4-Window Video Layout */
+    .video-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 4px;
+      flex: 1;
+      padding: 4px;
+      background: #0a0a0a;
+    }
+
+    .video-window {
+      background: #1a1a1a;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .video-window:hover {
+      border-color: rgba(59, 130, 246, 0.5);
+    }
+
+    .video-window.active {
+      border-color: #3b82f6;
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+
+    .video-element {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #000;
+    }
+
+    .video-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+      padding: 1rem;
+      color: white;
+    }
+
+    .participant-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .participant-status {
+      font-size: 0.8rem;
+      opacity: 0.8;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+    }
+
+    .status-indicator.muted {
+      background: #ef4444;
+    }
+
+    /* Specialized window styles */
+    .expert-video {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .resident-video {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .ultrasound-feed {
+      grid-column: 1;
+      grid-row: 2;
+      border-color: rgba(16, 185, 129, 0.5);
+    }
+
+    .ultrasound-feed:hover {
+      border-color: #10b981;
+    }
+
+    .annotation-window {
+      grid-column: 2;
+      grid-row: 2;
+      border-color: rgba(245, 158, 11, 0.5);
+    }
+
+    .annotation-window:hover {
+      border-color: #f59e0b;
+    }
+
+    /* Control Bar */
+    .control-bar {
+      background: rgba(20, 20, 20, 0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .control-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+
+    .control-btn.active {
+      background: #3b82f6;
+      border-color: #3b82f6;
+    }
+
+    .control-btn.danger {
+      background: #ef4444;
+      border-color: #ef4444;
+    }
+
+    .control-btn.danger:hover {
+      background: #dc2626;
+    }
+
+    .meeting-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .meeting-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .meeting-duration {
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
+    /* Loading and Error States */
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #94a3b8;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(59, 130, 246, 0.2);
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #ef4444;
+      text-align: center;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .video-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(4, 1fr);
+      }
+      
+      .expert-video { grid-column: 1; grid-row: 1; }
+      .resident-video { grid-column: 1; grid-row: 2; }
+      .ultrasound-feed { grid-column: 1; grid-row: 3; }
+      .annotation-window { grid-column: 1; grid-row: 4; }
+    }
+
+    /* Annotation Canvas Overlay */
+    .annotation-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: auto;
+      z-index: 10;
+    }
+
+    .window-label {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      z-index: 20;
+    }
+  </style>
+</head>
+<body>
+  <div class="video-call-container">
+    <!-- 4-Window Video Grid -->
+    <div class="video-grid">
+      <!-- Expert Supervisor Video -->
+      <div class="video-window expert-video" id="expert-video">
+        <div class="window-label">Expert Supervisor</div>
+        <video class="video-element" id="expert-video-element" autoplay muted></video>
+        <div class="loading-state" id="expert-loading">
+          <div class="loading-spinner"></div>
+          <p>Waiting for expert supervisor...</p>
+        </div>
+        <div class="video-overlay">
+          <div class="participant-name" id="expert-name">Expert Supervisor</div>
+          <div class="participant-status">
+            <div class="status-indicator" id="expert-status"></div>
+            <span id="expert-status-text">Connecting...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resident Doctor Video -->
+      <div class="video-window resident-video" id="resident-video">
+        <div class="window-label">Resident Doctor</div>
+        <video class="video-element" id="resident-video-element" autoplay muted></video>
+        <div class="loading-state" id="resident-loading">
+          <div class="loading-spinner"></div>
+          <p>Waiting for resident doctor...</p>
+        </div>
+        <div class="video-overlay">
+          <div class="participant-name" id="resident-name">Resident Doctor</div>
+          <div class="participant-status">
+            <div class="status-indicator" id="resident-status"></div>
+            <span id="resident-status-text">Connecting...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ultrasound Feed -->
+      <div class="video-window ultrasound-feed" id="ultrasound-feed">
+        <div class="window-label">Ultrasound Feed</div>
+        <video class="video-element" id="ultrasound-video-element" autoplay muted></video>
+        <div class="loading-state" id="ultrasound-loading">
+          <div class="loading-spinner"></div>
+          <p>Waiting for ultrasound feed...</p>
+        </div>
+        <div class="video-overlay">
+          <div class="participant-name">Ultrasound Device</div>
+          <div class="participant-status">
+            <div class="status-indicator" id="ultrasound-status"></div>
+            <span id="ultrasound-status-text">Screen share inactive</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Annotation Window -->
+      <div class="video-window annotation-window" id="annotation-window">
+        <div class="window-label">Annotation & Analysis</div>
+        <canvas class="annotation-canvas" id="annotation-canvas"></canvas>
+        <div class="loading-state" id="annotation-loading">
+          <div class="loading-spinner"></div>
+          <p>Loading annotation tools...</p>
+        </div>
+        <div class="video-overlay">
+          <div class="participant-name">Nerve Annotation</div>
+          <div class="participant-status">
+            <div class="status-indicator"></div>
+            <span>Ready for annotation</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Control Bar -->
+    <div class="control-bar">
+      <div class="control-group">
+        <button class="control-btn" id="mic-btn" title="Toggle Microphone">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 12C11.1046 12 12 11.1046 12 10V4C12 2.89543 11.1046 2 10 2C8.89543 2 8 2.89543 8 4V10C8 11.1046 8.89543 12 10 12Z" fill="currentColor"/>
+            <path d="M6 10C6 10.5523 5.55228 11 5 11C4.44772 11 4 10.5523 4 10C4 7.79086 5.79086 6 8 6H12C14.2091 6 16 7.79086 16 10C16 10.5523 15.5523 11 15 11C14.4477 11 14 10.5523 14 10C14 8.89543 13.1046 8 12 8H8C6.89543 8 6 8.89543 6 10Z" fill="currentColor"/>
+            <path d="M10 14C10.5523 14 11 14.4477 11 15V16C11 16.5523 10.5523 17 10 17C9.44772 17 9 16.5523 9 15V14C9 13.4477 9.44772 13 10 13C10.5523 13 11 13.4477 11 14V15" fill="currentColor"/>
+          </svg>
+        </button>
+        
+        <button class="control-btn" id="camera-btn" title="Toggle Camera">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 6C2 4.89543 2.89543 4 4 4H12C13.1046 4 14 4.89543 14 6V14C14 15.1046 13.1046 16 12 16H4C2.89543 16 2 15.1046 2 14V6Z" fill="currentColor"/>
+            <path d="M14 7L18 4V16L14 13V7Z" fill="currentColor"/>
+          </svg>
+        </button>
+        
+        <button class="control-btn" id="share-btn" title="Share Ultrasound Screen">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 4C2 2.89543 2.89543 2 4 2H16C17.1046 2 18 2.89543 18 4V12C18 13.1046 17.1046 14 16 14H4C2.89543 14 2 13.1046 2 12V4Z" stroke="currentColor" stroke-width="2"/>
+            <path d="M8 18H12M10 14V18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="meeting-info">
+        <div class="meeting-title" id="meeting-title">Ultrasound Telemedicine Session</div>
+        <div class="meeting-duration" id="meeting-duration">00:00</div>
+      </div>
+
+      <div class="control-group">
+        <button class="control-btn" id="participants-btn" title="Participants">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 12L11 12C12.6569 12 14 10.6569 14 9C14 7.34315 12.6569 6 11 6L9 6C7.34315 6 6 7.34315 6 9C6 10.6569 7.34315 12 9 12Z" fill="currentColor"/>
+            <path d="M3 18C3 15.7909 4.79086 14 7 14H13C15.2091 14 17 15.7909 17 18H3Z" fill="currentColor"/>
+          </svg>
+          <span id="participant-count">2</span>
+        </button>
+        
+        <button class="control-btn" id="settings-btn" title="Settings">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 12C11.1046 12 12 11.1046 12 10C12 8.89543 11.1046 8 10 8C8.89543 8 8 8.89543 8 10C8 11.1046 8.89543 12 10 12Z" fill="currentColor"/>
+            <path d="M17.6177 8.87988L16.9999 8.5L17.6177 8.12012C17.9711 7.92037 18.1616 7.52983 18.0933 7.13137L17.6177 4.87988C17.5494 4.48142 17.2406 4.17258 16.8421 4.10425L14.5906 3.62861C14.1921 3.56028 13.8016 3.75078 13.6018 4.10425L13.2219 4.72207C12.8685 5.07553 12.2315 5.07553 11.8781 4.72207L11.4982 4.10425C11.2984 3.75078 10.9079 3.56028 10.5094 3.62861L8.25787 4.10425C7.85941 4.17258 7.55057 4.48142 7.48224 4.87988L7.00659 7.13137C6.93826 7.52983 7.12876 7.92037 7.48224 8.12012L8.10006 8.5L7.48224 8.87988C7.12876 9.07963 6.93826 9.47017 7.00659 9.86863L7.48224 12.1201C7.55057 12.5186 7.85941 12.8274 8.25787 12.8958L10.5094 13.3714C10.9079 13.4397 11.2984 13.2492 11.4982 12.8958L11.8781 12.2779C12.2315 11.9245 12.8685 11.9245 13.2219 12.2779L13.6018 12.8958C13.8016 13.2492 14.1921 13.4397 14.5906 13.3714L16.8421 12.8958C17.2406 12.8274 17.5494 12.5186 17.6177 12.1201L18.0933 9.86863C18.1616 9.47017 17.9711 9.07963 17.6177 8.87988Z" fill="currentColor"/>
+          </svg>
+        </button>
+        
+        <button class="control-btn danger" id="leave-btn" title="Leave Meeting">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 3L17 17M3 17L17 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Webex SDK First -->
+  <script src="https://unpkg.com/webex@^2.60.0/umd/webex.min.js"></script>
+  
+  <!-- Load our modules in order -->
+  <script src="../js/webex-manager.js"></script>
+  <script src="../js/simple-auth.js"></script>
+  <script>
+    let webexManager = null;
+    let meetingDuration = 0;
+    let durationInterval = null;
+
+    // Initialize video call interface
+    async function initializeVideoCall() {
+      try {
+        console.log('🎥 Initializing video call interface...');
+        
+        // Parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const meetingId = urlParams.get('meetingId');
+        const enableVideo = urlParams.get('enableVideo') === 'true';
+        const urlUserRole = urlParams.get('userRole');
+        
+        // Check stored meeting data
+        const storedMeetingData = localStorage.getItem('meetingData');
+        const enableVideoOnJoin = localStorage.getItem('enableVideoOnJoin') === 'true';
+        const storedUserRole = localStorage.getItem('meetingUserRole');
+        
+        // Get user's role (priority: URL -> stored -> profile -> default)
+        const userRole = urlUserRole || storedUserRole || (getUserRole ? getUserRole() : 'expert');
+        const userRoleDisplay = userRole === 'expert' ? 'Expert Supervisor' : 'Resident Doctor';
+        
+        console.log('📋 Meeting parameters:', {
+          meetingId,
+          enableVideo: enableVideo || enableVideoOnJoin,
+          userRole,
+          userRoleDisplay,
+          storedData: storedMeetingData ? JSON.parse(storedMeetingData) : null
+        });
+        
+        // Debug: Check what's available
+        console.log('🔍 Debug info:');
+        console.log('- Webex SDK loaded:', typeof Webex !== 'undefined');
+        console.log('- WebexManager loaded:', typeof WebexManager !== 'undefined');
+        console.log('- initializeWebex available:', typeof initializeWebex !== 'undefined');
+        console.log('- isAuthenticated available:', typeof isAuthenticated !== 'undefined');
+        
+        // Check authentication
+        if (typeof isAuthenticated === 'undefined') {
+          throw new Error('Authentication functions not loaded');
+        }
+        
+        if (!isAuthenticated()) {
+          console.log('🚫 User not authenticated, redirecting to login...');
+          window.location.href = 'login-clean.html';
+          return;
+        }
+
+        // Initialize Webex
+        console.log('📡 Initializing Webex...');
+        webexManager = await initializeWebex();
+        console.log('✅ Webex initialized:', webexManager);
+        
+        // Update meeting info if available
+        if (meetingId) {
+          const meetingIdElement = document.getElementById('meeting-id');
+          if (meetingIdElement) {
+            meetingIdElement.textContent = meetingId;
+          }
+        }
+        
+        // Update meeting info with role
+        const meetingInfoElement = document.querySelector('.meeting-info h4');
+        if (meetingInfoElement && userRoleDisplay) {
+          meetingInfoElement.textContent = `Meeting Information - ${userRoleDisplay}`;
+        }
+        
+        // Auto-enable video if requested or based on role
+        const shouldEnableVideo = enableVideo || enableVideoOnJoin || (userRole === 'expert');
+        
+        if (shouldEnableVideo) {
+          console.log(`📹 Auto-enabling video for ${userRoleDisplay}...`);
+          setTimeout(async () => {
+            try {
+              if (webexManager && webexManager.toggleVideo) {
+                const videoEnabled = await webexManager.toggleVideo();
+                console.log('✅ Video auto-enabled successfully:', videoEnabled);
+                
+                // Show notification with role context
+                const message = userRole === 'expert' ? 
+                  'Video enabled automatically for Expert Supervisor' :
+                  'Video enabled as requested';
+                showVideoNotification(message);
+              } else {
+                console.warn('⚠️ WebexManager not available for video toggle');
+                showVideoNotification('Video toggle not available in demo mode', 'error');
+              }
+            } catch (error) {
+              console.error('❌ Failed to auto-enable video:', error);
+              showVideoNotification(`Failed to enable video: ${error.message}`, 'error');
+            }
+          }, 2000); // Wait 2 seconds for everything to initialize
+        }
+        
+        // Set up event listeners
+        setupEventListeners();
+        
+        // Clear stored flags
+        localStorage.removeItem('enableVideoOnJoin');
+        localStorage.removeItem('meetingUserRole');
+        
+        console.log('✅ Video call interface ready');
+      } catch (error) {
+        console.error('❌ Failed to initialize video call:', error);
+        console.error('❌ Error details:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        });
+        showError(`Failed to initialize video call system: ${error.message}`);
+      }
+    }
+
+    // Set up UI event listeners
+    function setupEventListeners() {
+      // Control buttons - add null checks
+      const micBtn = document.getElementById('mic-btn');
+      const cameraBtn = document.getElementById('camera-btn');
+      const shareBtn = document.getElementById('share-btn');
+      const leaveBtn = document.getElementById('leave-btn');
+      
+      if (micBtn) micBtn.addEventListener('click', toggleMicrophone);
+      if (cameraBtn) cameraBtn.addEventListener('click', toggleCamera);
+      if (shareBtn) shareBtn.addEventListener('click', toggleScreenShare);
+      if (leaveBtn) leaveBtn.addEventListener('click', leaveMeeting);
+
+      // Webex events
+      window.addEventListener('webex:localVideoReady', handleLocalVideo);
+      window.addEventListener('webex:remoteVideoAdded', handleRemoteVideo);
+      window.addEventListener('webex:membersUpdated', handleMembersUpdate);
+    }
+
+    // Handle local video stream
+    function handleLocalVideo(event) {
+      const { stream } = event.detail;
+      const videoElement = document.getElementById('resident-video-element');
+      
+      if (videoElement) {
+        videoElement.srcObject = stream;
+      }
+      
+      hideLoading('resident-loading');
+      updateParticipantStatus('resident', 'Connected', true);
+    }
+
+    // Handle remote video streams
+    function handleRemoteVideo(event) {
+      const { stream, member, type } = event.detail;
+      
+      // Assign to appropriate window based on member role or type
+      if (type === 'camera') {
+        const videoElement = document.getElementById('expert-video-element');
+        if (videoElement) {
+          videoElement.srcObject = stream;
+        }
+        hideLoading('expert-loading');
+        updateParticipantStatus('expert', member.displayName, true);
+      } else if (type === 'screen') {
+        const videoElement = document.getElementById('ultrasound-video-element');
+        if (videoElement) {
+          videoElement.srcObject = stream;
+        }
+        hideLoading('ultrasound-loading');
+        updateParticipantStatus('ultrasound', 'Screen sharing active', true);
+      }
+    }
+
+    // Handle members update
+    function handleMembersUpdate(event) {
+      const { members } = event.detail;
+      const participantCount = Object.keys(members).length;
+      
+      const participantCountElement = document.getElementById('participant-count');
+      if (participantCountElement) {
+        participantCountElement.textContent = participantCount;
+      }
+    }
+
+    // Toggle microphone
+    async function toggleMicrophone() {
+      if (!webexManager) return;
+      
+      try {
+        const isEnabled = await webexManager.toggleAudio();
+        const btn = document.getElementById('mic-btn');
+        
+        if (btn) {
+          if (isEnabled) {
+            btn.classList.remove('danger');
+            btn.title = 'Mute Microphone';
+          } else {
+            btn.classList.add('danger');
+            btn.title = 'Unmute Microphone';
+          }
+        }
+      } catch (error) {
+        console.error('Failed to toggle microphone:', error);
+      }
+    }
+
+    // Toggle camera
+    async function toggleCamera() {
+      if (!webexManager) return;
+      
+      try {
+        const isEnabled = await webexManager.toggleVideo();
+        const btn = document.getElementById('camera-btn');
+        
+        if (btn) {
+          if (isEnabled) {
+            btn.classList.remove('danger');
+            btn.title = 'Turn Off Camera';
+          } else {
+            btn.classList.add('danger');
+            btn.title = 'Turn On Camera';
+          }
+        }
+      } catch (error) {
+        console.error('Failed to toggle camera:', error);
+      }
+    }
+
+    // Toggle screen sharing
+    async function toggleScreenShare() {
+      if (!webexManager) return;
+      
+      try {
+        const btn = document.getElementById('share-btn');
+        
+        if (btn && btn.classList.contains('active')) {
+          await webexManager.stopScreenShare();
+          btn.classList.remove('active');
+          btn.title = 'Share Ultrasound Screen';
+          updateParticipantStatus('ultrasound', 'Screen share inactive', false);
+        } else {
+          await webexManager.startScreenShare();
+          if (btn) {
+            btn.classList.add('active');
+            btn.title = 'Stop Screen Share';
+          }
+          updateParticipantStatus('ultrasound', 'Screen sharing active', true);
+        }
+      } catch (error) {
+        console.error('Failed to toggle screen share:', error);
+      }
+    }
+
+    // Leave meeting
+    async function leaveMeeting() {
+      if (confirm('Are you sure you want to leave the meeting?')) {
+        try {
+          if (webexManager) {
+            await webexManager.leaveMeeting();
+          }
+          
+          // Stop duration timer
+          if (durationInterval) {
+            clearInterval(durationInterval);
+          }
+          
+          // Redirect to home
+          window.location.href = 'home-clean.html';
+        } catch (error) {
+          console.error('Failed to leave meeting:', error);
+        }
+      }
+    }
+
+    // Update participant status
+    function updateParticipantStatus(participant, statusText, isConnected) {
+      const statusElement = document.getElementById(`${participant}-status`);
+      const statusTextElement = document.getElementById(`${participant}-status-text`);
+      
+      if (statusElement) {
+        statusElement.classList.toggle('muted', !isConnected);
+      }
+      
+      if (statusTextElement) {
+        statusTextElement.textContent = statusText;
+      }
+    }
+
+    // Hide loading state
+    function hideLoading(loadingId) {
+      const loadingElement = document.getElementById(loadingId);
+      if (loadingElement) {
+        loadingElement.style.display = 'none';
+      }
+    }
+
+    // Show error message
+    function showError(message) {
+      // Create error overlay
+      const errorHtml = `
+        <div class="error-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2"/>
+            <line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <h3>Connection Error</h3>
+          <p>${message}</p>
+          <button onclick="window.location.reload()" style="
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: #3b82f6;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+          ">Retry</button>
+        </div>
+      `;
+      
+      document.querySelector('.video-grid').innerHTML = errorHtml;
+    }
+
+    // Show video notification
+    function showVideoNotification(message, type = 'success') {
+      const notification = document.createElement('div');
+      notification.className = `video-notification notification-${type}`;
+      notification.innerHTML = `
+        <div class="notification-content">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            ${type === 'error' ? 
+              '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="m12 17 .01 0"></path>' :
+              '<path d="M9 12l2 2 4-4"></path><circle cx="12" cy="12" r="10"></circle>'
+            }
+          </svg>
+          <span>${message}</span>
+        </div>
+      `;
+      
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: ${type === 'error' ? 'rgba(239, 68, 68, 0.95)' : 'rgba(16, 185, 129, 0.95)'};
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-weight: 500;
+        z-index: 2000;
+        animation: slideInDown 0.3s ease-out;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        border: 1px solid ${type === 'error' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(16, 185, 129, 0.3)'};
+      `;
+      
+      const style = document.createElement('style');
+      style.textContent = `
+        .notification-content {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        
+        @keyframes slideInDown {
+          from {
+            transform: translateX(-50%) translateY(-20px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes slideOutUp {
+          from {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+          }
+          to {
+            transform: translateX(-50%) translateY(-20px);
+            opacity: 0;
+          }
+        }
+      `;
+      
+      if (!document.querySelector('#video-notification-styles')) {
+        style.id = 'video-notification-styles';
+        document.head.appendChild(style);
+      }
+      
+      document.body.appendChild(notification);
+      
+      // Remove after 4 seconds
+      setTimeout(() => {
+        notification.style.animation = 'slideOutUp 0.3s ease-out';
+        setTimeout(() => {
+          if (document.body.contains(notification)) {
+            document.body.removeChild(notification);
+          }
+        }, 300);
+      }, 4000);
+    }
+
+    // Start meeting duration timer
+    function startDurationTimer() {
+      durationInterval = setInterval(() => {
+        meetingDuration++;
+        const minutes = Math.floor(meetingDuration / 60);
+        const seconds = meetingDuration % 60;
+        const formatted = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        const durationElement = document.getElementById('meeting-duration');
+        if (durationElement) {
+          durationElement.textContent = formatted;
+        }
+      }, 1000);
+    }
+
+    // Initialize when page loads
+    window.addEventListener('load', () => {
+      initializeVideoCall();
+      startDurationTimer();
+    });
+
+    // Clean up on page unload
+    window.addEventListener('beforeunload', () => {
+      if (webexManager) {
+        webexManager.leaveMeeting();
+      }
+      if (durationInterval) {
+        clearInterval(durationInterval);
+      }
+    });
+  </script>
+</body>
+</html>

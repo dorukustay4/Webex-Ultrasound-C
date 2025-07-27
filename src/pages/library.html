@@ -3,16 +3,399 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ultrasound Webex - Library</title>
+  <title>Session Library - Ultrasound Webex</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../styles/style.css">
-  <link rel="stylesheet" href="../styles/home-style.css">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      z-index: 1000;
+    }
+
+    .sidebar-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .sidebar-menu {
+      flex: 1;
+      padding: 1.5rem 1rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      text-decoration: none;
+      color: #94a3b8;
+      border-radius: 0.5rem;
+      margin-bottom: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #e2e8f0;
+    }
+
+    .nav-item.active {
+      background: rgba(59, 130, 246, 0.1);
+      color: #3b82f6;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .sidebar-user {
+      padding: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: white;
+    }
+
+    .user-info {
+      flex: 1;
+    }
+
+    .user-name {
+      display: block;
+      font-weight: 500;
+      color: #e2e8f0;
+    }
+
+    .user-email {
+      display: block;
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+
+    .logout-btn {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: none;
+      padding: 0.5rem;
+      border-radius: 0.375rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .logout-btn:hover {
+      background: rgba(239, 68, 68, 0.2);
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      margin-left: 280px;
+      padding: 2rem;
+    }
+
+    .page-header {
+      margin-bottom: 2rem;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      color: #94a3b8;
+      font-size: 1.1rem;
+    }
+
+    /* Library Content */
+    .library-filters {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .filter-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #94a3b8;
+    }
+
+    .filter-input, .filter-select {
+      padding: 0.5rem 0.75rem;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 0.5rem;
+      color: #e2e8f0;
+      font-size: 0.875rem;
+    }
+
+    .filter-input:focus, .filter-select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .calls-list {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 1rem;
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+    }
+
+    .calls-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .calls-table th {
+      background: rgba(15, 23, 42, 0.7);
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: #e2e8f0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.875rem;
+    }
+
+    .calls-table td {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #94a3b8;
+      font-size: 0.875rem;
+    }
+
+    .calls-table tr:hover {
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    .call-title-cell {
+      color: #e2e8f0;
+      font-weight: 500;
+    }
+
+    .call-date-cell {
+      white-space: nowrap;
+    }
+
+    .call-status {
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      display: inline-block;
+    }
+
+    .call-status.completed {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+    }
+
+    .call-status.archived {
+      background: rgba(156, 163, 175, 0.2);
+      color: #9ca3af;
+    }
+
+    .resident-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .resident-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      color: white;
+      font-weight: 600;
+    }
+
+    .annotations-count {
+      background: rgba(59, 130, 246, 0.1);
+      color: #3b82f6;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.375rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .action-btn {
+      padding: 0.375rem 0.75rem;
+      background: rgba(59, 130, 246, 0.1);
+      color: #3b82f6;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .action-btn:hover {
+      background: rgba(59, 130, 246, 0.2);
+    }
+
+    .action-btn.export {
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+      border-color: rgba(16, 185, 129, 0.2);
+    }
+
+    .action-btn.export:hover {
+      background: rgba(16, 185, 129, 0.2);
+    }
+
+    .action-btn.save {
+      background: rgba(245, 158, 11, 0.1);
+      color: #f59e0b;
+      border-color: rgba(245, 158, 11, 0.2);
+    }
+
+    .action-btn.save:hover {
+      background: rgba(245, 158, 11, 0.2);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #94a3b8;
+    }
+
+    .empty-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .empty-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-subtitle {
+      font-size: 0.875rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .main-content {
+        margin-left: 0;
+        padding: 1rem;
+      }
+      
+      .calls-table {
+        font-size: 0.75rem;
+      }
+      
+      .calls-table th,
+      .calls-table td {
+        padding: 0.5rem;
+      }
+      
+      .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="app-container">
-    <!-- Sidebar Navigation -->
+    <!-- Sidebar -->
     <nav class="sidebar">
       <div class="sidebar-header">
         <div class="logo">
@@ -26,50 +409,50 @@
               </linearGradient>
             </defs>
           </svg>
-          <h2 class="gradient-text">Ultrasound Webex</h2>
+          <h2>Ultrasound Webex</h2>
         </div>
       </div>
       
       <div class="sidebar-menu">
-        <a href="home.html" class="nav-item">
+        <a href="home-clean.html" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M10 2L3 7V18C3 18.5523 3.44772 19 4 19H7V14H13V19H16C16.5523 19 17 18.5523 17 18V7L10 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <span>Home</span>
         </a>
         
-        <a href="profile.html" class="nav-item">
+        <a href="library.html" class="nav-item active">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 4C4 2.89543 4.89543 2 6 2H14C15.1046 2 16 2.89543 16 4V16C16 17.1046 15.1046 18 14 18H6C4.89543 18 4 17.1046 4 16V4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 6H12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 10H12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 14H10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Library</span>
+        </a>
+        
+        <a href="about.html" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10 6V10L13 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>About</span>
+        </a>
+        
+        <a href="profile-clean.html" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M10 10C12.7614 10 15 7.76142 15 5C15 2.23858 12.7614 0 10 0C7.23858 0 5 2.23858 5 5C5 7.76142 7.23858 10 10 10Z" fill="currentColor"/>
             <path d="M10 12C4.47715 12 0 16.4772 0 22H20C20 16.4772 15.5228 12 10 12Z" fill="currentColor"/>
           </svg>
           <span>Profile</span>
         </a>
-        
-        <a href="index.html" class="nav-item">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M15 10L19 14L15 18M19 14H9M9 3H5C3.89543 3 3 3.89543 3 5V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span>Call Room</span>
-        </a>
-        
-        <a href="library.html" class="nav-item active">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M4 4H16C17.1046 4 18 4.89543 18 6V16C18 17.1046 17.1046 18 16 18H4C2.89543 18 2 17.1046 2 16V6C2 4.89543 2.89543 4 4 4Z" stroke="currentColor" stroke-width="2"/>
-            <path d="M6 8H14M6 12H10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          <span>Library</span>
-        </a>
       </div>
       
-      <!-- User section at bottom of sidebar -->
       <div class="sidebar-user" id="sidebar-user" style="display: none;">
-        <div class="user-avatar">
-          <img id="sidebar-user-avatar" src="" alt="User Avatar">
-        </div>
+        <div class="user-avatar" id="user-avatar">U</div>
         <div class="user-info">
-          <span class="user-name" id="sidebar-user-name">User Name</span>
-          <span class="user-email" id="sidebar-user-email">user@example.com</span>
+          <span class="user-name" id="user-name">User</span>
+          <span class="user-email" id="user-email">user@example.com</span>
         </div>
         <button class="logout-btn" onclick="logout()" title="Sign Out">
           <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -81,76 +464,469 @@
 
     <!-- Main Content -->
     <main class="main-content">
-      <div class="content-header">
-        <div class="welcome-section">
-          <h1 class="welcome-title">Annotation Library</h1>
-          <p class="welcome-subtitle">Browse and manage your saved annotations and recordings</p>
+      <div class="page-header">
+        <h1 class="page-title">Session Library</h1>
+        <p class="page-subtitle">View your session history, annotations, and shared ultrasound appointments</p>
+      </div>
+
+      <!-- Filters -->
+      <div class="library-filters">
+        <div class="filter-row">
+          <div class="filter-group">
+            <label class="filter-label">Search sessions</label>
+            <input type="text" class="filter-input" placeholder="Search by title or notes..." id="search-filter">
+          </div>
+          
+          <div class="filter-group">
+            <label class="filter-label">Date range</label>
+            <select class="filter-select" id="date-filter">
+              <option value="all">All time</option>
+              <option value="today">Today</option>
+              <option value="week">This week</option>
+              <option value="month">This month</option>
+              <option value="quarter">Last 3 months</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label class="filter-label">Status</label>
+            <select class="filter-select" id="status-filter">
+              <option value="all">All status</option>
+              <option value="completed">Completed</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label class="filter-label">Resident Doctor</label>
+            <select class="filter-select" id="resident-filter">
+              <option value="all">All residents</option>
+              <option value="Dr. Sarah Johnson">Dr. Sarah Johnson</option>
+              <option value="Dr. Emma Rodriguez">Dr. Emma Rodriguez</option>
+              <option value="Dr. James Wilson">Dr. James Wilson</option>
+              <option value="Dr. Alex Thompson">Dr. Alex Thompson</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <!-- Coming Soon Message -->
-      <div class="dashboard-card">
-        <div class="card-content" style="text-align: center; padding: 4rem 2rem;">
-          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 2rem; opacity: 0.5;">
-            <path d="M8 8H56C58.2091 8 60 9.79086 60 12V52C60 54.2091 58.2091 56 56 56H8C5.79086 56 4 54.2091 4 52V12C4 9.79086 5.79086 8 8 8Z" stroke="#6B7280" stroke-width="4"/>
-            <path d="M12 16H52M12 24H36M12 32H52M12 40H28" stroke="#6B7280" stroke-width="3" stroke-linecap="round"/>
-          </svg>
-          <h2 style="color: #ffffff; font-size: 1.5rem; margin-bottom: 1rem;">Library Coming Soon</h2>
-          <p style="color: #a0aec0; margin-bottom: 2rem; line-height: 1.6;">
-            The annotation library is currently under development. This will include features for:
-          </p>
-          <div style="text-align: left; max-width: 400px; margin: 0 auto 2rem;">
-            <ul style="color: #a0aec0; line-height: 1.8;">
-              <li>Saved annotation sessions</li>
-              <li>Recording archives</li>
-              <li>Searchable annotation database</li>
-              <li>Export and sharing capabilities</li>
-              <li>Collaboration tools</li>
-            </ul>
-          </div>
-          <button class="action-btn secondary" onclick="window.location.href='home.html'">
-            Back to Home
-          </button>
-        </div>
+      <!-- Sessions List -->
+      <div class="calls-list" id="calls-list">
+        <table class="calls-table">
+          <thead>
+            <tr>
+              <th>Date & Time</th>
+              <th>Session Title</th>
+              <th>Resident Doctor</th>
+              <th>Duration</th>
+              <th>Status</th>
+              <th>Annotations</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="calls-tbody">
+            <!-- Session rows will be dynamically generated here -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State (shown when no sessions) -->
+      <div class="empty-state" id="empty-state" style="display: none;">
+        <div class="empty-icon"></div>
+        <div class="empty-title">No sessions found</div>
+        <div class="empty-subtitle">Start a new ultrasound session to see your session history here</div>
       </div>
     </main>
   </div>
 
-  <script src="../scripts/auth.js"></script>
+  <!-- Load auth system -->
+  <script src="../js/simple-auth-fixed.js"></script>
+
   <script>
-    // Basic auth check for library page
-    document.addEventListener('DOMContentLoaded', function() {
-      const authMode = localStorage.getItem('webex_auth_mode');
-      
-      if (authMode === 'authenticated' && isAuthenticated && isAuthenticated()) {
-        const userInfo = getCurrentUser && getCurrentUser();
-        if (userInfo) {
-          // Display user info in sidebar
-          const sidebarUser = document.getElementById('sidebar-user');
-          const sidebarUserAvatar = document.getElementById('sidebar-user-avatar');
-          const sidebarUserName = document.getElementById('sidebar-user-name');
-          const sidebarUserEmail = document.getElementById('sidebar-user-email');
-          
-          if (sidebarUser) {
-            sidebarUser.style.display = 'flex';
-            
-            if (sidebarUserAvatar && userInfo.avatar) {
-              sidebarUserAvatar.src = userInfo.avatar;
-            }
-            
-            if (sidebarUserName && userInfo.displayName) {
-              sidebarUserName.textContent = userInfo.displayName;
-            }
-            
-            if (sidebarUserEmail && userInfo.emails && userInfo.emails.length > 0) {
-              sidebarUserEmail.textContent = userInfo.emails[0];
-            }
-          }
-        }
-      } else if (authMode !== 'guest') {
-        window.location.href = 'login.html';
+    // Sample session data (in a real app, this would come from a database)
+    const sampleCalls = [
+      {
+        id: 1,
+        title: "Emergency Cardiac Consultation",
+        date: "2025-01-27T14:30:00Z",
+        duration: "00:45:32",
+        participants: [
+          { name: "Dr. Sarah Johnson", role: "Resident", avatar: "SJ" },
+          { name: "Dr. Michael Chen", role: "Expert", avatar: "MC" }
+        ],
+        residentDoctor: "Dr. Sarah Johnson",
+        type: "emergency",
+        status: "completed",
+        annotations: 12,
+        recordings: 1,
+        notes: "Patient presented with chest pain. Ultrasound showed normal cardiac function."
+      },
+      {
+        id: 2,
+        title: "Routine Prenatal Ultrasound",
+        date: "2025-01-26T10:15:00Z",
+        duration: "00:28:45",
+        participants: [
+          { name: "Dr. Emma Rodriguez", role: "Resident", avatar: "ER" },
+          { name: "Dr. Lisa Park", role: "Expert", avatar: "LP" }
+        ],
+        residentDoctor: "Dr. Emma Rodriguez",
+        type: "consultation",
+        status: "completed",
+        annotations: 8,
+        recordings: 1,
+        notes: "20-week anatomy scan. All measurements within normal limits."
+      },
+      {
+        id: 3,
+        title: "Teaching Session - Abdominal Scanning",
+        date: "2025-01-25T16:00:00Z",
+        duration: "01:12:18",
+        participants: [
+          { name: "Dr. James Wilson", role: "Student", avatar: "JW" },
+          { name: "Dr. Maria Garcia", role: "Expert", avatar: "MG" }
+        ],
+        residentDoctor: "Dr. James Wilson",
+        type: "teaching",
+        status: "completed",
+        annotations: 25,
+        recordings: 2,
+        notes: "Educational session covering proper probe placement and image optimization."
+      },
+      {
+        id: 4,
+        title: "Follow-up Kidney Function",
+        date: "2025-01-24T09:30:00Z",
+        duration: "00:22:10",
+        participants: [
+          { name: "Dr. Alex Thompson", role: "Resident", avatar: "AT" },
+          { name: "Dr. Nina Patel", role: "Expert", avatar: "NP" }
+        ],
+        residentDoctor: "Dr. Alex Thompson",
+        type: "followup",
+        status: "archived",
+        annotations: 6,
+        recordings: 1,
+        notes: "Patient follow-up showing improved kidney function post-treatment."
+      },
+      {
+        id: 5,
+        title: "Emergency Abdominal Pain Assessment",
+        date: "2025-01-23T22:15:00Z",
+        duration: "00:35:20",
+        participants: [
+          { name: "Dr. Sarah Johnson", role: "Resident", avatar: "SJ" },
+          { name: "Dr. Robert Kim", role: "Expert", avatar: "RK" }
+        ],
+        residentDoctor: "Dr. Sarah Johnson",
+        type: "emergency",
+        status: "completed",
+        annotations: 15,
+        recordings: 1,
+        notes: "Late night emergency case. Appendicitis ruled out, muscular strain confirmed."
+      },
+      {
+        id: 6,
+        title: "Cardiac Function Review",
+        date: "2025-01-22T11:00:00Z",
+        duration: "00:40:15",
+        participants: [
+          { name: "Dr. Emma Rodriguez", role: "Resident", avatar: "ER" },
+          { name: "Dr. Michael Chen", role: "Expert", avatar: "MC" }
+        ],
+        residentDoctor: "Dr. Emma Rodriguez",
+        type: "consultation",
+        status: "archived",
+        annotations: 18,
+        recordings: 1,
+        notes: "Post-surgical cardiac assessment. Good recovery progress noted."
       }
+    ];
+
+    let filteredCalls = [...sampleCalls];
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Session Library page loading...');
+      
+      // Check authentication
+      initializeAuth();
+      
+      // Set up filters
+      setupFilters();
+      
+      // Render sessions
+      renderCalls();
     });
+
+    // Initialize authentication
+    function initializeAuth() {
+      if (isAuthenticated()) {
+        const user = getCurrentUser();
+        if (user) {
+          updateUserDisplay(user);
+        }
+      } else {
+        // Redirect to login or show auth prompt
+        console.log('User not authenticated');
+      }
+    }
+
+    // Update user display in sidebar
+    function updateUserDisplay(user) {
+      const sidebarUser = document.getElementById('sidebar-user');
+      const userAvatar = document.getElementById('user-avatar');
+      const userName = document.getElementById('user-name');
+      const userEmail = document.getElementById('user-email');
+
+      if (sidebarUser && userAvatar && userName && userEmail) {
+        sidebarUser.style.display = 'flex';
+        
+        const displayName = user.displayName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'User';
+        const email = user.emails?.[0] || user.email || 'user@domain.com';
+        
+        userAvatar.textContent = displayName.charAt(0).toUpperCase();
+        userName.textContent = displayName;
+        userEmail.textContent = email;
+      }
+    }
+
+    // Set up filter event listeners
+    function setupFilters() {
+      const searchFilter = document.getElementById('search-filter');
+      const dateFilter = document.getElementById('date-filter');
+      const statusFilter = document.getElementById('status-filter');
+      const residentFilter = document.getElementById('resident-filter');
+
+      [searchFilter, dateFilter, statusFilter, residentFilter].forEach(filter => {
+        if (filter) {
+          filter.addEventListener('change', applyFilters);
+          filter.addEventListener('input', applyFilters);
+        }
+      });
+    }
+
+    // Apply filters to sessions
+    function applyFilters() {
+      const searchTerm = document.getElementById('search-filter').value.toLowerCase();
+      const dateRange = document.getElementById('date-filter').value;
+      const status = document.getElementById('status-filter').value;
+      const resident = document.getElementById('resident-filter').value;
+
+      filteredCalls = sampleCalls.filter(call => {
+        // Search filter
+        const matchesSearch = !searchTerm || 
+          call.title.toLowerCase().includes(searchTerm) ||
+          call.notes.toLowerCase().includes(searchTerm);
+
+        // Date filter
+        const callDate = new Date(call.date);
+        const now = new Date();
+        let matchesDate = true;
+        
+        if (dateRange === 'today') {
+          matchesDate = callDate.toDateString() === now.toDateString();
+        } else if (dateRange === 'week') {
+          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          matchesDate = callDate >= weekAgo;
+        } else if (dateRange === 'month') {
+          const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+          matchesDate = callDate >= monthAgo;
+        } else if (dateRange === 'quarter') {
+          const quarterAgo = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
+          matchesDate = callDate >= quarterAgo;
+        }
+
+        // Status filter
+        const matchesStatus = status === 'all' || call.status === status;
+
+        // Resident filter
+        const matchesResident = resident === 'all' || call.residentDoctor === resident;
+
+        return matchesSearch && matchesDate && matchesStatus && matchesResident;
+      });
+
+      renderCalls();
+    }
+
+    // Render sessions list
+    function renderCalls() {
+      const callsList = document.getElementById('calls-list');
+      const callsTbody = document.getElementById('calls-tbody');
+      const emptyState = document.getElementById('empty-state');
+
+      if (filteredCalls.length === 0) {
+        callsList.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      callsList.style.display = 'block';
+      emptyState.style.display = 'none';
+
+      callsTbody.innerHTML = filteredCalls.map(call => createCallRow(call)).join('');
+    }
+
+    // Create session row HTML
+    function createCallRow(call) {
+      const callDate = new Date(call.date);
+      const formattedDate = callDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+      const formattedTime = callDate.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      const statusClass = call.status === 'completed' ? 'completed' : 'archived';
+      const statusText = call.status === 'completed' ? 'Completed' : 'Archived';
+
+      // Find resident doctor info
+      const resident = call.participants.find(p => p.name === call.residentDoctor);
+      const residentAvatar = resident ? resident.avatar : call.residentDoctor.split(' ').map(n => n[0]).join('');
+
+      return `
+        <tr>
+          <td class="call-date-cell">
+            <div>${formattedDate}</div>
+            <div style="font-size: 0.75rem; color: #6b7280;">${formattedTime}</div>
+          </td>
+          <td class="call-title-cell">${call.title}</td>
+          <td>
+            <div class="resident-info">
+              <div class="resident-avatar">${residentAvatar}</div>
+              <span>${call.residentDoctor}</span>
+            </div>
+          </td>
+          <td>${call.duration}</td>
+          <td>
+            <span class="call-status ${statusClass}">${statusText}</span>
+          </td>
+          <td>
+            <span class="annotations-count">${call.annotations}</span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button class="action-btn" onclick="viewAnnotations(${call.id})">
+                View
+              </button>
+              <button class="action-btn save" onclick="saveAnnotations(${call.id})">
+                Save
+              </button>
+              <button class="action-btn export" onclick="exportAnnotations(${call.id})">
+                Export
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    // View session details
+    function viewCallDetails(callId) {
+      const call = sampleCalls.find(c => c.id === callId);
+      if (call) {
+        alert(`Session Details:\n\nTitle: ${call.title}\nDate: ${new Date(call.date).toLocaleString()}\nDuration: ${call.duration}\nResident: ${call.residentDoctor}\nParticipants: ${call.participants.map(p => p.name).join(', ')}\n\nNotes: ${call.notes}`);
+      }
+    }
+
+    // View annotations
+    function viewAnnotations(callId) {
+      const call = sampleCalls.find(c => c.id === callId);
+      if (call) {
+        alert(`Annotations for "${call.title}":\n\n• Measurement annotation at 05:23\n• Arrow pointing to anatomical structure at 12:45\n• Text note: "Normal findings" at 18:32\n• Circle highlighting area of interest at 25:10\n\nTotal: ${call.annotations} annotations\n\n(In a real app, this would show a detailed annotation viewer)`);
+      }
+    }
+
+    // Save annotations
+    function saveAnnotations(callId) {
+      const call = sampleCalls.find(c => c.id === callId);
+      if (call) {
+        // Simulate saving process
+        const saveBtn = event.target;
+        const originalText = saveBtn.textContent;
+        
+        saveBtn.textContent = 'Saving...';
+        saveBtn.disabled = true;
+        
+        setTimeout(() => {
+          saveBtn.textContent = 'Saved ✓';
+          saveBtn.style.background = 'rgba(16, 185, 129, 0.2)';
+          saveBtn.style.color = '#10b981';
+          
+          setTimeout(() => {
+            saveBtn.textContent = originalText;
+            saveBtn.disabled = false;
+            saveBtn.style.background = '';
+            saveBtn.style.color = '';
+          }, 2000);
+        }, 1000);
+        
+        console.log(`Saving ${call.annotations} annotations for "${call.title}"`);
+      }
+    }
+
+    // Export annotations
+    function exportAnnotations(callId) {
+      const call = sampleCalls.find(c => c.id === callId);
+      if (call) {
+        // Simulate export process
+        const exportBtn = event.target;
+        const originalText = exportBtn.textContent;
+        
+        exportBtn.textContent = 'Exporting...';
+        exportBtn.disabled = true;
+        
+        setTimeout(() => {
+          // Create mock export data
+          const exportData = {
+            callTitle: call.title,
+            date: call.date,
+            residentDoctor: call.residentDoctor,
+            annotations: [
+              { timestamp: '05:23', type: 'measurement', content: 'Left ventricle: 45mm' },
+              { timestamp: '12:45', type: 'arrow', content: 'Pointing to mitral valve' },
+              { timestamp: '18:32', type: 'text', content: 'Normal findings' },
+              { timestamp: '25:10', type: 'circle', content: 'Area of interest highlighted' }
+            ]
+          };
+          
+          // Create and download mock file
+          const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `annotations_${call.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+          
+          exportBtn.textContent = 'Exported ✓';
+          exportBtn.style.background = 'rgba(16, 185, 129, 0.2)';
+          exportBtn.style.color = '#10b981';
+          
+          setTimeout(() => {
+            exportBtn.textContent = originalText;
+            exportBtn.disabled = false;
+            exportBtn.style.background = '';
+            exportBtn.style.color = '';
+          }, 2000);
+        }, 1500);
+        
+        console.log(`Exporting ${call.annotations} annotations for "${call.title}"`);
+      }
+    }
+
+    // Logout function
+    function logout() {
+      if (typeof window.logout === 'function') {
+        window.logout();
+      }
+      window.location.href = 'home-clean.html';
+    }
   </script>
 </body>
 </html>

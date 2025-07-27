@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Ultrasound Webex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0a0a0a 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-container {
+      background: rgba(20, 20, 20, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      max-width: 500px;
+      width: 90%;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .logo h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo p {
+      color: #9ca3af;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .logo .subtitle {
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+
+    .login-form {
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #e2e8f0;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-input {
+      width: 100%;
+      background: rgba(15, 15, 15, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      color: #e2e8f0;
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-input::placeholder {
+      color: #6b7280;
+    }
+
+    .login-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+      border: none;
+      color: white;
+      padding: 14px 24px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 1rem;
+    }
+
+    .login-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .demo-btn {
+      width: 100%;
+      background: rgba(75, 85, 99, 0.3);
+      border: 1px solid rgba(75, 85, 99, 0.5);
+      color: #9ca3af;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .demo-btn:hover {
+      background: rgba(75, 85, 99, 0.5);
+      color: #e2e8f0;
+    }
+
+    .help-text {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      color: #93c5fd;
+      line-height: 1.5;
+    }
+
+    .help-text strong {
+      color: #ddd6fe;
+    }
+
+    .help-text a {
+      color: #60a5fa;
+      text-decoration: none;
+    }
+
+    .help-text a:hover {
+      text-decoration: underline;
+    }
+
+    .error-message {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+      color: #fca5a5;
+      display: none;
+    }
+
+    .success-message {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+      color: #86efac;
+      display: none;
+    }
+
+    .loading {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 20px 0;
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .divider span {
+      padding: 0 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo">
+      <h1>🩺 Ultrasound Webex</h1>
+      <p>Telemedicine Ultrasound Platform</p>
+      <p class="subtitle">Enter your Webex Personal Access Token to continue</p>
+    </div>
+
+    <div class="help-text">
+      <strong>How to get your Personal Access Token:</strong><br>
+      1. Go to <a href="https://developer.webex.com/docs/getting-started" target="_blank">Webex Developer Portal</a><br>
+      2. Scroll down to "Your Personal Access Token" section<br>
+      3. Copy the token and paste it below<br><br>
+      <strong>Note:</strong> Personal tokens expire in 12 hours and are perfect for development.
+    </div>
+
+    <div class="error-message" id="errorMessage"></div>
+    <div class="success-message" id="successMessage"></div>
+
+    <form class="login-form" id="loginForm">
+      <div class="form-group">
+        <label for="accessToken" class="form-label">Personal Access Token</label>
+        <input
+          type="password"
+          id="accessToken"
+          class="form-input"
+          placeholder="Paste your Webex Personal Access Token here..."
+          required
+        >
+      </div>
+      
+      <button type="submit" class="login-btn" id="loginBtn">
+        Sign In with Personal Access Token
+      </button>
+    </form>
+
+    <div class="divider">
+      <span>OR</span>
+    </div>
+
+    <button class="demo-btn" id="demoBtn">
+      🎭 Continue with Demo Mode (No Token Required)
+    </button>
+  </div>
+
+  <!-- Load the auth system -->
+  <script src="../js/simple-auth-fixed.js"></script>
+
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const loginBtn = document.getElementById('loginBtn');
+    const demoBtn = document.getElementById('demoBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+    const accessTokenInput = document.getElementById('accessToken');
+
+    // Check if already authenticated
+    if (isAuthenticated()) {
+      console.log('✅ User already authenticated, redirecting...');
+      window.location.href = 'home-clean.html';
+    }
+
+    // Helper functions for messages
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
+      successMessage.style.display = 'none';
+    }
+
+    function showSuccess(message) {
+      successMessage.textContent = message;
+      successMessage.style.display = 'block';
+      errorMessage.style.display = 'none';
+    }
+
+    function hideMessages() {
+      errorMessage.style.display = 'none';
+      successMessage.style.display = 'none';
+    }
+
+    function setLoading(isLoading) {
+      if (isLoading) {
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = '<span class="loading"><span class="spinner"></span>Validating Token...</span>';
+        demoBtn.disabled = true;
+      } else {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = 'Sign In with Personal Access Token';
+        demoBtn.disabled = false;
+      }
+    }
+
+    // Handle form submission
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const token = accessTokenInput.value.trim();
+      if (!token) {
+        showError('Please enter your Personal Access Token');
+        return;
+      }
+
+      hideMessages();
+      setLoading(true);
+
+      try {
+        console.log('🔐 Attempting authentication with Personal Access Token...');
+        const result = await usePersonalAccessToken(token);
+
+        if (result.success) {
+          showSuccess(`Welcome ${result.userInfo.displayName}! Redirecting...`);
+          
+          // Redirect after a short delay to show success message
+          setTimeout(() => {
+            window.location.href = 'home-clean.html';
+          }, 1500);
+        } else {
+          showError(result.error || 'Authentication failed');
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('❌ Login error:', error);
+        showError('Authentication failed: ' + (error.message || 'Unknown error'));
+        setLoading(false);
+      }
+    });
+
+    // Handle demo mode
+    demoBtn.addEventListener('click', async () => {
+      hideMessages();
+      demoBtn.disabled = true;
+      demoBtn.textContent = '🎭 Starting Demo Mode...';
+
+      try {
+        console.log('🎭 Starting demo mode...');
+        const result = await switchToDemo();
+
+        if (result.success) {
+          showSuccess('Demo mode activated! Redirecting...');
+          
+          setTimeout(() => {
+            window.location.href = 'home-clean.html';
+          }, 1500);
+        } else {
+          showError('Failed to start demo mode: ' + (result.error || 'Unknown error'));
+          demoBtn.disabled = false;
+          demoBtn.textContent = '🎭 Continue with Demo Mode (No Token Required)';
+        }
+      } catch (error) {
+        console.error('❌ Demo mode error:', error);
+        showError('Failed to start demo mode: ' + (error.message || 'Unknown error'));
+        demoBtn.disabled = false;
+        demoBtn.textContent = '🎭 Continue with Demo Mode (No Token Required)';
+      }
+    });
+
+    // Clear messages when user starts typing
+    accessTokenInput.addEventListener('input', hideMessages);
+
+    console.log('✅ Simple login page loaded');
+  </script>
+</body>
+</html>

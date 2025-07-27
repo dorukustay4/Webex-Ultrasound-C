@@ -868,3 +868,228 @@ body {
 .local-video {
   display: none !important;
 }
+
+/* Role-based Video Call Layouts */
+.role-expert .video-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 300px;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas: 
+    "local-video ultrasound-feed annotation-panel"
+    "remote-video ultrasound-feed annotation-panel";
+  gap: 1rem;
+  height: calc(100vh - 200px);
+  padding: 1rem;
+}
+
+.role-expert .local-video-window {
+  grid-area: local-video;
+  background: rgba(20, 20, 20, 0.9);
+  border: 2px solid #3b82f6;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.role-expert .remote-video-window {
+  grid-area: remote-video;
+  background: rgba(20, 20, 20, 0.9);
+  border: 2px solid #10b981;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.role-expert .ultrasound-feed-window {
+  grid-area: ultrasound-feed;
+  background: rgba(20, 20, 20, 0.9);
+  border: 2px solid #f59e0b;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.role-expert .annotation-panel {
+  grid-area: annotation-panel;
+  background: rgba(20, 20, 20, 0.95);
+  border: 2px solid #8b5cf6;
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.role-resident .video-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas: 
+    "local-video ultrasound-feed"
+    "remote-video ultrasound-feed";
+  gap: 1rem;
+  height: calc(100vh - 200px);
+  padding: 1rem;
+}
+
+.role-resident .local-video-window {
+  grid-area: local-video;
+  background: rgba(20, 20, 20, 0.9);
+  border: 2px solid #3b82f6;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.role-resident .remote-video-window {
+  grid-area: remote-video;
+  background: rgba(20, 20, 20, 0.9);
+  border: 2px solid #10b981;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.role-resident .ultrasound-feed-window {
+  grid-area: ultrasound-feed;
+  background: rgba(20, 20, 20, 0.9);
+  border: 2px solid #f59e0b;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Video Window Labels */
+.video-window-label {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  z-index: 10;
+  backdrop-filter: blur(4px);
+}
+
+.video-window-status {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(16, 185, 129, 0.9);
+  color: #ffffff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  z-index: 10;
+}
+
+.video-window-status.offline {
+  background: rgba(239, 68, 68, 0.9);
+}
+
+/* Annotation Panel Specific Styles */
+.annotation-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.annotation-tool-btn {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid #3b82f6;
+  color: #3b82f6;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.annotation-tool-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #60a5fa;
+}
+
+.annotation-tool-btn.active {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.annotation-canvas {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  min-height: 200px;
+}
+
+/* Video Element Styles */
+.video-element {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.video-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  color: #94a3b8;
+  font-size: 0.9rem;
+  border-radius: 8px;
+}
+
+/* Responsive adjustments for role-based layouts */
+@media (max-width: 1200px) {
+  .role-expert .video-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 200px;
+    grid-template-areas: 
+      "local-video ultrasound-feed"
+      "remote-video ultrasound-feed"
+      "annotation-panel annotation-panel";
+  }
+  
+  .role-expert .annotation-panel {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .role-expert .video-grid,
+  .role-resident .video-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+  
+  .role-expert .video-grid {
+    grid-template-areas: 
+      "local-video"
+      "remote-video"
+      "ultrasound-feed"
+      "annotation-panel";
+  }
+  
+  .role-resident .video-grid {
+    grid-template-areas: 
+      "local-video"
+      "remote-video"
+      "ultrasound-feed";
+  }
+  
+  .video-window-label,
+  .video-window-status {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.4rem;
+  }
+}

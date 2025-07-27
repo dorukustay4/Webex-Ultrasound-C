@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Access Demo</title>
+    <style>
+        body {
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0a0a0a 100%);
+            color: #e2e8f0;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #3b82f6;
+            margin-bottom: 2rem;
+        }
+
+        .video-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .video-section {
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .video-section h3 {
+            margin-top: 0;
+            color: #10b981;
+            text-align: center;
+        }
+
+        video {
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        button:disabled {
+            background: #4b5563;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status {
+            background: rgba(15, 15, 15, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+        }
+
+        .camera-list {
+            margin-top: 1rem;
+        }
+
+        .camera-list select {
+            width: 100%;
+            padding: 0.5rem;
+            background: rgba(15, 15, 15, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .video-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Camera Access Demo</h1>
+        
+        <div class="video-container">
+            <div class="video-section">
+                <h3>Primary Camera</h3>
+                <video id="video1" playsinline></video>
+                <div class="controls">
+                    <button onclick="startCamera1()">Start Camera</button>
+                    <button onclick="toggleVideo1()">Toggle Video</button>
+                    <button onclick="toggleAudio1()">Toggle Audio</button>
+                    <button onclick="stopCamera1()">Stop Camera</button>
+                </div>
+                <div class="camera-list">
+                    <select id="cameraSelect1" onchange="switchCamera1()">
+                        <option value="">Select Camera...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="video-section">
+                <h3>Secondary Camera</h3>
+                <video id="video2" playsinline></video>
+                <div class="controls">
+                    <button onclick="startCamera2()">Start Camera</button>
+                    <button onclick="takeSnapshot()">Take Snapshot</button>
+                    <button onclick="stopCamera2()">Stop Camera</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="listCameras()">List Available Cameras</button>
+            <button onclick="getStreamInfo()">Get Stream Info</button>
+            <button onclick="testConstraints()">Test HD Constraints</button>
+        </div>
+
+        <div id="status" class="status">
+            Ready to test camera access. Click "Start Camera" to begin.
+        </div>
+    </div>
+
+    <!-- Load camera utilities -->
+    <script src="../js/camera-utils.js"></script>
+    
+    <script>
+        let video1Active = false;
+        let video2Active = false;
+
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        async function startCamera1() {
+            try {
+                updateStatus('Requesting camera access for video 1...', 'info');
+                
+                const videoElement = await streamToVideo('#video1');
+                video1Active = true;
+                
+                updateStatus('Camera 1 started successfully!', 'success');
+                
+                // Load available cameras
+                await listCameras();
+                
+            } catch (error) {
+                updateStatus(`Failed to start camera 1: ${error.message}`, 'error');
+            }
+        }
+
+        async function startCamera2() {
+            try {
+                updateStatus('Requesting camera access for video 2...', 'info');
+                
+                // Use different constraints for the second camera
+                const constraints = {
+                    video: {
+                        width: { ideal: 640, min: 320 },
+                        height: { ideal: 480, min: 240 },
+                        frameRate: { ideal: 15, min: 10 }
+                    },
+                    audio: false // No audio for second camera
+                };
+                
+                const videoElement = await streamToVideo('#video2', constraints);
+                video2Active = true;
+                
+                updateStatus('Camera 2 started successfully!', 'success');
+                
+            } catch (error) {
+                updateStatus(`Failed to start camera 2: ${error.message}`, 'error');
+            }
+        }
+
+        function toggleVideo1() {
+            try {
+                const isEnabled = toggleVideo();
+                updateStatus(`Video 1 ${isEnabled ? 'enabled' : 'disabled'}`, 'success');
+            } catch (error) {
+                updateStatus(`Failed to toggle video: ${error.message}`, 'error');
+            }
+        }
+
+        function toggleAudio1() {
+            try {
+                const isEnabled = toggleAudio();
+                updateStatus(`Audio 1 ${isEnabled ? 'enabled' : 'disabled'}`, 'success');
+            } catch (error) {
+                updateStatus(`Failed to toggle audio: ${error.message}`, 'error');
+            }
+        }
+
+        function stopCamera1() {
+            try {
+                stopCameraStream();
+                video1Active = false;
+                updateStatus('Camera 1 stopped', 'success');
+            } catch (error) {
+                updateStatus(`Failed to stop camera 1: ${error.message}`, 'error');
+            }
+        }
+
+        function stopCamera2() {
+            try {
+                const video2 = document.getElementById('video2');
+                if (video2.srcObject) {
+                    video2.srcObject.getTracks().forEach(track => track.stop());
+                    video2.srcObject = null;
+                }
+                video2Active = false;
+                updateStatus('Camera 2 stopped', 'success');
+            } catch (error) {
+                updateStatus(`Failed to stop camera 2: ${error.message}`, 'error');
+            }
+        }
+
+        async function listCameras() {
+            try {
+                const cameras = await getAvailableCameras();
+                const select = document.getElementById('cameraSelect1');
+                
+                // Clear existing options
+                select.innerHTML = '<option value="">Select Camera...</option>';
+                
+                cameras.forEach(camera => {
+                    const option = document.createElement('option');
+                    option.value = camera.deviceId;
+                    option.textContent = camera.label || `Camera ${camera.deviceId.substring(0, 8)}...`;
+                    select.appendChild(option);
+                });
+                
+                updateStatus(`Found ${cameras.length} cameras`, 'success');
+                
+            } catch (error) {
+                updateStatus(`Failed to list cameras: ${error.message}`, 'error');
+            }
+        }
+
+        async function switchCamera1() {
+            try {
+                const select = document.getElementById('cameraSelect1');
+                const deviceId = select.value;
+                
+                if (!deviceId) return;
+                
+                updateStatus('Switching camera...', 'info');
+                await switchCamera(deviceId);
+                updateStatus('Camera switched successfully!', 'success');
+                
+            } catch (error) {
+                updateStatus(`Failed to switch camera: ${error.message}`, 'error');
+            }
+        }
+
+        function getStreamInfo() {
+            try {
+                const info = getCameraStreamInfo();
+                if (info) {
+                    updateStatus(`Stream Info: ${JSON.stringify(info, null, 2)}`, 'success');
+                } else {
+                    updateStatus('No active stream', 'info');
+                }
+            } catch (error) {
+                updateStatus(`Failed to get stream info: ${error.message}`, 'error');
+            }
+        }
+
+        async function testConstraints() {
+            try {
+                updateStatus('Testing HD constraints...', 'info');
+                
+                const hdConstraints = {
+                    video: {
+                        width: { ideal: 1920, min: 1280 },
+                        height: { ideal: 1080, min: 720 },
+                        frameRate: { ideal: 60, min: 30 }
+                    },
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                };
+                
+                const stream = await requestCameraAccess(hdConstraints);
+                updateStatus('HD constraints supported!', 'success');
+                
+                // Show video track settings
+                const videoTrack = stream.getVideoTracks()[0];
+                if (videoTrack) {
+                    const settings = videoTrack.getSettings();
+                    updateStatus(`HD Stream: ${settings.width}x${settings.height} @ ${settings.frameRate}fps`, 'success');
+                }
+                
+            } catch (error) {
+                updateStatus(`HD constraints failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function takeSnapshot() {
+            try {
+                const video2 = document.getElementById('video2');
+                if (!video2.srcObject) {
+                    updateStatus('No active stream on video 2', 'error');
+                    return;
+                }
+
+                // Create canvas and capture frame
+                const canvas = document.createElement('canvas');
+                canvas.width = video2.videoWidth;
+                canvas.height = video2.videoHeight;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video2, 0, 0);
+                
+                // Convert to blob and create download link
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `snapshot_${Date.now()}.png`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    
+                    updateStatus('Snapshot captured and downloaded!', 'success');
+                });
+                
+            } catch (error) {
+                updateStatus(`Failed to take snapshot: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStatus('Camera demo loaded. Ready to test camera access.', 'success');
+        });
+    </script>
+</body>
+</html>

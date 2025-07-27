@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Routing Debug - Ultrasound Webex</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background: #0a0a0a;
+      color: #e2e8f0;
+    }
+    .debug-info {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .debug-info h3 {
+      color: #3b82f6;
+      margin-top: 0;
+    }
+    .debug-info pre {
+      background: #000;
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    .test-btn {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 0.5rem;
+    }
+    .test-btn:hover {
+      background: #2563eb;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔧 Routing Debug Page</h1>
+  
+  <div class="debug-info">
+    <h3>Current Location Information</h3>
+    <pre id="location-info"></pre>
+  </div>
+
+  <div class="debug-info">
+    <h3>URL Test Results</h3>
+    <div id="url-tests"></div>
+  </div>
+
+  <div class="debug-info">
+    <h3>Test Navigation</h3>
+    <button class="test-btn" onclick="testRelativeNavigation()">Test Relative Navigation</button>
+    <button class="test-btn" onclick="testAbsoluteNavigation()">Test Absolute Navigation</button>
+    <button class="test-btn" onclick="testVideoCallNavigation()">Test Video Call Navigation</button>
+    <button class="test-btn" onclick="testBackToHome()">Back to Home</button>
+  </div>
+
+  <div class="debug-info">
+    <h3>Navigation Log</h3>
+    <pre id="nav-log"></pre>
+  </div>
+
+  <script>
+    let navLog = [];
+
+    function log(message) {
+      const timestamp = new Date().toLocaleTimeString();
+      navLog.push(`[${timestamp}] ${message}`);
+      document.getElementById('nav-log').textContent = navLog.join('\n');
+      console.log(message);
+    }
+
+    function updateLocationInfo() {
+      const info = {
+        href: window.location.href,
+        origin: window.location.origin,
+        pathname: window.location.pathname,
+        search: window.location.search,
+        hash: window.location.hash,
+        host: window.location.host,
+        hostname: window.location.hostname,
+        port: window.location.port,
+        protocol: window.location.protocol
+      };
+      
+      document.getElementById('location-info').textContent = JSON.stringify(info, null, 2);
+      log('Updated location info');
+    }
+
+    function testRelativeNavigation() {
+      log('Testing relative navigation to home-clean.html');
+      window.location.href = 'home-clean.html';
+    }
+
+    function testAbsoluteNavigation() {
+      log('Testing absolute navigation to home-clean.html');
+      window.location.href = '/src/pages/home-clean.html';
+    }
+
+    function testVideoCallNavigation() {
+      log('Testing navigation to video-call-multi.html with parameters');
+      const params = new URLSearchParams({
+        meetingId: 'test-meeting-123',
+        meetingNumber: '123 456 789',
+        isHost: 'true'
+      });
+      window.location.href = `video-call-multi.html?${params.toString()}`;
+    }
+
+    function testBackToHome() {
+      log('Testing navigation back to home-clean.html');
+      window.location.href = 'home-clean.html';
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      log('Debug page loaded');
+      updateLocationInfo();
+      
+      // Test URL construction
+      const testUrls = [
+        'home-clean.html',
+        './home-clean.html',
+        '../pages/home-clean.html',
+        '/src/pages/home-clean.html',
+        'video-call-multi.html',
+        './video-call-multi.html'
+      ];
+      
+      const urlTests = document.getElementById('url-tests');
+      testUrls.forEach(url => {
+        const fullUrl = new URL(url, window.location.href);
+        const div = document.createElement('div');
+        div.innerHTML = `<strong>${url}</strong> → <code>${fullUrl.href}</code>`;
+        urlTests.appendChild(div);
+      });
+    });
+
+    // Monitor navigation
+    window.addEventListener('beforeunload', function() {
+      log('Page unloading...');
+    });
+
+    window.addEventListener('popstate', function(event) {
+      log('Popstate event: ' + JSON.stringify(event.state));
+      updateLocationInfo();
+    });
+  </script>
+</body>
+</html>

@@ -7,10 +7,11 @@ export default defineConfig({
   // Public directory for static assets
   publicDir: 'public',
   
-  // Development server configuration
+  // Development server configuration for Electron app
   server: {
     port: 3000,
-    open: 'src/pages/index.html'
+    strictPort: true,  // Force port 3000 or fail
+    open: false  // Disable auto-opening browser since we're using Electron
   },
   
   // Define global variables for Node.js compatibility
@@ -24,14 +25,15 @@ export default defineConfig({
     outDir: 'dist',
     rollupOptions: {
       input: {
-        main: 'src/pages/index.html',
-        login: 'src/pages/login.html',
-        'auth-callback': 'src/pages/auth-callback.html',
-        'role-selection': 'src/pages/role-selection.html',
-        home: 'src/pages/home.html',
-        profile: 'src/pages/profile.html',
-        library: 'src/pages/library.html',
-        'webex-demo': 'src/pages/webex-demo.html'
+        main: 'index.html',
+        'login-clean': 'src/pages/login-clean.html',
+        'login-oauth': 'src/pages/login-oauth.html',
+        'login-simple': 'src/pages/login-simple.html',
+        'home-clean': 'src/pages/home-clean.html',
+        'profile-clean': 'src/pages/profile-clean.html',
+        'video-call': 'src/pages/video-call.html',
+        'oauth-callback': 'src/pages/oauth-callback.html',
+        'oauth-callback-simple': 'src/pages/oauth-callback-simple.html'
       }
     }
   },
