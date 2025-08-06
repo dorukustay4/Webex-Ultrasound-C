@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VGG Image Annotator - Medical Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f8f9fa;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .via-container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        .via-toolbar {
+            width: 200px;
+            background: #2c3e50;
+            color: white;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        
+        .via-canvas-area {
+            flex: 1;
+            position: relative;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tool-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .tool-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #ecf0f1;
+        }
+        
+        .tool-btn {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 0.25rem;
+            background: #34495e;
+            border: none;
+            color: white;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+        
+        .tool-btn:hover {
+            background: #4a6741;
+        }
+        
+        .tool-btn.active {
+            background: #27ae60;
+        }
+        
+        .via-canvas {
+            border: 1px solid #ddd;
+            cursor: crosshair;
+        }
+        
+        .via-image {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+        
+        .status-bar {
+            position: absolute;
+            bottom: 0;
+            left: 200px;
+            right: 0;
+            background: #34495e;
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .annotation-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #34495e;
+            border-radius: 3px;
+            padding: 0.5rem;
+        }
+        
+        .annotation-item {
+            background: #2c3e50;
+            padding: 0.25rem 0.5rem;
+            margin-bottom: 0.25rem;
+            border-radius: 2px;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+        
+        .annotation-item:hover {
+            background: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <div class="via-container">
+        <div class="via-toolbar">
+            <div class="tool-section">
+                <div class="tool-title">Drawing Tools</div>
+                <button class="tool-btn active" id="polygonBtn">Polygon</button>
+                <button class="tool-btn" id="selectBtn">Select</button>
+            </div>
+            
+            <div class="tool-section">
+                <div class="tool-title">Actions</div>
+                <button class="tool-btn" id="deleteBtn">Delete</button>
+                <button class="tool-btn" id="clearBtn">Clear All</button>
+            </div>
+            
+            <div class="tool-section">
+                <div class="tool-title">Annotations</div>
+                <div class="annotation-list" id="annotationList">
+                    <div style="color: #95a5a6; font-size: 0.7rem; text-align: center; padding: 1rem;">
+                        No annotations yet
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="via-canvas-area">
+            <canvas id="viaCanvas" class="via-canvas" style="position: absolute; z-index: 10;"></canvas>
+            <img id="viaImage" class="via-image" alt="Annotation Image" style="z-index: 1;">
+        </div>
+        
+        <div class="status-bar">
+            <span id="statusText">Ready - Click polygon tool to start drawing</span>
+            <span id="coordText">No coordinates</span>
+        </div>
+    </div>
+
+    <script>
+        let canvas, ctx, img;
+        let isDrawing = false;
+        let currentTool = 'polygon';
+        let currentPolygon = [];
+        let allPolygons = [];
+        let selectedPolygon = null;
+        
+        // Initialize VIA
+        function initVIA() {
+            canvas = document.getElementById('viaCanvas');
+            ctx = canvas.getContext('2d');
+            img = document.getElementById('viaImage');
+            
+            setupEventListeners();
+            updateStatus('VGG Image Annotator Ready');
+        }
+        
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Tool buttons
+            document.getElementById('polygonBtn').addEventListener('click', () => setTool('polygon'));
+            document.getElementById('selectBtn').addEventListener('click', () => setTool('select'));
+            document.getElementById('deleteBtn').addEventListener('click', deleteSelected);
+            document.getElementById('clearBtn').addEventListener('click', clearAll);
+            
+            // Canvas events
+            canvas.addEventListener('click', handleCanvasClick);
+            canvas.addEventListener('dblclick', completePolygon);
+            canvas.addEventListener('mousemove', handleMouseMove);
+            
+            // Listen for messages from parent
+            window.addEventListener('message', handleParentMessage);
+        }
+        
+        // Handle messages from parent window
+        function handleParentMessage(event) {
+            const { type, data } = event.data;
+            
+            switch (type) {
+                case 'load_image':
+                    loadImage(data.src);
+                    break;
+                case 'set_tool':
+                    setTool(data.tool);
+                    break;
+                case 'get_annotations':
+                    sendAnnotationsToParent();
+                    break;
+                case 'clear_all':
+                    clearAll();
+                    break;
+            }
+        }
+        
+        // Load image
+        function loadImage(src) {
+            img.src = src;
+            img.onload = function() {
+                const containerWidth = canvas.parentElement.clientWidth;
+                const containerHeight = canvas.parentElement.clientHeight - 30; // Account for status bar
+                
+                const imgAspect = img.naturalWidth / img.naturalHeight;
+                const containerAspect = containerWidth / containerHeight;
+                
+                let displayWidth, displayHeight;
+                
+                if (imgAspect > containerAspect) {
+                    displayWidth = Math.min(containerWidth * 0.9, img.naturalWidth);
+                    displayHeight = displayWidth / imgAspect;
+                } else {
+                    displayHeight = Math.min(containerHeight * 0.9, img.naturalHeight);
+                    displayWidth = displayHeight * imgAspect;
+                }
+                
+                canvas.width = displayWidth;
+                canvas.height = displayHeight;
+                canvas.style.width = displayWidth + 'px';
+                canvas.style.height = displayHeight + 'px';
+                
+                img.style.width = displayWidth + 'px';
+                img.style.height = displayHeight + 'px';
+                
+                updateStatus('Image loaded - Ready for annotation');
+                redrawCanvas();
+            };
+        }
+        
+        // Set current tool
+        function setTool(tool) {
+            currentTool = tool;
+            
+            // Update button states
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tool + 'Btn').classList.add('active');
+            
+            // Update cursor
+            canvas.style.cursor = tool === 'polygon' ? 'crosshair' : 'pointer';
+            
+            updateStatus(`Tool: ${tool.charAt(0).toUpperCase() + tool.slice(1)}`);
+        }
+        
+        // Handle canvas click
+        function handleCanvasClick(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            if (currentTool === 'polygon') {
+                addPolygonPoint(x, y);
+            } else if (currentTool === 'select') {
+                selectPolygon(x, y);
+            }
+        }
+        
+        // Add point to current polygon
+        function addPolygonPoint(x, y) {
+            currentPolygon.push({ x, y });
+            redrawCanvas();
+            updateStatus(`Polygon: ${currentPolygon.length} points (double-click to complete)`);
+        }
+        
+        // Complete current polygon
+        function completePolygon() {
+            if (currentPolygon.length < 3) return;
+            
+            const annotation = {
+                id: Date.now(),
+                type: 'polygon',
+                points: [...currentPolygon],
+                attributes: {},
+                timestamp: new Date().toISOString()
+            };
+            
+            allPolygons.push(annotation);
+            currentPolygon = [];
+            
+            redrawCanvas();
+            updateAnnotationList();
+            updateStatus(`Polygon completed! Total: ${allPolygons.length}`);
+            
+            // Send to parent
+            sendAnnotationToParent(annotation);
+        }
+        
+        // Select polygon at point
+        function selectPolygon(x, y) {
+            selectedPolygon = null;
+            
+            for (let i = allPolygons.length - 1; i >= 0; i--) {
+                if (isPointInPolygon({ x, y }, allPolygons[i].points)) {
+                    selectedPolygon = i;
+                    break;
+                }
+            }
+            
+            redrawCanvas();
+            updateStatus(selectedPolygon !== null ? `Selected polygon ${selectedPolygon + 1}` : 'No polygon selected');
+        }
+        
+        // Check if point is inside polygon
+        function isPointInPolygon(point, polygon) {
+            let inside = false;
+            for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+                if (((polygon[i].y > point.y) !== (polygon[j].y > point.y)) &&
+                    (point.x < (polygon[j].x - polygon[i].x) * (point.y - polygon[i].y) / (polygon[j].y - polygon[i].y) + polygon[i].x)) {
+                    inside = !inside;
+                }
+            }
+            return inside;
+        }
+        
+        // Delete selected polygon
+        function deleteSelected() {
+            if (selectedPolygon !== null) {
+                allPolygons.splice(selectedPolygon, 1);
+                selectedPolygon = null;
+                redrawCanvas();
+                updateAnnotationList();
+                updateStatus('Selected polygon deleted');
+            }
+        }
+        
+        // Clear all polygons
+        function clearAll() {
+            if (confirm('Clear all annotations?')) {
+                allPolygons = [];
+                currentPolygon = [];
+                selectedPolygon = null;
+                redrawCanvas();
+                updateAnnotationList();
+                updateStatus('All annotations cleared');
+            }
+        }
+        
+        // Redraw canvas
+        function redrawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw completed polygons
+            allPolygons.forEach((annotation, index) => {
+                const color = index === selectedPolygon ? '#e74c3c' : '#27ae60';
+                drawPolygon(annotation.points, color, false, index + 1);
+            });
+            
+            // Draw current polygon being drawn
+            if (currentPolygon.length > 0) {
+                drawPolygon(currentPolygon, '#3498db', true);
+            }
+        }
+        
+        // Draw polygon
+        function drawPolygon(points, color, isActive, label = null) {
+            if (points.length === 0) return;
+            
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color + '30';
+            ctx.lineWidth = 2;
+            
+            // Draw polygon
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].x, points[i].y);
+            }
+            
+            if (!isActive && points.length > 2) {
+                ctx.closePath();
+                ctx.fill();
+            }
+            
+            ctx.stroke();
+            
+            // Draw points
+            points.forEach((point, index) => {
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 4, 0, 2 * Math.PI);
+                ctx.fillStyle = color;
+                ctx.fill();
+                
+                if (isActive) {
+                    ctx.fillStyle = 'white';
+                    ctx.font = '10px Arial';
+                    ctx.fillText((index + 1).toString(), point.x + 6, point.y - 6);
+                }
+            });
+            
+            // Draw label
+            if (label && points.length > 0) {
+                const center = calculateCenter(points);
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 12px Arial';
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 3;
+                ctx.strokeText(label.toString(), center.x - 6, center.y + 4);
+                ctx.fillText(label.toString(), center.x - 6, center.y + 4);
+            }
+        }
+        
+        // Calculate polygon center
+        function calculateCenter(points) {
+            let x = 0, y = 0;
+            points.forEach(point => {
+                x += point.x;
+                y += point.y;
+            });
+            return { x: x / points.length, y: y / points.length };
+        }
+        
+        // Handle mouse move
+        function handleMouseMove(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.round(e.clientX - rect.left);
+            const y = Math.round(e.clientY - rect.top);
+            
+            document.getElementById('coordText').textContent = `X: ${x}, Y: ${y}`;
+        }
+        
+        // Update status
+        function updateStatus(text) {
+            document.getElementById('statusText').textContent = text;
+        }
+        
+        // Update annotation list
+        function updateAnnotationList() {
+            const list = document.getElementById('annotationList');
+            
+            if (allPolygons.length === 0) {
+                list.innerHTML = '<div style="color: #95a5a6; font-size: 0.7rem; text-align: center; padding: 1rem;">No annotations yet</div>';
+                return;
+            }
+            
+            list.innerHTML = allPolygons.map((annotation, index) => 
+                `<div class="annotation-item" onclick="selectAnnotation(${index})">
+                    Polygon ${index + 1} (${annotation.points.length} points)
+                </div>`
+            ).join('');
+        }
+        
+        // Select annotation from list
+        function selectAnnotation(index) {
+            selectedPolygon = index;
+            redrawCanvas();
+            updateStatus(`Selected polygon ${index + 1}`);
+        }
+        
+        // Send annotation to parent
+        function sendAnnotationToParent(annotation) {
+            window.parent.postMessage({
+                type: 'annotation_created',
+                data: annotation
+            }, '*');
+        }
+        
+        // Send all annotations to parent
+        function sendAnnotationsToParent() {
+            window.parent.postMessage({
+                type: 'annotations_export',
+                data: allPolygons
+            }, '*');
+        }
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initVIA);
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (img.src) {
+                loadImage(img.src);
+            }
+        });
+    </script>
+</body>
+</html>

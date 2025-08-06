@@ -1,27 +1,27 @@
 /*
 Project Goal:
-Integrate Webex SDK into an Electron-based web application to support a telemedicine call with four video windows:
-1. Expert Supervisor's video
-2. Resident Doctor's video
-3. Ultrasound feed shared by the Resident
-4. Annotation window for Expert to view snapshots and tag nerves
+Regional Anesthesia Annotation Platform - A specialized Electron application for annotating 
+ultrasound images in ultrasound-guided regional anesthesia procedures.
 
 Functional Requirements:
-- Use Webex JavaScript SDK for video calling
-- Set up Electron to display these four windows simultaneously
-- Enable screen sharing or video feed for ultrasound
-- Include annotation functionality using VGG Image Annotator (or similar) in one window
+- Electron-based desktop application
+- Local VGG Image Annotator integration
+- Specialized annotation attributes for nerve blocks
+- Image upload and annotation workflow
+- Export functionality for research and documentation
 
-Please implement step-by-step with clean and reusable code structure.
+Clean, focused code structure for medical annotation workflow.
 */
 
 
-const { app, BrowserWindow, ipcMain, desktopCapturer, Notification } = require('electron');
+const { app, BrowserWindow, ipcMain, Notification } = require('electron');
 const path = require('path');
 const fs = require('fs').promises;
+const DatabaseManager = require('./src/database/db-manager');
 
-// Keep a global reference of the window object
+// Keep a global reference of the window object and database
 let mainWindow;
+let dbManager;
 
 function createWindow() {
   // Create the browser window
@@ -34,9 +34,8 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       enableRemoteModule: false,
-      webSecurity: false, // Allow embedded OAuth webviews
+      webSecurity: true,
       allowRunningInsecureContent: false,
-      webviewTag: true, // Enable webview tag for embedded OAuth
       preload: path.join(__dirname, 'preload.js')
     },
     titleBarStyle: 'default',
@@ -44,14 +43,14 @@ function createWindow() {
     icon: path.join(__dirname, 'assets/icon.png') // Optional: add an icon
   });
 
-  // Load the login page from the development server
-  const startUrl = 'http://localhost:3000/src/pages/login-simple.html';
+  // Load the home page from the development server
+  const startUrl = 'http://localhost:3000/';
   
-  console.log('Loading Ultrasound Webex app from:', startUrl);
+  console.log('Loading Regional Anesthesia Annotation Platform from:', startUrl);
   
-  // Enable media permissions for camera, microphone, and screen capture
+  // Enable basic permissions for local file access and notifications
   mainWindow.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
-    const allowedPermissions = ['camera', 'microphone', 'display-capture', 'notifications'];
+    const allowedPermissions = ['notifications'];
     
     if (allowedPermissions.includes(permission)) {
       console.log(`Granting permission: ${permission}`);
@@ -62,11 +61,11 @@ function createWindow() {
     }
   });
   
-  // Handle media access requests
+  // Handle permission checks for local development
   mainWindow.webContents.session.setPermissionCheckHandler((webContents, permission, requestingOrigin) => {
-    const allowedPermissions = ['camera', 'microphone', 'display-capture', 'notifications'];
+    const allowedPermissions = ['notifications'];
     
-    // Allow media permissions for localhost development
+    // Allow basic permissions for localhost development
     if (requestingOrigin === 'http://localhost:3000' && allowedPermissions.includes(permission)) {
       console.log(`Allowing ${permission} access for localhost`);
       return true;
@@ -75,8 +74,25 @@ function createWindow() {
     return false;
   });
   
-  // Load the URL
-  mainWindow.loadURL(startUrl);
+  // Load the URL with detailed logging
+  console.log('🔄 Attempting to load URL:', startUrl);
+  
+  // Add navigation listeners for debugging
+  mainWindow.webContents.on('did-start-loading', () => {
+    console.log('📡 Started loading page...');
+  });
+  
+  mainWindow.webContents.on('did-finish-load', () => {
+    console.log('✅ Page loaded successfully');
+  });
+  
+  mainWindow.webContents.on('did-navigate', (event, url) => {
+    console.log('🔄 Navigated to:', url);
+  });
+  
+  mainWindow.loadURL(startUrl).catch(error => {
+    console.error('❌ Failed to load URL:', error);
+  });
   
   // Show window when ready
   mainWindow.once('ready-to-show', () => {
@@ -165,7 +181,7 @@ function createWindow() {
         <body>
           <div class="container">
             <h1>🔧 Development Server Required</h1>
-            <p>The Electron app needs a running development server to load the web pages.</p>
+            <p>The Regional Anesthesia Annotation Platform needs a running development server.</p>
             
             <div class="warning">
               <strong>⚠️ Error:</strong> Could not connect to http://localhost:3000
@@ -217,7 +233,7 @@ function createWindow() {
   // Handle page title updates
   mainWindow.webContents.on('page-title-updated', (event, title) => {
     event.preventDefault();
-    mainWindow.setTitle(`Ultrasound Webex - ${title}`);
+    mainWindow.setTitle(`Regional Anesthesia Annotation Platform - ${title}`);
   });
   
   // Log when navigation occurs
@@ -226,8 +242,32 @@ function createWindow() {
   });
 }
 
-// IPC Handlers for Webex Integration
+// IPC Handlers for Application Features
 function setupIPCHandlers() {
+  // Navigation handler
+  ipcMain.handle('navigate', async (event, page) => {
+    try {
+      let targetUrl;
+      
+      // Construct the proper URL for the development server
+      if (page.startsWith('http')) {
+        targetUrl = page;
+      } else {
+        // Remove .html extension if present and build the localhost URL
+        const pageName = page.replace('.html', '');
+        targetUrl = `http://localhost:3000/src/pages/${pageName}.html`;
+      }
+      
+      console.log('🔄 Navigating to:', targetUrl);
+      await mainWindow.loadURL(targetUrl);
+      
+      return { success: true, url: targetUrl };
+    } catch (error) {
+      console.error('❌ Navigation failed:', error);
+      return { success: false, error: error.message };
+    }
+  });
+  
   // Get system information
   ipcMain.handle('get-system-info', async () => {
     return {
@@ -237,36 +277,6 @@ function setupIPCHandlers() {
       electronVersion: process.versions.electron,
       chromeVersion: process.versions.chrome
     };
-  });
-
-  // Get available media devices
-  ipcMain.handle('get-media-devices', async () => {
-    try {
-      // This will be handled by the renderer process using navigator.mediaDevices
-      return { success: true };
-    } catch (error) {
-      console.error('❌ Failed to get media devices:', error);
-      return { success: false, error: error.message };
-    }
-  });
-
-  // Get screen sources for screen sharing
-  ipcMain.handle('get-screen-sources', async () => {
-    try {
-      const sources = await desktopCapturer.getSources({
-        types: ['window', 'screen'],
-        thumbnailSize: { width: 320, height: 240 }
-      });
-      
-      return sources.map(source => ({
-        id: source.id,
-        name: source.name,
-        thumbnail: source.thumbnail.toDataURL()
-      }));
-    } catch (error) {
-      console.error('❌ Failed to get screen sources:', error);
-      return [];
-    }
   });
 
   // Show system notifications
@@ -333,33 +343,161 @@ function setupIPCHandlers() {
     }
   });
 
-  // Handle opening external URLs (for OAuth)
-  ipcMain.handle('open-external', async (event, url) => {
+  // Database IPC Handlers
+  // Save session to database
+  ipcMain.handle('db-save-session', async (event, sessionData) => {
     try {
-      console.log('🔗 Opening external URL:', url);
-      const { shell } = require('electron');
-      await shell.openExternal(url);
-      return { success: true };
+      console.log('🔄 IPC Handler: db-save-session called');
+      console.log('📊 Session data received:', sessionData);
+      
+      if (!dbManager) {
+        throw new Error('Database not initialized');
+      }
+      
+      const result = await dbManager.saveSession(sessionData);
+      console.log('✅ IPC Handler: Session saved successfully:', result);
+      return { success: true, result };
     } catch (error) {
-      console.error('❌ Failed to open external URL:', error);
+      console.error('❌ IPC Handler: Failed to save session:', error);
+      console.error('❌ Error details:', error.message, error.stack);
       return { success: false, error: error.message };
     }
   });
 
-  console.log('📡 IPC handlers set up for Webex integration');
+  // Save image to database
+  ipcMain.handle('db-save-image', async (event, imageData) => {
+    try {
+      console.log('🔄 IPC Handler: db-save-image called');
+      console.log('📊 Image data received:', {
+        id: imageData.id,
+        sessionId: imageData.sessionId,
+        filename: imageData.filename,
+        hasData: !!imageData.data,
+        dataLength: imageData.data ? imageData.data.length : 0
+      });
+      
+      if (!dbManager) {
+        throw new Error('Database not initialized');
+      }
+      
+      const result = await dbManager.saveImage(imageData);
+      console.log('✅ IPC Handler: Image saved successfully:', result);
+      return { success: true, result };
+    } catch (error) {
+      console.error('❌ IPC Handler: Failed to save image:', error);
+      console.error('❌ Error details:', error.message, error.stack);
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Save annotation to database
+  ipcMain.handle('db-save-annotation', async (event, annotationData) => {
+    try {
+      console.log('🔄 IPC Handler: db-save-annotation called');
+      console.log('📊 Annotation data received:', {
+        id: annotationData.id,
+        sessionId: annotationData.sessionId,
+        imageId: annotationData.imageId,
+        annotationType: annotationData.annotationType,
+        hasPoints: !!annotationData.points
+      });
+      
+      if (!dbManager) {
+        throw new Error('Database not initialized');
+      }
+      
+      const result = await dbManager.saveAnnotation(annotationData);
+      console.log('✅ IPC Handler: Annotation saved successfully:', result);
+      return { success: true, result };
+    } catch (error) {
+      console.error('❌ IPC Handler: Failed to save annotation:', error);
+      console.error('❌ Error details:', error.message, error.stack);
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Get all sessions
+  ipcMain.handle('db-get-sessions', async () => {
+    try {
+      console.log('🔄 IPC Handler: db-get-sessions called');
+      
+      if (!dbManager) {
+        throw new Error('Database not initialized');
+      }
+      
+      const sessions = await dbManager.getAllSessions();
+      console.log('✅ IPC Handler: Retrieved sessions successfully');
+      console.log(`📊 Found ${sessions.length} sessions in database`);
+      
+      sessions.forEach((session, index) => {
+        console.log(`Session ${index + 1}:`, {
+          id: session.id,
+          title: session.title,
+          attendees: session.attendees,
+          total_annotations: session.total_annotations,
+          actual_annotations: session.actual_annotations,
+          status: session.status
+        });
+      });
+      
+      return { success: true, sessions };
+    } catch (error) {
+      console.error('❌ IPC Handler: Failed to get sessions:', error);
+      console.error('❌ Error details:', error.message, error.stack);
+      return { success: false, error: error.message, sessions: [] };
+    }
+  });
+
+  // Get session details
+  ipcMain.handle('db-get-session-details', async (event, sessionId) => {
+    try {
+      if (!dbManager) {
+        throw new Error('Database not initialized');
+      }
+      const sessionDetails = await dbManager.getSessionDetails(sessionId);
+      return { 
+        success: true, 
+        session: sessionDetails?.session,
+        annotations: sessionDetails?.annotations || [],
+        images: sessionDetails?.images || []
+      };
+    } catch (error) {
+      console.error('❌ Failed to get session details:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Delete session
+  ipcMain.handle('db-delete-session', async (event, sessionId) => {
+    try {
+      if (!dbManager) {
+        throw new Error('Database not initialized');
+      }
+      const result = await dbManager.deleteSession(sessionId);
+      return { success: true, result };
+    } catch (error) {
+      console.error('❌ Failed to delete session:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  console.log('🔧 IPC handlers set up for annotation platform with database support');
 }
 
-// Enable media access globally
-app.commandLine.appendSwitch('enable-media-stream');
-app.commandLine.appendSwitch('allow-http-screen-capture');
-app.commandLine.appendSwitch('enable-usermedia-screen-capturing');
-app.commandLine.appendSwitch('auto-select-desktop-capture-source', 'Screen');
-
 // This method will be called when Electron has finished initialization
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   console.log('🎯 Electron app ready');
   
-  // Set up IPC handlers for Webex integration
+  // Initialize database
+  try {
+    dbManager = new DatabaseManager();
+    await dbManager.initialize();
+    console.log('📊 Database initialized successfully');
+  } catch (error) {
+    console.error('❌ Database initialization failed:', error);
+  }
+  
+  // Set up IPC handlers for annotation platform
   setupIPCHandlers();
   
   // Create main window
@@ -378,11 +516,23 @@ app.on('window-all-closed', () => {
   // On macOS, keep app running even when windows are closed
   if (process.platform !== 'darwin') {
     console.log('👋 All windows closed, quitting app');
+    // Close database connection
+    if (dbManager) {
+      dbManager.close();
+    }
     app.quit();
   }
 });
 
-// Security: Prevent navigation to external URLs (except for OAuth)
+// App quit handler
+app.on('before-quit', () => {
+  console.log('🔚 App is quitting, cleaning up...');
+  if (dbManager) {
+    dbManager.close();
+  }
+});
+
+// Security: Prevent navigation to external URLs
 app.on('web-contents-created', (event, contents) => {
   contents.on('will-navigate', (navigationEvent, navigationUrl) => {
     const parsedUrl = new URL(navigationUrl);
@@ -393,37 +543,19 @@ app.on('web-contents-created', (event, contents) => {
       return;
     }
     
-    // Allow Webex OAuth URLs for embedded webviews
-    if (parsedUrl.hostname.includes('webex.com') || 
-        parsedUrl.hostname.includes('webexapis.com') ||
-        parsedUrl.hostname.includes('idbroker-eu.webex.com')) {
-      console.log('🔐 Allowing Webex OAuth URL for embedded webview:', navigationUrl);
-      return;
-    }
-    
-    // Block other external navigation
+    // Block external navigation
     console.log('🚫 Blocking navigation to external URL:', navigationUrl);
     navigationEvent.preventDefault();
   });
   
   contents.on('new-window', (event, navigationUrl) => {
-    const parsedUrl = new URL(navigationUrl);
-    
-    // Allow Webex OAuth URLs for embedded webviews
-    if (parsedUrl.hostname.includes('webex.com') || 
-        parsedUrl.hostname.includes('webexapis.com') ||
-        parsedUrl.hostname.includes('idbroker-eu.webex.com')) {
-      console.log('🔐 Allowing Webex OAuth new window for embedded webview:', navigationUrl);
-      return;
-    }
-    
-    // Prevent other new windows
+    // Prevent new windows
     event.preventDefault();
     console.log('🚫 Blocked new window:', navigationUrl);
   });
 });
 
-console.log('🚀 Ultrasound Webex Electron app starting...');
+console.log('🚀 Regional Anesthesia Annotation Platform starting...');
 console.log('📁 App path:', app.getAppPath());
 console.log('🔧 Node.js version:', process.version);
 console.log('⚡ Electron version:', process.versions.electron);

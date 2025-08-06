@@ -1,5 +1,5 @@
 {
-  "name": "ultrasound-webex-uclxnhs",
+  "name": "ultrasound-annotation-platform",
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
@@ -15,17 +15,17 @@
     "dist": "electron-builder"
   },
   "keywords": [
-    "webex",
     "annotation",
-    "meeting",
+    "medical",
     "ultrasound",
-    "medical"
+    "image-analysis",
+    "vgg"
   ],
   "author": "",
   "license": "ISC",
-  "description": "Ultrasound Webex - Advanced Webex meeting annotation tool with VIA-style polygon annotations",
+  "description": "Ultrasound Annotation Platform - Advanced medical image annotation tool with VGG Image Annotator integration",
   "dependencies": {
-    "webex": "^2.60.4"
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "electron": "^37.2.4",

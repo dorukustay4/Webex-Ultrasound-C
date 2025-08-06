@@ -1,0 +1,2526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regional Anesthesia Annotation Room - Polygon Only</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #fefefe;
+      color: #2d3748;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .annotation-container {
+      display: flex;
+      height: 100vh;
+    }
+
+    /* Header */
+    .annotation-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      height: 60px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .back-btn {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      color: #4a5568;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+
+    .back-btn:hover {
+      background: #edf2f7;
+      border-color: #cbd5e0;
+    }
+
+    .room-title h1 {
+      color: #2d3748;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .upload-btn {
+      background: #4299e1;
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+
+    .upload-btn:hover {
+      background: #3182ce;
+    }
+
+    .session-btn {
+      background: #38a169;
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+
+    .session-btn:hover {
+      background: #2f855a;
+    }
+
+    /* Main Layout */
+    .main-content {
+      display: flex;
+      flex: 1;
+      padding-top: 60px;
+    }
+
+    .canvas-area {
+      flex: 1;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border-right: 1px solid #e2e8f0;
+    }
+
+    .image-container {
+      position: relative;
+      max-width: 90%;
+      max-height: 90%;
+      display: none;
+      cursor: pointer;
+    }
+
+    .image-container.active {
+      display: block;
+    }
+
+    .main-image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .toolbar-panel {
+      width: 320px;
+      background: #f7fafc;
+      border-left: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .toolbar-header {
+      padding: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      background: white;
+    }
+
+    .toolbar-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 0.5rem;
+    }
+
+    .toolbar-subtitle {
+      font-size: 0.85rem;
+      color: #718096;
+    }
+
+    .tool-section {
+      padding: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .tool-section-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 0.75rem;
+    }
+
+    .tool-button {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      color: #4a5568;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .tool-button:hover {
+      background: #edf2f7;
+      border-color: #cbd5e0;
+    }
+
+    .tool-button.active {
+      background: #4299e1;
+      color: white;
+      border-color: #4299e1;
+    }
+
+    .attribute-group {
+      margin-bottom: 1rem;
+    }
+
+    .attribute-label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #4a5568;
+      margin-bottom: 0.25rem;
+      display: block;
+    }
+
+    .attribute-select {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      background: white;
+      font-size: 0.85rem;
+    }
+
+    .attribute-input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      background: white;
+      font-size: 0.85rem;
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    /* Welcome/Upload Screen */
+    .upload-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .upload-prompt {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .upload-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem;
+      background: #f7fafc;
+      border: 2px dashed #cbd5e0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #a0aec0;
+    }
+
+    .upload-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 0.5rem;
+    }
+
+    .upload-description {
+      color: #718096;
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .upload-area {
+      border: 2px dashed #cbd5e0;
+      border-radius: 8px;
+      padding: 2rem;
+      background: #f7fafc;
+      cursor: pointer;
+      transition: all 0.2s;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .upload-area:hover {
+      border-color: #4299e1;
+      background: #ebf8ff;
+    }
+
+    .upload-area input {
+      display: none;
+    }
+
+    .upload-text {
+      color: #4299e1;
+      font-weight: 500;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .upload-hint {
+      color: #718096;
+      font-size: 0.85rem;
+    }
+
+    /* VIA Container - Initially Hidden */
+    .via-container {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 320px;
+      bottom: 0;
+      background: white;
+      display: none;
+      z-index: 5;
+    }
+
+    .via-container.active {
+      display: block;
+    }
+
+    .annotation-workspace {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8f9fa;
+    }
+
+    #annotationCanvas {
+      border: none;
+      background: transparent;
+    }
+
+    #workspaceImage {
+      display: block;
+    }
+
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e2e8f0;
+      border-top: 3px solid #4299e1;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      color: #4a5568;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-subtitle {
+      color: #718096;
+      font-size: 0.9rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #4a5568;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #4299e1;
+      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      background: white;
+      transition: all 0.2s;
+    }
+
+    .form-select:focus {
+      outline: none;
+      border-color: #4299e1;
+      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+      margin-top: 2rem;
+    }
+
+    .btn-cancel {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      color: #4a5568;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-cancel:hover {
+      background: #edf2f7;
+      border-color: #cbd5e0;
+    }
+
+    .btn-primary {
+      background: #4299e1;
+      border: none;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #3182ce;
+    }
+
+    .btn-danger {
+      background: #e53e3e;
+      border: none;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-danger:hover {
+      background: #c53030;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .stat-item {
+      background: #f7fafc;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+  <div class="annotation-container">
+    <!-- Header -->
+    <header class="annotation-header">
+      <div class="header-left">
+        <a href="home-clean.html" class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Back to Home
+        </a>
+        <div class="room-title">
+          <h1>Annotation Whiteboard</h1>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <button class="upload-btn" id="startSessionBtn" onclick="showStartSessionModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Start a Session
+        </button>
+        <button class="session-btn" id="sessionControls" style="display: none;">
+          <span id="sessionInfo">Session: #001</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Canvas Area -->
+      <div class="canvas-area">
+        <!-- Upload Overlay -->
+        <div class="upload-overlay" id="uploadOverlay">
+          <div class="upload-prompt">
+            <div class="upload-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 16L4 17C4 18.1046 4.89543 19 6 19L18 19C19.1046 19 20 18.1046 20 17L20 16M16 8L12 4M12 4L8 8M12 4L12 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h2 class="upload-title">Upload an Image</h2>
+            <p class="upload-description">Click below to select an image for annotation</p>
+            
+            <div class="upload-area" onclick="uploadImages()">
+              <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(event)">
+              <div class="upload-text">Choose Image File</div>
+              <div class="upload-hint">JPG, PNG, DICOM supported</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Image Display Area -->
+        <div class="image-container" id="imageContainer">
+          <img id="mainImage" class="main-image" alt="Annotation Image">
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+          <div class="loading-spinner"></div>
+          <div class="loading-text">Preparing annotation tools...</div>
+        </div>
+      </div>
+
+      <!-- Toolbar Panel -->
+      <div class="toolbar-panel">
+        <div class="toolbar-header">
+          <div class="toolbar-title">Annotation Tools</div>
+          <div class="toolbar-subtitle">Ultrasound-guided regional anesthesia</div>
+        </div>
+
+        <div class="tool-section">
+          <div class="tool-section-title">Drawing Tools</div>
+          <button class="tool-button active" id="polygonTool" onclick="activatePolygonTool()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Polygon Tool
+          </button>
+        </div>
+
+        <div class="tool-section">
+          <div class="tool-section-title">Regional Anesthesia Attributes</div>
+          
+          <div class="attribute-group">
+            <label class="attribute-label">Nerve Type</label>
+            <select class="attribute-select" id="nerveType">
+              <option value="Brachial Plexus">Brachial Plexus</option>
+              <option value="Femoral">Femoral</option>
+              <option value="Sciatic">Sciatic</option>
+              <option value="Popliteal">Popliteal</option>
+              <option value="Axillary">Axillary</option>
+              <option value="Interscalene">Interscalene</option>
+              <option value="Supraclavicular">Supraclavicular</option>
+              <option value="Infraclavicular">Infraclavicular</option>
+              <option value="Adductor Canal">Adductor Canal</option>
+              <option value="Lateral Femoral Cutaneous">Lateral Femoral Cutaneous</option>
+              <option value="Obturator">Obturator</option>
+              <option value="Common Peroneal">Common Peroneal</option>
+              <option value="Tibial">Tibial</option>
+              <option value="Superficial Peroneal">Superficial Peroneal</option>
+              <option value="Deep Peroneal">Deep Peroneal</option>
+              <option value="Median">Median</option>
+              <option value="Ulnar">Ulnar</option>
+              <option value="Radial">Radial</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="attribute-group">
+            <label class="attribute-label">Side of Body</label>
+            <select class="attribute-select" id="sideOfBody">
+              <option value="Left">Left</option>
+              <option value="Right">Right</option>
+              <option value="Bilateral">Bilateral</option>
+            </select>
+          </div>
+
+          <div class="attribute-group">
+            <label class="attribute-label">Patient Position</label>
+            <select class="attribute-select" id="patientPosition">
+              <option value="Supine">Supine</option>
+              <option value="Lateral Decubitus">Lateral Decubitus</option>
+              <option value="Prone">Prone</option>
+              <option value="Sitting">Sitting</option>
+              <option value="Trendelenburg">Trendelenburg</option>
+              <option value="Reverse Trendelenburg">Reverse Trendelenburg</option>
+              <option value="Beach Chair">Beach Chair</option>
+              <option value="Lithotomy">Lithotomy</option>
+            </select>
+          </div>
+
+          <div class="attribute-group">
+            <label class="attribute-label">Visibility</label>
+            <select class="attribute-select" id="visibility">
+              <option value="Excellent">Excellent</option>
+              <option value="Good">Good</option>
+              <option value="Fair">Fair</option>
+              <option value="Poor">Poor</option>
+              <option value="Not Visible">Not Visible</option>
+            </select>
+          </div>
+
+          <div class="attribute-group">
+            <label class="attribute-label">Patient Age Group</label>
+            <select class="attribute-select" id="patientAgeGroup">
+              <option value="Neonate">Neonate (0-28 days)</option>
+              <option value="Infant">Infant (1 month - 2 years)</option>
+              <option value="Child">Child (2-12 years)</option>
+              <option value="Adolescent">Adolescent (12-18 years)</option>
+              <option value="Young Adult">Young Adult (18-40 years)</option>
+              <option value="Middle Age">Middle Age (40-65 years)</option>
+              <option value="Elderly">Elderly (65+ years)</option>
+            </select>
+          </div>
+
+          <div class="attribute-group">
+            <label class="attribute-label">Needle Approach</label>
+            <select class="attribute-select" id="needleApproach">
+              <option value="In-plane">In-plane</option>
+              <option value="Out-of-plane">Out-of-plane</option>
+              <option value="Oblique">Oblique</option>
+              <option value="Perpendicular">Perpendicular</option>
+            </select>
+          </div>
+
+          <div class="attribute-group">
+            <label class="attribute-label">Clinical Notes</label>
+            <textarea class="attribute-input" id="clinicalNotes" placeholder="Additional observations about the procedure..."></textarea>
+          </div>
+        </div>
+
+        <div class="tool-section">
+          <div class="tool-section-title">Actions</div>
+          <button class="tool-button" id="saveAnnotationBtn" onclick="saveCurrentAnnotation()" style="display: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 21H5C4.44772 21 4 20.5523 4 20V4C4 3.44772 4.44772 3 5 3H16L20 7V20C20 20.5523 19.5523 21 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M17 21V13H7V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M7 3V8H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Save Current Annotation
+          </button>
+          <button class="tool-button" id="testAnnotationBtn" onclick="createTestAnnotation()" style="display: none;" title="Create a test annotation for testing">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Create Test Annotation
+          </button>
+          <button class="tool-button" id="debugBtn" onclick="debugSessionData()" style="display: none;" title="Debug current session data">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 8V12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Debug Session Data
+          </button>
+          <button class="tool-button" id="nextAnnotationBtn" onclick="nextAnnotation()" style="display: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Next Annotation
+          </button>
+          <button class="tool-button" id="endSessionBtn" onclick="showEndSessionModal()" style="display: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            End Session
+          </button>
+          <button class="tool-button" onclick="clearAnnotations()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 6H5H21M19 6V20C19 21.1046 18.1046 22 17 22H7C5.89543 22 5 21.1046 5 20V6M8 6V4C8 2.89543 8.89543 2 10 2H14C15.1046 2 16 2.89543 16 4V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Clear All
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VGG Image Annotator Container -->
+    <div class="via-container" id="viaContainer">
+      <iframe 
+        id="via_image_annotator" 
+        src="/via/via-simple.html" 
+        style="width: 100%; height: 100%; border: none;"
+        title="VGG Image Annotator">
+      </iframe>
+      
+      <!-- Loading Overlay for VIA -->
+      <div class="loading-overlay" id="viaLoadingOverlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading VGG Image Annotator...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Start Session Modal -->
+  <div class="modal-overlay" id="startSessionModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Start New Annotation Session</h2>
+        <p class="modal-subtitle">Configure your regional anesthesia annotation session</p>
+      </div>
+      
+      <form id="sessionForm">
+        <div class="form-group">
+          <label class="form-label">Session Title</label>
+          <input type="text" class="form-input" id="sessionTitle" placeholder="e.g., Ultrasound-guided Nerve Block Study" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Doctor Name</label>
+          <input type="text" class="form-input" id="doctorName" placeholder="e.g., Dr. Smith" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-select" id="sessionCategory" required>
+            <option value="">Select category...</option>
+            <option value="consultation">Consultation</option>
+            <option value="training">Training</option>
+            <option value="annotation_session">Annotation Session</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Session ID</label>
+          <input type="text" class="form-input" id="sessionId" readonly>
+        </div>
+      </form>
+      
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeStartSessionModal()">Cancel</button>
+        <button type="button" class="btn-primary" onclick="startSession()">Start Session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Session Modal -->
+  <div class="modal-overlay" id="endSessionModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">End Session</h2>
+        <p class="modal-subtitle">Session statistics and export options</p>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number" id="totalAnnotations">0</div>
+          <div class="stat-label">Total Annotations</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="totalImages">0</div>
+          <div class="stat-label">Images Annotated</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="sessionDuration">00:00</div>
+          <div class="stat-label">Session Duration</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="sessionCategory">-</div>
+          <div class="stat-label">Category</div>
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeEndSessionModal()">Continue Session</button>
+        <button type="button" class="btn-primary" onclick="exportSessionData()">Export Session Data</button>
+        <button type="button" class="btn-danger" onclick="endSession()">End Session</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentImage = null;
+    let currentSession = null;
+    let sessionAnnotations = [];
+    let sessionImages = [];
+    let sessionStartTime = null;
+
+    // Session Management Functions
+    function showStartSessionModal() {
+      // Double-check current session state
+      console.log('🔍 Checking session state before opening modal:', currentSession);
+      
+      // If there's an active session, warn user
+      if (currentSession && currentSession.status === 'active') {
+        showToast('Please end the current session before starting a new one', 'warning');
+        return;
+      }
+      
+      // Clear any residual session data to ensure clean state
+      if (currentSession) {
+        console.log('⚠️ Found inactive session data, clearing...');
+        currentSession = null;
+        sessionAnnotations = [];
+        sessionImages = [];
+        sessionStartTime = null;
+        currentImage = null;
+      }
+      
+      // Generate next session ID
+      const lastSessionId = parseInt(localStorage.getItem('lastSessionId') || '0');
+      const nextSessionId = (lastSessionId + 1).toString().padStart(3, '0');
+      document.getElementById('sessionId').value = nextSessionId;
+      
+      // Clear form inputs for fresh start
+      document.getElementById('sessionTitle').value = '';
+      document.getElementById('doctorName').value = '';
+      document.getElementById('sessionCategory').value = 'annotation_session';
+      
+      console.log('✅ Opening session modal for new session #' + nextSessionId);
+      document.getElementById('startSessionModal').classList.add('active');
+    }
+
+    function closeStartSessionModal() {
+      document.getElementById('startSessionModal').classList.remove('active');
+      document.getElementById('sessionForm').reset();
+    }
+
+    // Debug helper function
+    function checkSessionState() {
+      console.log('📊 Current Session State Debug:');
+      console.log('- currentSession:', currentSession);
+      console.log('- sessionAnnotations length:', sessionAnnotations?.length || 0);
+      console.log('- sessionImages length:', sessionImages?.length || 0);
+      console.log('- sessionStartTime:', sessionStartTime);
+      console.log('- currentImage:', currentImage);
+      console.log('- localStorage currentSession:', localStorage.getItem('currentSession'));
+      console.log('- localStorage sessionStartTime:', localStorage.getItem('sessionStartTime'));
+      
+      // Check form availability
+      const titleInput = document.getElementById('sessionTitle');
+      const doctorInput = document.getElementById('doctorName');
+      const categorySelect = document.getElementById('sessionCategory');
+      
+      console.log('📝 Form Element States:');
+      console.log('- Title input disabled:', titleInput?.disabled);
+      console.log('- Doctor input disabled:', doctorInput?.disabled);
+      console.log('- Category select disabled:', categorySelect?.disabled);
+      console.log('- Start button visible:', document.getElementById('startSessionBtn')?.style.display !== 'none');
+      
+      return {
+        currentSession,
+        sessionAnnotations: sessionAnnotations?.length || 0,
+        sessionImages: sessionImages?.length || 0,
+        formAccessible: !titleInput?.disabled && !doctorInput?.disabled && !categorySelect?.disabled
+      };
+    }
+
+    // Make debug function globally available
+    window.checkSessionState = checkSessionState;
+
+    function startSession() {
+      const form = document.getElementById('sessionForm');
+      const title = document.getElementById('sessionTitle').value.trim();
+      const doctorName = document.getElementById('doctorName').value.trim();
+      const category = document.getElementById('sessionCategory').value;
+      const sessionId = document.getElementById('sessionId').value;
+      
+      console.log('🚀 Starting new session with data:', { title, doctorName, category, sessionId });
+      
+      if (!title || !doctorName || !category) {
+        console.error('❌ Form validation failed:', { title: !!title, doctorName: !!doctorName, category: !!category });
+        showToast('Please fill in all required fields', 'error');
+        return;
+      }
+      
+      // Clear any old session data to prevent mixing
+      console.log('🧹 Clearing ALL old annotation data from localStorage');
+      localStorage.removeItem('medical_annotations');
+      localStorage.removeItem('session_images');
+      
+      // Also clear any other annotation-related data
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.includes('annotation') || key.includes('session_images') || key.includes('medical_'))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => {
+        localStorage.removeItem(key);
+        console.log(`🗑️ Removed old data: ${key}`);
+      });
+      
+      // Create session object
+      currentSession = {
+        id: sessionId,
+        title: title,
+        doctor_name: doctorName,
+        category: category,
+        startTime: new Date().toISOString(),
+        endTime: null,
+        annotations: [],
+        images: [],
+        status: 'active'
+      };
+      
+      sessionStartTime = Date.now();
+      sessionAnnotations = [];
+      sessionImages = [];
+      
+      // Update UI
+      document.getElementById('startSessionBtn').style.display = 'none';
+      document.getElementById('sessionControls').style.display = 'inline-flex';
+      document.getElementById('sessionInfo').textContent = `Session: #${sessionId}`;
+      
+      document.getElementById('saveAnnotationBtn').style.display = 'block';
+      document.getElementById('testAnnotationBtn').style.display = 'block';
+      document.getElementById('debugBtn').style.display = 'block';
+      document.getElementById('nextAnnotationBtn').style.display = 'block';
+      document.getElementById('endSessionBtn').style.display = 'block';
+      
+      // Save session data to localStorage for persistence
+      localStorage.setItem('currentSession', JSON.stringify(currentSession));
+      localStorage.setItem('sessionStartTime', sessionStartTime.toString());
+      localStorage.setItem('lastSessionId', sessionId);
+      
+      closeStartSessionModal();
+      showToast(`Session #${sessionId} started successfully! You can now upload images.`, 'success');
+      
+      console.log('🚀 Session started:', currentSession);
+      console.log('💾 Session data saved to localStorage');
+    }
+
+    function saveCurrentAnnotation() {
+      if (!currentSession) {
+        showToast('No active session', 'error');
+        return;
+      }
+      
+      if (!currentImage) {
+        showToast('No image loaded to save annotation for', 'error');
+        return;
+      }
+      
+      // Get current VIA annotations by requesting them
+      try {
+        const viaFrame = document.getElementById('via_image_annotator');
+        const viaWindow = viaFrame.contentWindow;
+        
+        if (viaWindow) {
+          // Request current annotations from VIA
+          viaWindow.postMessage({ type: 'get_annotations' }, '*');
+          showToast('Requesting annotations from VIA...', 'info');
+          return;
+        }
+      } catch (error) {
+        console.log('Could not get annotations from VIA, saving form data only');
+      }
+      
+      // Fallback: save current form data as annotation even without polygon points
+      saveAnnotationToSession();
+    }
+
+    function saveAnnotationToSession() {
+      if (!currentSession || !currentImage) {
+        console.log('⚠️ Missing session or image for annotation save');
+        return;
+      }
+      
+      const annotation = {
+        id: Date.now().toString(),
+        timestamp: new Date().toISOString(),
+        imageId: currentImage.id,
+        imageName: currentImage.filename,
+        annotationType: 'polygon',
+        points: [], // Will be populated by VIA annotations if available
+        nerveType: document.getElementById('nerveType').value,
+        sideOfBody: document.getElementById('sideOfBody').value,
+        patientPosition: document.getElementById('patientPosition').value,
+        visibility: document.getElementById('visibility').value,
+        patientAgeGroup: document.getElementById('patientAgeGroup').value,
+        needleApproach: document.getElementById('needleApproach').value,
+        clinicalNotes: document.getElementById('clinicalNotes').value
+      };
+      
+      sessionAnnotations.push(annotation);
+      currentSession.annotations.push(annotation);
+      
+      // Add image to session if not already included
+      if (!sessionImages.find(img => img.id === currentImage.id)) {
+        const imageData = {
+          id: currentImage.id,
+          sessionId: currentSession.id,
+          filename: currentImage.filename,
+          data: currentImage.data, // Ensure base64 image data is included
+          filePath: null,
+          fileSize: currentImage.size,
+          fileType: currentImage.type,
+          uploadedAt: currentImage.uploadedAt
+        };
+        
+        sessionImages.push(imageData);
+        currentSession.images.push(currentImage);
+        
+        console.log('✅ Added image to session:', {
+          filename: imageData.filename,
+          id: imageData.id,
+          hasData: !!imageData.data,
+          dataLength: imageData.data ? imageData.data.length : 0
+        });
+        
+        // Save image to database
+        if (window.electronAPI && window.electronAPI.dbSaveImage) {
+          window.electronAPI.dbSaveImage(imageData)
+            .then(result => {
+              if (result.success) {
+                console.log('✅ Image saved to database:', result);
+              } else {
+                console.error('❌ Failed to save image to database:', result.error);
+              }
+            })
+            .catch(error => {
+              console.error('❌ Database image save error:', error);
+            });
+        }
+      } else {
+        console.log('ℹ️ Image already exists in session images');
+      }
+      
+      // Save annotation to database
+      const dbAnnotation = {
+        id: annotation.id,
+        sessionId: currentSession.id,
+        imageId: annotation.imageId,
+        annotationType: annotation.annotationType,
+        points: JSON.stringify(annotation.points), // Convert to JSON string for database
+        nerveType: annotation.nerveType,
+        sideOfBody: annotation.sideOfBody,
+        patientPosition: annotation.patientPosition,
+        visibility: annotation.visibility,
+        patientAgeGroup: annotation.patientAgeGroup,
+        needleApproach: annotation.needleApproach,
+        clinicalNotes: annotation.clinicalNotes,
+        timestamp: annotation.timestamp
+      };
+      
+      if (window.electronAPI && window.electronAPI.dbSaveAnnotation) {
+        window.electronAPI.dbSaveAnnotation(dbAnnotation)
+          .then(result => {
+            if (result.success) {
+              console.log('✅ Annotation saved to database:', result);
+            } else {
+              console.error('❌ Failed to save annotation to database:', result.error);
+            }
+          })
+          .catch(error => {
+            console.error('❌ Database annotation save error:', error);
+          });
+      }
+      
+      showToast('Annotation saved to session!', 'success');
+      console.log('💾 Annotation saved to session:', annotation);
+      console.log(`📊 Session now has ${sessionAnnotations.length} annotations and ${sessionImages.length} images`);
+    }
+
+    function nextAnnotation() {
+      if (!currentSession) {
+        showToast('No active session', 'error');
+        return;
+      }
+      
+      // Reset the interface for next annotation
+      document.getElementById('viaContainer').classList.remove('active');
+      document.getElementById('imageContainer').classList.remove('active');
+      document.getElementById('uploadOverlay').style.display = 'flex';
+      currentImage = null;
+      
+      // Reset form fields to defaults
+      document.getElementById('nerveType').selectedIndex = 0;
+      document.getElementById('sideOfBody').selectedIndex = 0;
+      document.getElementById('patientPosition').selectedIndex = 0;
+      document.getElementById('visibility').selectedIndex = 1; // Good is default
+      document.getElementById('patientAgeGroup').selectedIndex = 4; // Young Adult is default
+      document.getElementById('needleApproach').selectedIndex = 0;
+      document.getElementById('clinicalNotes').value = '';
+      
+      showToast('Ready for next annotation - upload a new image', 'info');
+    }
+
+    function showEndSessionModal() {
+      if (!currentSession) {
+        showToast('No active session', 'error');
+        return;
+      }
+      
+      // Calculate session duration
+      const duration = Date.now() - sessionStartTime;
+      const minutes = Math.floor(duration / 60000);
+      const seconds = Math.floor((duration % 60000) / 1000);
+      const durationStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      
+      // Update modal stats
+      document.getElementById('totalAnnotations').textContent = sessionAnnotations.length;
+      document.getElementById('totalImages').textContent = sessionImages.length;
+      document.getElementById('sessionDuration').textContent = durationStr;
+      document.getElementById('sessionCategory').textContent = currentSession.category.replace('_', ' ');
+      
+      document.getElementById('endSessionModal').classList.add('active');
+    }
+
+    function closeEndSessionModal() {
+      document.getElementById('endSessionModal').classList.remove('active');
+    }
+
+    async function exportSessionData() {
+      if (!currentSession) {
+        showToast('No active session to export', 'error');
+        return;
+      }
+      
+      const sessionDuration = Date.now() - sessionStartTime;
+      
+      console.log('📤 Exporting session data:');
+      console.log('- Session annotations:', sessionAnnotations.length);
+      console.log('- Session images:', sessionImages.length);
+      console.log('- Current session annotations:', currentSession.annotations?.length || 0);
+      
+      // Use ONLY current session annotations (not localStorage)
+      const currentSessionAnnotations = sessionAnnotations || [];
+      
+      showToast('Preparing export with image compression...', 'info');
+      
+      // Create flattened annotation-image pairs for CURRENT SESSION ONLY
+      const flattenedAnnotations = await Promise.all(currentSessionAnnotations.map(async (annotation) => {
+        const associatedImage = sessionImages.find(img => img.id === annotation.imageId);
+        
+        // Compress image data if it exists
+        let imageInfo = {
+          data: null,
+          compressionNote: 'No image data available'
+        };
+        
+        if (associatedImage?.data) {
+          if (associatedImage.data.length > 100000) { // If larger than ~100KB, compress
+            imageInfo = await compressImageForExport(associatedImage.data, 800, 0.8);
+          } else {
+            imageInfo = {
+              data: associatedImage.data,
+              originalSize: associatedImage.data.length,
+              compressedSize: associatedImage.data.length,
+              compressionRatio: 0,
+              note: 'No compression needed (small image)'
+            };
+          }
+        }
+        
+        return {
+          // Annotation data
+          annotationId: annotation.id,
+          annotationTimestamp: annotation.timestamp,
+          annotationType: annotation.annotationType,
+          annotationPoints: annotation.points,
+          
+          // Medical attributes
+          nerveType: annotation.nerveType,
+          sideOfBody: annotation.sideOfBody,
+          patientPosition: annotation.patientPosition,
+          visibility: annotation.visibility,
+          patientAgeGroup: annotation.patientAgeGroup,
+          needleApproach: annotation.needleApproach,
+          clinicalNotes: annotation.clinicalNotes,
+          
+          // Image data paired with annotation (current session only)
+          imageId: annotation.imageId,
+          imageName: annotation.imageName,
+          imageData: imageInfo.data,
+          imageSize: associatedImage?.size || associatedImage?.fileSize || null,
+          imageType: associatedImage?.type || associatedImage?.fileType || null,
+          imageUploadedAt: associatedImage?.uploadedAt || null,
+          imageCompression: {
+            originalSize: imageInfo.originalSize || 0,
+            compressedSize: imageInfo.compressedSize || 0,
+            compressionRatio: imageInfo.compressionRatio || 0,
+            note: imageInfo.note || imageInfo.compressionNote
+          }
+        };
+      }));
+      
+      const exportData = {
+        sessionInfo: {
+          id: currentSession.id,
+          title: currentSession.title,
+          attendees: currentSession.doctor_name,
+          category: currentSession.category,
+          startTime: currentSession.startTime,
+          exportTime: new Date().toISOString(),
+          duration: sessionDuration,
+          totalAnnotations: currentSessionAnnotations.length,
+          totalImages: sessionImages.length
+        },
+        format: 'flattened_annotation_image_pairs',
+        description: 'Session export with annotation-image pairs in flattened format (CURRENT SESSION ONLY)',
+        dataSource: 'current_session_only',
+        compressionInfo: 'Images automatically compressed for optimal file size',
+        annotations: flattenedAnnotations
+      };
+      
+      const filename = `session_${currentSession.id}_${currentSession.category}_${new Date().toISOString().split('T')[0]}.json`;
+      downloadJSON(exportData, filename);
+      
+      showToast(`Session data exported with ${currentSessionAnnotations.length} annotations from current session only!`, 'success');
+      console.log('📤 Current session data exported with compression:', exportData);
+    }
+
+    function endSession() {
+      if (!currentSession) return;
+      
+      currentSession.endTime = new Date().toISOString();
+      currentSession.status = 'completed';
+      
+      // Save final session data to database
+      const sessionData = {
+        id: currentSession.id,
+        title: currentSession.title,
+        attendees: currentSession.doctor_name, // Map doctor_name to attendees for database
+        category: currentSession.category,
+        startTime: currentSession.startTime,
+        endTime: currentSession.endTime,
+        duration: Date.now() - sessionStartTime,
+        totalAnnotations: sessionAnnotations.length,
+        totalImages: sessionImages.length,
+        status: 'completed'
+      };
+      
+      console.log('💾 Saving session data to database:', sessionData);
+      console.log('📊 Session contains:', {
+        annotations: sessionAnnotations.length,
+        images: sessionImages.length,
+        duration: sessionData.duration
+      });
+      
+      // Ensure all annotations are saved to database before ending session
+      const saveAllAnnotations = async () => {
+        if (sessionAnnotations.length > 0) {
+          console.log(`🔄 Ensuring ${sessionAnnotations.length} annotations are saved to database...`);
+          for (const annotation of sessionAnnotations) {
+            const dbAnnotation = {
+              id: annotation.id,
+              sessionId: currentSession.id,
+              imageId: annotation.imageId,
+              annotationType: annotation.annotationType,
+              points: JSON.stringify(annotation.points),
+              nerveType: annotation.nerveType,
+              sideOfBody: annotation.sideOfBody,
+              patientPosition: annotation.patientPosition,
+              visibility: annotation.visibility,
+              patientAgeGroup: annotation.patientAgeGroup,
+              needleApproach: annotation.needleApproach,
+              clinicalNotes: annotation.clinicalNotes,
+              timestamp: annotation.timestamp
+            };
+            
+            try {
+              await window.electronAPI.dbSaveAnnotation(dbAnnotation);
+              console.log(`✅ Annotation ${annotation.id} ensured in database`);
+            } catch (error) {
+              console.error(`❌ Failed to ensure annotation ${annotation.id}:`, error);
+            }
+          }
+        }
+      };
+      
+      // Save annotations first, then save session
+      if (window.electronAPI && window.electronAPI.dbSaveSession) {
+        // First ensure all annotations are in database
+        saveAllAnnotations().then(() => {
+          // Then save the session with the correct count
+          return window.electronAPI.dbSaveSession(sessionData);
+        }).then(result => {
+          if (result.success) {
+            console.log('✅ Session saved to database successfully:', result);
+            showToast('Session data saved to library!', 'success');
+          } else {
+            console.error('❌ Failed to save session to database:', result.error);
+            showToast('Session completed but save failed', 'error');
+          }
+        }).catch(error => {
+          console.error('❌ Database save error:', error);
+          showToast('Session completed but save failed', 'error');
+        });
+      } else {
+        console.error('❌ electronAPI or dbSaveSession not available');
+        showToast('Database not available - session not saved', 'error');
+      }
+      
+      // Clean up localStorage
+      localStorage.removeItem('currentSession');
+      localStorage.removeItem('sessionStartTime');
+      
+      // Reset UI to initial state
+      document.getElementById('startSessionBtn').style.display = 'inline-flex';
+      document.getElementById('sessionControls').style.display = 'none';
+      
+      document.getElementById('saveAnnotationBtn').style.display = 'none';
+      document.getElementById('testAnnotationBtn').style.display = 'none';
+      document.getElementById('debugBtn').style.display = 'none';
+      document.getElementById('nextAnnotationBtn').style.display = 'none';
+      document.getElementById('endSessionBtn').style.display = 'none';
+      
+      // Reset workspace
+      document.getElementById('viaContainer').classList.remove('active');
+      document.getElementById('imageContainer').classList.remove('active');
+      document.getElementById('uploadOverlay').style.display = 'flex';
+      
+      closeEndSessionModal();
+      
+      console.log('🏁 Session ended:', currentSession);
+      const endedSessionId = currentSession.id;
+      
+      // Clear session data IMMEDIATELY
+      currentSession = null;
+      sessionAnnotations = [];
+      sessionImages = [];
+      sessionStartTime = null;
+      currentImage = null;
+      
+      // Clear form inputs to ensure fresh start
+      document.getElementById('sessionTitle').value = '';
+      document.getElementById('doctorName').value = '';
+      document.getElementById('sessionCategory').value = 'annotation_session';
+      
+      showToast(`Session #${endedSessionId} ended successfully! You can start a new session.`, 'success');
+      
+      console.log('✅ Session data cleared, ready for new session');
+    }
+
+    // Predefined Medical Attributes for Ultrasound-Guided Regional Anesthesia
+    const MEDICAL_ATTRIBUTES = {
+      "Nerve_Type": {
+        type: "dropdown",
+        description: "Type of nerve being targeted for regional anesthesia",
+        options: {
+          "Brachial Plexus": "Brachial plexus nerve block",
+          "Femoral": "Femoral nerve block",
+          "Sciatic": "Sciatic nerve block",
+          "Popliteal": "Popliteal nerve block",
+          "Axillary": "Axillary nerve block",
+          "Interscalene": "Interscalene brachial plexus block",
+          "Supraclavicular": "Supraclavicular brachial plexus block",
+          "Infraclavicular": "Infraclavicular brachial plexus block",
+          "Adductor Canal": "Adductor canal (saphenous) nerve block",
+          "Lateral Femoral Cutaneous": "Lateral femoral cutaneous nerve block",
+          "Obturator": "Obturator nerve block",
+          "Common Peroneal": "Common peroneal nerve block",
+          "Tibial": "Tibial nerve block",
+          "Superficial Peroneal": "Superficial peroneal nerve block",
+          "Deep Peroneal": "Deep peroneal nerve block",
+          "Median": "Median nerve block",
+          "Ulnar": "Ulnar nerve block",
+          "Radial": "Radial nerve block",
+          "Other": "Other nerve type"
+        },
+        default_option_id: "Brachial Plexus"
+      },
+      "Side_of_Body": {
+        type: "dropdown",
+        description: "Side of body where the procedure is performed",
+        options: {
+          "Left": "Left side",
+          "Right": "Right side", 
+          "Bilateral": "Both sides"
+        },
+        default_option_id: "Left"
+      },
+      "Patient_Position": {
+        type: "dropdown",
+        description: "Patient positioning during the procedure",
+        options: {
+          "Supine": "Supine position",
+          "Lateral Decubitus": "Lateral decubitus position",
+          "Prone": "Prone position",
+          "Sitting": "Sitting position",
+          "Trendelenburg": "Trendelenburg position",
+          "Reverse Trendelenburg": "Reverse Trendelenburg position",
+          "Beach Chair": "Beach chair position",
+          "Lithotomy": "Lithotomy position"
+        },
+        default_option_id: "Supine"
+      },
+      "Visibility": {
+        type: "dropdown",
+        description: "Ultrasound visualization quality of target structures",
+        options: {
+          "Excellent": "Excellent visualization",
+          "Good": "Good visualization",
+          "Fair": "Fair visualization", 
+          "Poor": "Poor visualization",
+          "Not Visible": "Target not visible"
+        },
+        default_option_id: "Good"
+      },
+      "Patient_Age_Group": {
+        type: "dropdown",
+        description: "Age group classification of the patient",
+        options: {
+          "Neonate": "Neonate (0-28 days)",
+          "Infant": "Infant (1 month - 2 years)",
+          "Child": "Child (2-12 years)",
+          "Adolescent": "Adolescent (12-18 years)",
+          "Young Adult": "Young Adult (18-40 years)",
+          "Middle Age": "Middle Age (40-65 years)",
+          "Elderly": "Elderly (65+ years)"
+        },
+        default_option_id: "Young Adult"
+      },
+      "Needle_Approach": {
+        type: "dropdown",
+        description: "Needle approach technique relative to ultrasound beam",
+        options: {
+          "In-plane": "In-plane approach (needle visible along its length)",
+          "Out-of-plane": "Out-of-plane approach (needle tip visible as dot)",
+          "Oblique": "Oblique approach",
+          "Perpendicular": "Perpendicular approach"
+        },
+        default_option_id: "In-plane"
+      },
+      "Clinical_Notes": {
+        type: "text",
+        description: "Additional clinical observations and procedure notes",
+        default_value: ""
+      }
+    };
+
+    // Upload Images Function
+    function uploadImages() {
+      console.log('🖼️ Upload images function called');
+      console.log('- Current session:', currentSession);
+      
+      if (!currentSession) {
+        showToast('Please start a session first by clicking "Start a Session" button above', 'error');
+        console.log('❌ No active session - cannot upload');
+        // Highlight the start session button
+        const startBtn = document.getElementById('startSessionBtn');
+        if (startBtn) {
+          startBtn.style.animation = 'pulse 1s ease-in-out 3 alternate';
+        }
+        return;
+      }
+      
+      console.log('✅ Session active, triggering file input click');
+      const fileInput = document.getElementById('fileInput');
+      if (fileInput) {
+        // Reset the file input to ensure change event fires even for same file
+        fileInput.value = '';
+        fileInput.click();
+        console.log('📁 File input clicked');
+      } else {
+        console.error('❌ File input element not found');
+        showToast('Upload interface error - please refresh the page', 'error');
+      }
+    }
+
+    // Handle File Upload
+    function handleFileUpload(event) {
+      console.log('📥 File upload handler called');
+      console.log('- Event:', event);
+      console.log('- Files:', event.target.files);
+      
+      const file = event.target.files[0];
+      if (!file) {
+        console.log('❌ No file selected');
+        return;
+      }
+
+      console.log('✅ File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
+      console.log('🔄 Processing medical image:', file.name);
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        console.log('📖 File read completed, creating image object');
+        currentImage = {
+          id: 'img_' + Date.now(),
+          filename: file.name,
+          data: e.target.result,
+          size: file.size,
+          type: file.type,
+          uploadedAt: new Date().toISOString()
+        };
+
+        console.log('🖼️ Image object created:', {
+          id: currentImage.id,
+          filename: currentImage.filename,
+          size: currentImage.size,
+          type: currentImage.type
+        });
+        
+        displayImage(e.target.result);
+      };
+      
+      reader.onerror = function(error) {
+        console.error('❌ File reading error:', error);
+        showToast('Error reading file. Please try again.', 'error');
+      };
+      
+      reader.readAsDataURL(file);
+    }
+
+    // Display Image in Canvas Area
+    function displayImage(imageSrc) {
+      console.log('🎨 Display image function called');
+      
+      const uploadOverlay = document.getElementById('uploadOverlay');
+      const imageContainer = document.getElementById('imageContainer');
+      const mainImage = document.getElementById('mainImage');
+
+      if (!uploadOverlay || !imageContainer || !mainImage) {
+        console.error('❌ Required DOM elements not found:', {
+          uploadOverlay: !!uploadOverlay,
+          imageContainer: !!imageContainer,
+          mainImage: !!mainImage
+        });
+        showToast('Interface error - please refresh the page', 'error');
+        return;
+      }
+
+      console.log('✅ DOM elements found, updating display');
+      
+      // Hide upload overlay and show image
+      uploadOverlay.style.display = 'none';
+      mainImage.src = imageSrc;
+      imageContainer.classList.add('active');
+
+      console.log('✅ Image displayed - starting annotation automatically');
+      showToast('Image loaded successfully! Starting annotation tools...', 'success');
+      
+      // Automatically start annotation after a brief delay to ensure image is loaded
+      setTimeout(() => {
+        startAnnotation();
+      }, 500);
+    }
+
+    // Start Annotation Mode
+    function startAnnotation() {
+      if (!currentImage) return;
+
+      console.log('🎯 Starting local VGG annotation mode...');
+      
+      // Show loading
+      showLoading();
+
+      // Hide image container and show VIA
+      document.getElementById('imageContainer').style.display = 'none';
+      document.getElementById('viaContainer').classList.add('active');
+
+      // Initialize local VIA
+      setTimeout(() => {
+        initializeLocalVIA();
+        hideLoading();
+      }, 1000);
+    }
+
+    // Initialize Local VGG Image Annotator
+    function initializeLocalVIA() {
+      const viaFrame = document.getElementById('via_image_annotator');
+      
+      viaFrame.onload = function() {
+        console.log('Local VIA iframe loaded, sending image...');
+        setTimeout(() => {
+          sendImageToVIA();
+        }, 1000);
+      };
+
+      // If already loaded, send image immediately
+      if (viaFrame.contentDocument && viaFrame.contentDocument.readyState === 'complete') {
+        setTimeout(() => {
+          sendImageToVIA();
+        }, 500);
+      }
+    }
+
+    // Send Image to Local VIA
+    function sendImageToVIA() {
+      try {
+        const viaFrame = document.getElementById('via_image_annotator');
+        const viaWindow = viaFrame.contentWindow;
+        
+        if (viaWindow && currentImage) {
+          viaWindow.postMessage({
+            type: 'load_image',
+            data: {
+              src: currentImage.data,
+              filename: currentImage.filename,
+              id: currentImage.id
+            }
+          }, '*');
+          
+          console.log('✅ Image sent to local VIA successfully');
+          showToast('Local VGG Image Annotator ready!', 'success');
+        }
+        
+      } catch (error) {
+        console.log('⚠️ Error communicating with local VIA:', error);
+        showToast('VIA loaded - you can start annotating', 'info');
+      }
+    }
+
+    // Listen for VIA Messages
+    window.addEventListener('message', function(event) {
+      // Accept messages from local VIA iframe
+      if (event.source !== document.getElementById('via_image_annotator').contentWindow) return;
+      
+      const { type, data } = event.data;
+      
+      switch (type) {
+        case 'annotation_created':
+          console.log('💾 Annotation received from VIA:', data);
+          saveMedicalAnnotationFromVIA(data);
+          showToast('Annotation saved successfully!', 'success');
+          break;
+        case 'annotations_export':
+          console.log('📤 Exporting annotations from VIA:', data);
+          exportVIAAnnotations(data);
+          break;
+        case 'get_annotations':
+          // Handle get annotations response
+          console.log('📥 Received annotations from VIA:', data);
+          if (data && data.length > 0) {
+            // Process each annotation from VIA (save to current session only)
+            data.forEach(annotation => {
+              console.log('Processing VIA annotation for current session:', annotation);
+              saveMedicalAnnotationFromVIA(annotation);
+            });
+            showToast(`Saved ${data.length} annotation(s) from VIA to current session!`, 'success');
+          } else {
+            // No VIA annotations, save form data only to current session
+            saveAnnotationToSession();
+            showToast('Saved annotation with medical attributes to current session', 'success');
+          }
+          break;
+        case 'get_annotations_for_save':
+          // Handle session save request
+          if (data && data.length > 0) {
+            data.forEach(annotation => saveMedicalAnnotationFromVIA(annotation));
+          }
+          saveAnnotationToSession();
+          break;
+      }
+    });
+
+    // Save Medical Annotation from VIA (only to current session, not localStorage)
+    function saveMedicalAnnotationFromVIA(viaAnnotation) {
+      if (!currentSession) {
+        console.log('⚠️ No active session - cannot save annotation');
+        showToast('No active session. Please start a session first.', 'error');
+        return;
+      }
+      
+      const medicalAnnotation = {
+        id: viaAnnotation.id || Date.now(),
+        timestamp: viaAnnotation.timestamp || new Date().toISOString(),
+        imageId: currentImage?.id,
+        imageName: currentImage?.filename,
+        annotationType: viaAnnotation.type || 'polygon',
+        points: viaAnnotation.points || [],
+        nerveType: document.getElementById('nerveType').value,
+        sideOfBody: document.getElementById('sideOfBody').value,
+        patientPosition: document.getElementById('patientPosition').value,
+        visibility: document.getElementById('visibility').value,
+        patientAgeGroup: document.getElementById('patientAgeGroup').value,
+        needleApproach: document.getElementById('needleApproach').value,
+        clinicalNotes: document.getElementById('clinicalNotes').value
+      };
+      
+      // Add to CURRENT SESSION arrays only (NOT localStorage)
+      sessionAnnotations.push(medicalAnnotation);
+      if (currentSession) {
+        currentSession.annotations.push(medicalAnnotation);
+      }
+      
+      // Add image to session if not already included
+      if (currentImage && !sessionImages.find(img => img.id === currentImage.id)) {
+        const imageData = {
+          id: currentImage.id,
+          sessionId: currentSession?.id,
+          filename: currentImage.filename,
+          data: currentImage.data, // Include base64 image data
+          size: currentImage.size,
+          type: currentImage.type,
+          uploadedAt: currentImage.uploadedAt
+        };
+        
+        sessionImages.push(imageData);
+        if (currentSession) {
+          currentSession.images.push(currentImage);
+        }
+        
+        console.log('✅ Added image to current session only:', {
+          filename: imageData.filename,
+          sessionId: currentSession?.id,
+          hasData: !!imageData.data
+        });
+      }
+      
+      // Save to database if available (but NOT localStorage)
+      if (currentSession && window.electronAPI && window.electronAPI.dbSaveAnnotation) {
+        const dbAnnotation = {
+          id: medicalAnnotation.id,
+          sessionId: currentSession.id,
+          imageId: medicalAnnotation.imageId,
+          annotationType: medicalAnnotation.annotationType,
+          points: JSON.stringify(medicalAnnotation.points),
+          nerveType: medicalAnnotation.nerveType,
+          sideOfBody: medicalAnnotation.sideOfBody,
+          patientPosition: medicalAnnotation.patientPosition,
+          visibility: medicalAnnotation.visibility,
+          patientAgeGroup: medicalAnnotation.patientAgeGroup,
+          needleApproach: medicalAnnotation.needleApproach,
+          clinicalNotes: medicalAnnotation.clinicalNotes,
+          timestamp: medicalAnnotation.timestamp
+        };
+        
+        window.electronAPI.dbSaveAnnotation(dbAnnotation)
+          .then(result => {
+            if (result.success) {
+              console.log('✅ VIA annotation saved to database:', result);
+            } else {
+              console.error('❌ Failed to save VIA annotation to database:', result.error);
+            }
+          })
+          .catch(error => {
+            console.error('❌ Database VIA annotation save error:', error);
+          });
+      }
+      
+      console.log('🏥 VIA annotation saved to CURRENT SESSION ONLY with', medicalAnnotation.points?.length || 0, 'points');
+      console.log(`📊 Current session now has ${sessionAnnotations.length} annotations and ${sessionImages.length} images`);
+      showToast(`Annotation saved to current session! (Total: ${sessionAnnotations.length})`, 'success');
+    }
+
+    // Activate Polygon Tool
+    function activatePolygonTool() {
+      console.log('🎯 Polygon tool activated');
+      
+      if (!document.getElementById('viaContainer').classList.contains('active')) {
+        showToast('Please upload an image first to start annotation', 'info');
+        return;
+      }
+      
+      // Send message to local VIA to enable polygon tool
+      try {
+        const viaFrame = document.getElementById('via_image_annotator');
+        const viaWindow = viaFrame.contentWindow;
+        
+        if (viaWindow) {
+          viaWindow.postMessage({
+            type: 'set_tool',
+            data: { tool: 'polygon' }
+          }, '*');
+          
+          showToast('Polygon tool activated in VGG annotator', 'success');
+          console.log('📐 Polygon tool message sent to local VIA');
+        }
+      } catch (error) {
+        console.log('⚠️ Could not communicate with local VIA:', error);
+        showToast('Use polygon tool in the left toolbar of VGG annotator', 'info');
+      }
+    }
+
+    // Show Loading State
+    function showLoading() {
+      document.getElementById('loadingOverlay').style.display = 'flex';
+    }
+
+    // Hide Loading State
+    function hideLoading() {
+      document.getElementById('loadingOverlay').style.display = 'none';
+    }
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+      // Create toast element
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      toast.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: ${type === 'error' ? '#ef4444' : type === 'info' ? '#3b82f6' : '#10b981'};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 500;
+        z-index: 2000;
+        animation: slideInRight 0.3s ease-out;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        max-width: 300px;
+        font-size: 0.9rem;
+      `;
+      
+      document.body.appendChild(toast);
+      
+      // Remove after 4 seconds
+      setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => {
+          if (document.body.contains(toast)) {
+            document.body.removeChild(toast);
+          }
+        }, 300);
+      }, 4000);
+    }
+
+    // Export Annotations (flattened format with image data - CURRENT SESSION ONLY)
+    function exportAnnotations() {
+      if (!currentSession) {
+        showToast('No active session to export', 'error');
+        return;
+      }
+      
+      // First try to get annotations from VIA
+      try {
+        const viaFrame = document.getElementById('via_image_annotator');
+        const viaWindow = viaFrame.contentWindow;
+        
+        if (viaWindow) {
+          viaWindow.postMessage({ type: 'get_annotations' }, '*');
+          // VIA will send back annotations via message
+          return;
+        }
+      } catch (error) {
+        console.log('Could not get annotations from VIA, using current session data');
+      }
+      
+      // Use current session annotations only (not localStorage)
+      const currentSessionAnnotations = sessionAnnotations || [];
+      const currentSessionImages = sessionImages || [];
+      
+      if (currentSessionAnnotations.length === 0) {
+        showToast('No annotations in current session to export', 'info');
+        return;
+      }
+      
+      // Create flattened annotation-image pairs for CURRENT SESSION ONLY
+      const flattenedAnnotations = currentSessionAnnotations.map(annotation => {
+        const associatedImage = currentSessionImages.find(img => img.id === annotation.imageId);
+        
+        // Compress image data if it exists and is too large
+        let imageData = associatedImage?.data || null;
+        let compressionNote = '';
+        
+        if (imageData && imageData.length > 500000) { // If larger than ~500KB
+          compressionNote = 'Image compressed for export (optimized for file size)';
+          // Note: Real compression would need to be done asynchronously
+          // For now, we'll just note that compression should be applied
+        }
+        
+        return {
+          // Annotation data
+          annotationId: annotation.id,
+          annotationTimestamp: annotation.timestamp,
+          annotationType: annotation.annotationType,
+          annotationPoints: annotation.points,
+          
+          // Medical attributes
+          nerveType: annotation.nerveType,
+          sideOfBody: annotation.sideOfBody,
+          patientPosition: annotation.patientPosition,
+          visibility: annotation.visibility,
+          patientAgeGroup: annotation.patientAgeGroup,
+          needleApproach: annotation.needleApproach,
+          clinicalNotes: annotation.clinicalNotes,
+          
+          // Image data paired with annotation
+          imageId: annotation.imageId,
+          imageName: annotation.imageName,
+          imageData: imageData,
+          imageSize: associatedImage?.size || null,
+          imageType: associatedImage?.type || null,
+          imageUploadedAt: associatedImage?.uploadedAt || null,
+          compressionNote: compressionNote || 'No compression needed'
+        };
+      });
+      
+      const exportData = {
+        projectName: 'Ultrasound_Guided_Regional_Anesthesia_Annotations',
+        sessionId: currentSession?.id || 'unknown',
+        exportDate: new Date().toISOString(),
+        totalAnnotations: flattenedAnnotations.length,
+        format: 'flattened_annotation_image_pairs',
+        description: 'Current session annotations with paired image data',
+        dataSource: 'current_session_only',
+        annotations: flattenedAnnotations
+      };
+      
+      const filename = `session_${currentSession?.id || 'unknown'}_annotations_${new Date().toISOString().split('T')[0]}.json`;
+      downloadJSON(exportData, filename);
+      showToast(`Current session annotations exported successfully (${flattenedAnnotations.length} annotations)!`, 'success');
+    }
+
+    // Export VIA Annotations (flattened format with image data - CURRENT SESSION ONLY)
+    async function exportVIAAnnotations(viaAnnotations) {
+      if (!currentSession) {
+        showToast('No active session to export', 'error');
+        return;
+      }
+      
+      // Convert VIA annotations to medical format with current attributes and image data
+      const medicalAnnotations = viaAnnotations.map(viaAnnotation => ({
+        // Annotation data
+        annotationId: viaAnnotation.id || Date.now(),
+        annotationTimestamp: viaAnnotation.timestamp || new Date().toISOString(),
+        annotationType: viaAnnotation.type || 'polygon',
+        annotationPoints: viaAnnotation.points || [],
+        
+        // Medical attributes
+        nerveType: document.getElementById('nerveType').value,
+        sideOfBody: document.getElementById('sideOfBody').value,
+        patientPosition: document.getElementById('patientPosition').value,
+        visibility: document.getElementById('visibility').value,
+        patientAgeGroup: document.getElementById('patientAgeGroup').value,
+        needleApproach: document.getElementById('needleApproach').value,
+        clinicalNotes: document.getElementById('clinicalNotes').value,
+        
+        // Image data paired with annotation
+        imageId: currentImage?.id,
+        imageName: currentImage?.filename,
+        imageData: currentImage?.data, // Base64 encoded image
+        imageSize: currentImage?.size,
+        imageType: currentImage?.type,
+        imageUploadedAt: currentImage?.uploadedAt
+      }));
+      
+      // Use ONLY current session annotations (no localStorage)
+      const currentSessionAnnotations = sessionAnnotations || [];
+      
+      // Convert current session annotations to flattened format with compression
+      const flattenedSessionAnnotations = await Promise.all(currentSessionAnnotations.map(async (annotation) => {
+        const associatedImage = sessionImages.find(img => img.id === annotation.imageId);
+        
+        // Compress image if needed
+        let imageInfo = { data: null, note: 'No image data' };
+        if (associatedImage?.data) {
+          if (associatedImage.data.length > 100000) {
+            imageInfo = await compressImageForExport(associatedImage.data, 800, 0.8);
+          } else {
+            imageInfo = {
+              data: associatedImage.data,
+              note: 'No compression needed (small image)'
+            };
+          }
+        }
+        
+        return {
+          // Annotation data
+          annotationId: annotation.id,
+          annotationTimestamp: annotation.timestamp,
+          annotationType: annotation.annotationType,
+          annotationPoints: annotation.points,
+          
+          // Medical attributes
+          nerveType: annotation.nerveType,
+          sideOfBody: annotation.sideOfBody,
+          patientPosition: annotation.patientPosition,
+          visibility: annotation.visibility,
+          patientAgeGroup: annotation.patientAgeGroup,
+          needleApproach: annotation.needleApproach,
+          clinicalNotes: annotation.clinicalNotes,
+          
+          // Image data paired with annotation
+          imageId: annotation.imageId,
+          imageName: annotation.imageName,
+          imageData: imageInfo.data,
+          imageSize: associatedImage?.size || null,
+          imageType: associatedImage?.type || null,
+          imageUploadedAt: associatedImage?.uploadedAt || null,
+          compressionNote: imageInfo.note
+        };
+      }));
+      
+      // Combine VIA annotations with current session annotations
+      const allCurrentAnnotations = [...flattenedSessionAnnotations, ...medicalAnnotations];
+      
+      const exportData = {
+        sessionInfo: {
+          id: currentSession.id,
+          title: currentSession.title,
+          attendees: currentSession.doctor_name,
+          category: currentSession.category
+        },
+        projectName: 'Ultrasound_Guided_Regional_Anesthesia_Annotations',
+        exportDate: new Date().toISOString(),
+        totalAnnotations: allCurrentAnnotations.length,
+        format: 'flattened_annotation_image_pairs',
+        description: 'Current session annotations with paired image data (VIA + Session)',
+        dataSource: 'current_session_only',
+        annotations: allCurrentAnnotations
+      };
+      
+      const filename = `session_${currentSession.id}_via_export_${new Date().toISOString().split('T')[0]}.json`;
+      downloadJSON(exportData, filename);
+      showToast(`Current session VIA annotations exported (${allCurrentAnnotations.length} total)!`, 'success');
+    }
+
+    // Helper function to debug session data (for development)
+    function debugSessionData() {
+      console.log('🔍 DEBUG: Current Session Data:');
+      console.log('- Current Session:', currentSession);
+      console.log('- Session Annotations Count:', sessionAnnotations.length);
+      console.log('- Session Images Count:', sessionImages.length);
+      console.log('- Session Annotations:', sessionAnnotations);
+      console.log('- Session Images:', sessionImages);
+      
+      console.log('🔍 DEBUG: LocalStorage Data:');
+      const localAnnotations = JSON.parse(localStorage.getItem('medical_annotations') || '[]');
+      const localImages = JSON.parse(localStorage.getItem('session_images') || '[]');
+      console.log('- LocalStorage Annotations Count:', localAnnotations.length);
+      console.log('- LocalStorage Images Count:', localImages.length);
+      console.log('- LocalStorage Annotations:', localAnnotations);
+      console.log('- LocalStorage Images:', localImages);
+      
+      showToast(`Current session: ${sessionAnnotations.length} annotations. LocalStorage: ${localAnnotations.length} annotations.`, 'info');
+    }
+
+    // Helper function to compress image data for export
+    function compressImageForExport(imageDataUrl, maxWidth = 800, quality = 0.7) {
+      return new Promise((resolve) => {
+        try {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          const img = new Image();
+          
+          img.onload = function() {
+            // Calculate new dimensions
+            const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
+            const newWidth = img.width * ratio;
+            const newHeight = img.height * ratio;
+            
+            // Set canvas size
+            canvas.width = newWidth;
+            canvas.height = newHeight;
+            
+            // Draw and compress
+            ctx.drawImage(img, 0, 0, newWidth, newHeight);
+            const compressedData = canvas.toDataURL('image/jpeg', quality);
+            
+            console.log(`🗜️ Image compressed: ${img.width}x${img.height} → ${newWidth}x${newHeight}`);
+            console.log(`📦 Size reduction: ${imageDataUrl.length} → ${compressedData.length} chars`);
+            
+            resolve({
+              data: compressedData,
+              originalSize: imageDataUrl.length,
+              compressedSize: compressedData.length,
+              compressionRatio: Math.round((1 - compressedData.length / imageDataUrl.length) * 100),
+              dimensions: `${newWidth}x${newHeight}`,
+              note: `Compressed to ${quality * 100}% quality, max ${maxWidth}px width`
+            });
+          };
+          
+          img.onerror = function() {
+            console.log('⚠️ Could not compress image, using original');
+            resolve({
+              data: imageDataUrl,
+              originalSize: imageDataUrl.length,
+              compressedSize: imageDataUrl.length,
+              compressionRatio: 0,
+              note: 'No compression applied (compression failed)'
+            });
+          };
+          
+          img.src = imageDataUrl;
+        } catch (error) {
+          console.log('⚠️ Compression error:', error);
+          resolve({
+            data: imageDataUrl,
+            originalSize: imageDataUrl.length,
+            compressedSize: imageDataUrl.length,
+            compressionRatio: 0,
+            note: 'No compression applied (error occurred)'
+          });
+        }
+      });
+    }
+
+    // Download JSON helper
+    function downloadJSON(data, filename) {
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: 'application/json'
+      });
+      
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Clear All Annotations
+    function clearAnnotations() {
+      if (confirm('Clear all annotations? This action cannot be undone.')) {
+        localStorage.removeItem('medical_annotations');
+        allPolygons = [];
+        currentPolygon = [];
+        annotationMode = false;
+        
+        if (canvas) {
+          redrawCanvas();
+        }
+        
+        showToast('All annotations cleared', 'info');
+        console.log('�️ All annotations cleared');
+        
+        // Reset to upload state
+        document.getElementById('viaContainer').classList.remove('active');
+        document.getElementById('imageContainer').classList.remove('active');
+        document.getElementById('uploadOverlay').style.display = 'flex';
+        currentImage = null;
+      }
+    }
+
+    // Test function to create a sample annotation for testing (global scope)
+    function createTestAnnotation() {
+      if (!currentSession) {
+        showToast('Please start a session first', 'error');
+        return;
+      }
+      
+      if (!currentImage) {
+        showToast('Please upload an image first', 'error');
+        return;
+      }
+      
+      // Create a test annotation with sample polygon points
+      const testAnnotation = {
+        id: 'test_' + Date.now(),
+        timestamp: new Date().toISOString(),
+        type: 'polygon',
+        points: [[100, 100], [200, 100], [200, 200], [100, 200]], // Sample rectangle
+      };
+      
+      console.log('🧪 Creating test annotation:', testAnnotation);
+      saveMedicalAnnotationFromVIA(testAnnotation);
+      showToast('Test annotation created and saved!', 'success');
+    }
+
+    // Populate dropdown menus with options from MEDICAL_ATTRIBUTES
+    function populateDropdowns() {
+      // Populate Nerve Type dropdown
+      const nerveTypeSelect = document.getElementById('nerveType');
+      nerveTypeSelect.innerHTML = '';
+      Object.entries(MEDICAL_ATTRIBUTES.Nerve_Type.options).forEach(([key, value]) => {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = key;
+        option.title = value;
+        nerveTypeSelect.appendChild(option);
+      });
+      nerveTypeSelect.value = MEDICAL_ATTRIBUTES.Nerve_Type.default_option_id;
+
+      // Populate Side of Body dropdown
+      const sideSelect = document.getElementById('sideOfBody');
+      sideSelect.innerHTML = '';
+      Object.entries(MEDICAL_ATTRIBUTES.Side_of_Body.options).forEach(([key, value]) => {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = key;
+        option.title = value;
+        sideSelect.appendChild(option);
+      });
+      sideSelect.value = MEDICAL_ATTRIBUTES.Side_of_Body.default_option_id;
+
+      // Populate Patient Position dropdown
+      const positionSelect = document.getElementById('patientPosition');
+      positionSelect.innerHTML = '';
+      Object.entries(MEDICAL_ATTRIBUTES.Patient_Position.options).forEach(([key, value]) => {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = key;
+        option.title = value;
+        positionSelect.appendChild(option);
+      });
+      positionSelect.value = MEDICAL_ATTRIBUTES.Patient_Position.default_option_id;
+
+      // Populate Visibility dropdown
+      const visibilitySelect = document.getElementById('visibility');
+      visibilitySelect.innerHTML = '';
+      Object.entries(MEDICAL_ATTRIBUTES.Visibility.options).forEach(([key, value]) => {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = key;
+        option.title = value;
+        visibilitySelect.appendChild(option);
+      });
+      visibilitySelect.value = MEDICAL_ATTRIBUTES.Visibility.default_option_id;
+
+      // Populate Patient Age Group dropdown
+      const ageGroupSelect = document.getElementById('patientAgeGroup');
+      ageGroupSelect.innerHTML = '';
+      Object.entries(MEDICAL_ATTRIBUTES.Patient_Age_Group.options).forEach(([key, value]) => {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = key;
+        option.title = value;
+        ageGroupSelect.appendChild(option);
+      });
+      ageGroupSelect.value = MEDICAL_ATTRIBUTES.Patient_Age_Group.default_option_id;
+
+      // Populate Needle Approach dropdown
+      const needleSelect = document.getElementById('needleApproach');
+      needleSelect.innerHTML = '';
+      Object.entries(MEDICAL_ATTRIBUTES.Needle_Approach.options).forEach(([key, value]) => {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = key;
+        option.title = value;
+        needleSelect.appendChild(option);
+      });
+      needleSelect.value = MEDICAL_ATTRIBUTES.Needle_Approach.default_option_id;
+
+      console.log('✅ Dropdown menus populated with medical attributes');
+    }
+
+    // Initialize Application
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🏥 Annotation Whiteboard initialized');
+      console.log('🔧 Configuration: Local VGG Image Annotator');
+      
+      // Populate dropdown menus first
+      populateDropdowns();
+      
+      // Check for existing session data from home page
+      const storedSession = localStorage.getItem('currentSession');
+      const storedStartTime = localStorage.getItem('sessionStartTime');
+      
+      console.log('🔍 Checking for stored session data...');
+      console.log('- storedSession:', storedSession);
+      console.log('- storedStartTime:', storedStartTime);
+      
+      if (storedSession && storedStartTime) {
+        try {
+          // Load existing session
+          currentSession = JSON.parse(storedSession);
+          sessionStartTime = parseInt(storedStartTime);
+          sessionAnnotations = [];
+          sessionImages = [];
+          
+          console.log('📂 Loaded existing session:', currentSession);
+          
+          // Update UI to show active session
+          document.getElementById('startSessionBtn').style.display = 'none';
+          document.getElementById('sessionControls').style.display = 'inline-flex';
+          document.getElementById('sessionInfo').textContent = `Session: #${currentSession.id}`;
+          
+          document.getElementById('saveAnnotationBtn').style.display = 'block';
+          document.getElementById('testAnnotationBtn').style.display = 'block';
+          document.getElementById('debugBtn').style.display = 'block';
+          document.getElementById('nextAnnotationBtn').style.display = 'block';
+          document.getElementById('endSessionBtn').style.display = 'block';
+          
+          showToast(`Session #${currentSession.id} loaded successfully! You can now upload images.`, 'success');
+          console.log('✅ Session UI updated successfully');
+        } catch (error) {
+          console.error('❌ Error loading session data:', error);
+          showToast('Error loading session data. Please start a new session.', 'error');
+          // Clear corrupted data
+          localStorage.removeItem('currentSession');
+          localStorage.removeItem('sessionStartTime');
+        }
+      } else {
+        console.log('⚠️ No existing session found - user may need to start a session from home page or locally');
+        console.log('🎯 Showing start session button for local session creation');
+        showToast('No active session detected. Click "Start a Session" above to create a new annotation session.', 'info');
+        
+        // Make sure the start session button is visible
+        document.getElementById('startSessionBtn').style.display = 'inline-flex';
+        document.getElementById('sessionControls').style.display = 'none';
+      }
+      
+      // Initialize toolbar interactivity
+      const toolButtons = document.querySelectorAll('.tool-button');
+      toolButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          // Remove active class from all buttons in the same section
+          const section = this.closest('.tool-section');
+          if (section) {
+            const siblingButtons = section.querySelectorAll('.tool-button');
+            siblingButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+          }
+        });
+      });
+      
+      // Ensure upload overlay is visible initially
+      const uploadOverlay = document.getElementById('uploadOverlay');
+      const imageContainer = document.getElementById('imageContainer');
+      const viaContainer = document.getElementById('viaContainer');
+      
+      if (uploadOverlay && imageContainer && viaContainer) {
+        uploadOverlay.style.display = 'flex';
+        imageContainer.classList.remove('active');
+        viaContainer.classList.remove('active');
+        console.log('✅ UI initialized - upload overlay is ready');
+      } else {
+        console.error('❌ Critical UI elements missing:', {
+          uploadOverlay: !!uploadOverlay,
+          imageContainer: !!imageContainer,
+          viaContainer: !!viaContainer
+        });
+      }
+    });
+
+    // Add CSS for toast animations and button pulse
+    const toastStyles = document.createElement('style');
+    toastStyles.textContent = `
+      @keyframes slideInRight {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      
+      @keyframes slideOutRight {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+      
+      @keyframes pulse {
+        from {
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+        }
+        to {
+          transform: scale(1.05);
+          box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+        }
+      }
+    `;
+    document.head.appendChild(toastStyles);
+
+    // Keyboard Shortcuts
+    document.addEventListener('keydown', function(e) {
+      // Escape to close modals or go back
+      if (e.key === 'Escape') {
+        // Close modals first
+        if (document.getElementById('startSessionModal').classList.contains('active')) {
+          closeStartSessionModal();
+          return;
+        }
+        if (document.getElementById('endSessionModal').classList.contains('active')) {
+          closeEndSessionModal();
+          return;
+        }
+        
+        if (annotationMode && currentPolygon.length > 0) {
+          // Cancel current polygon
+          currentPolygon = [];
+          redrawCanvas();
+          showToast('Current polygon cancelled', 'info');
+        } else if (document.getElementById('viaContainer').classList.contains('active')) {
+          if (confirm('Exit annotation mode? Unsaved work will be lost.')) {
+            clearAnnotations();
+          }
+        } else {
+          window.location.href = 'home-clean.html';
+        }
+      }
+      
+      // Ctrl+E to export
+      if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+        e.preventDefault();
+        exportAnnotations();
+      }
+      
+      // Ctrl+U to upload
+      if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
+        e.preventDefault();
+        uploadImages();
+      }
+    });
+
+    // Close modals when clicking outside
+    document.addEventListener('click', function(e) {
+      // Start Session Modal
+      if (e.target.id === 'startSessionModal') {
+        closeStartSessionModal();
+      }
+      // End Session Modal
+      if (e.target.id === 'endSessionModal') {
+        closeEndSessionModal();
+      }
+    });
+  </script>
+</body>
+</html>

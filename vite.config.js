@@ -33,7 +33,8 @@ export default defineConfig({
         'profile-clean': 'src/pages/profile-clean.html',
         'video-call': 'src/pages/video-call.html',
         'oauth-callback': 'src/pages/oauth-callback.html',
-        'oauth-callback-simple': 'src/pages/oauth-callback-simple.html'
+        'oauth-callback-simple': 'src/pages/oauth-callback-simple.html',
+        'annotation-room': 'src/pages/annotation-room.html'
       }
     }
   },

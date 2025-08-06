@@ -3,6 +3,9 @@ const { contextBridge, ipcRenderer } = require('electron');
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('electronAPI', {
+  // Navigation
+  navigate: (page) => ipcRenderer.invoke('navigate', page),
+  
   // Webex-related APIs
   webexOAuth: (authUrl) => ipcRenderer.invoke('webex-oauth', authUrl),
   openExternal: (url) => ipcRenderer.invoke('open-external', url),
@@ -26,6 +29,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // File operations for annotations
   saveAnnotationData: (data) => ipcRenderer.invoke('save-annotation-data', data),
   loadAnnotationData: () => ipcRenderer.invoke('load-annotation-data'),
+  
+  // Database operations
+  dbSaveSession: (sessionData) => ipcRenderer.invoke('db-save-session', sessionData),
+  dbSaveImage: (imageData) => ipcRenderer.invoke('db-save-image', imageData),
+  dbSaveAnnotation: (annotationData) => ipcRenderer.invoke('db-save-annotation', annotationData),
+  dbGetSessions: () => ipcRenderer.invoke('db-get-sessions'),
+  dbGetSessionDetails: (sessionId) => ipcRenderer.invoke('db-get-session-details', sessionId),
+  dbDeleteSession: (sessionId) => ipcRenderer.invoke('db-delete-session', sessionId),
   
   // App lifecycle
   onAppReady: (callback) => ipcRenderer.on('app-ready', callback),
