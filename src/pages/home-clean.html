@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="../js/statistics-manager.js"></script>
   <style>
     * {
       margin: 0;
@@ -16,7 +17,7 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0a0a0a 100%);
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
       color: #e2e8f0;
       min-height: 100vh;
     }
@@ -29,7 +30,7 @@
     /* Sidebar */
     .sidebar {
       width: 280px;
-      background: rgba(20, 20, 20, 0.95);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(20px);
       border-right: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
@@ -86,57 +87,6 @@
       border-left-color: #3b82f6;
     }
 
-    .sidebar-user {
-      padding: 1.5rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 600;
-    }
-
-    .user-info {
-      flex: 1;
-    }
-
-    .user-name {
-      font-weight: 600;
-      font-size: 0.9rem;
-      display: block;
-    }
-
-    .user-email {
-      font-size: 0.8rem;
-      color: #94a3b8;
-      display: block;
-    }
-
-    .logout-btn {
-      background: none;
-      border: none;
-      color: #94a3b8;
-      cursor: pointer;
-      padding: 0.5rem;
-      border-radius: 6px;
-      transition: all 0.2s;
-    }
-
-    .logout-btn:hover {
-      background: rgba(239, 68, 68, 0.1);
-      color: #ef4444;
-    }
-
     /* Main Content */
     .main-content {
       flex: 1;
@@ -171,8 +121,8 @@
     }
 
     .action-btn {
-      background: rgba(20, 20, 20, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(59, 130, 246, 0.2);
       border-radius: 12px;
       padding: 1.5rem;
       color: #e2e8f0;
@@ -207,8 +157,8 @@
     }
 
     .stat-card {
-      background: rgba(20, 20, 20, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(59, 130, 246, 0.2);
       border-radius: 12px;
       padding: 1.5rem;
     }
@@ -225,11 +175,33 @@
       font-size: 0.9rem;
     }
 
+    .stat-card.refresh-stats {
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-color: #10b981;
+    }
+
+    .stat-card.refresh-stats:hover {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: #10b981;
+      transform: translateY(-2px);
+    }
+
+    .stat-card.refresh-stats .stat-value {
+      color: #10b981;
+      font-size: 1.5rem;
+    }
+
+    .stat-card.refresh-stats .stat-label {
+      color: #10b981;
+      font-weight: 500;
+    }
+
     /* Video Call Interface */
     .video-interface {
       display: none;
-      background: rgba(20, 20, 20, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(59, 130, 246, 0.2);
       border-radius: 16px;
       padding: 2rem;
       margin-top: 2rem;
@@ -395,27 +367,6 @@
           </svg>
           <span>About</span>
         </a>
-        
-        <a href="profile-clean.html" class="nav-item">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 10C12.7614 10 15 7.76142 15 5C15 2.23858 12.7614 0 10 0C7.23858 0 5 2.23858 5 5C5 7.76142 7.23858 10 10 10Z" fill="currentColor"/>
-            <path d="M10 12C4.47715 12 0 16.4772 0 22H20C20 16.4772 15.5228 12 10 12Z" fill="currentColor"/>
-          </svg>
-          <span>Profile</span>
-        </a>
-      </div>
-      
-      <div class="sidebar-user" id="sidebar-user" style="display: none;">
-        <div class="user-avatar" id="user-avatar">U</div>
-        <div class="user-info">
-          <span class="user-name" id="user-name">User</span>
-          <span class="user-email" id="user-email">user@example.com</span>
-        </div>
-        <button class="logout-btn" onclick="logout()" title="Sign Out">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M9 3H5C3.89543 3 3 3.89543 3 5V15C3 16.1046 3.89543 17 5 17H9M13 7L17 11M17 11L13 15M17 11H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
       </div>
     </nav>
 
@@ -437,49 +388,32 @@
             <div style="font-size: 0.8rem; opacity: 0.8;">Begin ultrasound annotation</div>
           </div>
         </button>
-        
-        <button class="action-btn" onclick="openImageLibrary()">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M21 15L16 10L5 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <div>
-            <div style="font-weight: 600;">Image Library</div>
-            <div style="font-size: 0.8rem; opacity: 0.8;">Browse annotated images</div>
-          </div>
-        </button>
-        
-        <button class="action-btn" onclick="uploadImages()">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M21 15V19C21 19.5523 20.4477 20 20 20H4C3.44772 20 3 19.5523 3 19V15M17 8L12 3M12 3L7 8M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <div>
-            <div style="font-weight: 600;">Upload Images</div>
-            <div style="font-size: 0.8rem; opacity: 0.8;">Add new images to annotate</div>
-          </div>
-        </button>
       </div>
 
       <div class="stats-grid">
-        <div class="stat-card">
+        <div class="stat-card" data-stat="images">
           <div class="stat-value">0</div>
           <div class="stat-label">Images Annotated</div>
         </div>
         
-        <div class="stat-card">
+        <div class="stat-card" data-stat="annotations">
           <div class="stat-value">0</div>
           <div class="stat-label">Annotations Created</div>
         </div>
         
-        <div class="stat-card">
+        <div class="stat-card" data-stat="time">
           <div class="stat-value">0h</div>
           <div class="stat-label">Session Time</div>
         </div>
         
-        <div class="stat-card">
+        <div class="stat-card" data-stat="collaborators">
           <div class="stat-value">0</div>
           <div class="stat-label">Collaborators</div>
+        </div>
+        
+        <div class="stat-card refresh-stats" onclick="refreshStatistics()" title="Refresh statistics">
+          <div class="stat-value">🔄</div>
+          <div class="stat-label">Refresh Stats</div>
         </div>
       </div>
 
@@ -585,7 +519,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(15, 23, 42, 0.6);
       display: none;
       align-items: center;
       justify-content: center;
@@ -598,13 +532,13 @@
     }
 
     .modal {
-      background: #1a1a1a;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #ffffff;
+      border: 1px solid rgba(59, 130, 246, 0.15);
       border-radius: 12px;
       padding: 2rem;
       width: 90%;
       max-width: 500px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(59, 130, 246, 0.1);
       animation: modalSlideIn 0.3s ease-out;
     }
 
@@ -626,12 +560,12 @@
     .modal-title {
       font-size: 1.5rem;
       font-weight: 600;
-      color: #e2e8f0;
+      color: #1e293b;
       margin-bottom: 0.5rem;
     }
 
     .modal-subtitle {
-      color: #94a3b8;
+      color: #64748b;
       font-size: 0.9rem;
     }
 
@@ -643,18 +577,18 @@
       display: block;
       font-size: 0.9rem;
       font-weight: 500;
-      color: #cbd5e0;
+      color: #374151;
       margin-bottom: 0.5rem;
     }
 
     .form-input {
       width: 100%;
       padding: 0.75rem;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid #d1d5db;
       border-radius: 6px;
       font-size: 0.9rem;
-      background: rgba(255, 255, 255, 0.05);
-      color: #e2e8f0;
+      background: #ffffff;
+      color: #1f2937;
       transition: all 0.2s;
     }
 
@@ -667,11 +601,11 @@
     .form-select {
       width: 100%;
       padding: 0.75rem;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid #d1d5db;
       border-radius: 6px;
       font-size: 0.9rem;
-      background: rgba(255, 255, 255, 0.05);
-      color: #e2e8f0;
+      background: #ffffff;
+      color: #1f2937;
       transition: all 0.2s;
     }
 
@@ -689,9 +623,9 @@
     }
 
     .btn-cancel {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #cbd5e0;
+      background: #f8fafc;
+      border: 1px solid #d1d5db;
+      color: #4b5563;
       padding: 0.75rem 1.5rem;
       border-radius: 6px;
       font-weight: 500;
@@ -700,8 +634,9 @@
     }
 
     .btn-cancel:hover {
-      background: rgba(255, 255, 255, 0.15);
-      border-color: rgba(255, 255, 255, 0.3);
+      background: #f1f5f9;
+      border-color: #9ca3af;
+      color: #374151;
     }
 
     .btn-primary {
@@ -718,6 +653,21 @@
     .btn-primary:hover {
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .form-input::placeholder {
+      color: #9ca3af;
+    }
+
+    .form-input[readonly] {
+      background: #f9fafb;
+      color: #6b7280;
+      cursor: not-allowed;
+    }
+
+    .form-select option {
+      background: #ffffff;
+      color: #1f2937;
     }
   </style>
 
@@ -790,69 +740,10 @@
       }
     }
 
-    // Open Image Library
-    async function openImageLibrary() {
-      try {
-        if (typeof window.electronAPI !== 'undefined' && window.electronAPI.navigateTo) {
-          await window.electronAPI.navigateTo('library.html');
-        } else {
-          window.location.href = 'library.html';
-        }
-      } catch (error) {
-        console.error('Failed to open library:', error);
-        window.location.href = 'library.html';
-      }
-    }
-
-    // Upload Images Function
-    function uploadImages() {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
-      input.multiple = true;
-      
-      input.onchange = function(event) {
-        const files = event.target.files;
-        if (files.length > 0) {
-          showToast(`Selected ${files.length} image(s) for annotation`, 'info');
-          
-          // Store selected images in localStorage for the annotation room
-          const imageData = [];
-          let processedCount = 0;
-          
-          Array.from(files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-              imageData.push({
-                name: file.name,
-                data: e.target.result,
-                size: file.size,
-                type: file.type,
-                uploadedAt: new Date().toISOString()
-              });
-              
-              processedCount++;
-              
-              // If all files are processed, store and navigate
-              if (processedCount === files.length) {
-                localStorage.setItem('uploadedImages', JSON.stringify(imageData));
-                showToast('Images processed, opening annotation room...', 'success');
-                setTimeout(() => openAnnotationRoom(), 1000);
-              }
-            };
-            reader.readAsDataURL(file);
-          });
-        }
-      };
-      
-      input.click();
-    }
-
     // Logout function (simplified for annotation platform)
     function logout() {
       if (confirm('Are you sure you want to logout?')) {
         // Clear any stored annotation data or session data
-        localStorage.removeItem('uploadedImages');
         localStorage.removeItem('annotationProjects');
         localStorage.removeItem('userSession');
         sessionStorage.clear();
@@ -864,26 +755,6 @@
           window.location.href = 'login-clean.html';
         }, 1000);
       }
-    }
-
-    // Load user info (simplified)
-    function loadUserInfo() {
-      // For annotation platform, we can use simple user data
-      const defaultUser = {
-        name: 'Medical Professional',
-        email: 'user@medical.com',
-        role: 'Annotation Specialist'
-      };
-      
-      const sidebarUser = document.getElementById('sidebar-user');
-      const userName = document.getElementById('user-name');
-      const userEmail = document.getElementById('user-email');
-      const userAvatar = document.getElementById('user-avatar');
-
-      if (userName) userName.textContent = defaultUser.name;
-      if (userEmail) userEmail.textContent = defaultUser.email;
-      if (userAvatar) userAvatar.textContent = defaultUser.name.charAt(0).toUpperCase();
-      if (sidebarUser) sidebarUser.style.display = 'flex';
     }
 
     // Toast notification function
@@ -944,12 +815,106 @@
     `;
     document.head.appendChild(toastStyles);
 
+    // Statistics Management Functions
+    async function loadStatistics() {
+      console.log('📊 Loading real statistics from database...');
+      
+      // Show loading state
+      const refreshCard = document.querySelector('.refresh-stats .stat-value');
+      if (refreshCard) {
+        refreshCard.textContent = '⏳';
+      }
+      
+      try {
+        const stats = await window.statisticsManager.loadStatsFromDatabase();
+        console.log('📊 Statistics loaded:', stats);
+        
+        // Update the display
+        window.statisticsManager.updateStatsDisplay(stats);
+        
+        // Reset refresh button
+        if (refreshCard) {
+          refreshCard.textContent = '🔄';
+        }
+        
+        // Show last updated info
+        if (stats.totalSessions > 0) {
+          showToast(`Statistics updated: ${stats.totalSessions} sessions processed`, 'success');
+        } else {
+          showToast('No session data found - start your first annotation session!', 'info');
+        }
+        
+        // Store current stats for comparison
+        window.currentStats = stats;
+        
+      } catch (error) {
+        console.error('❌ Failed to load statistics:', error);
+        
+        // Reset refresh button on error
+        if (refreshCard) {
+          refreshCard.textContent = '❌';
+          setTimeout(() => {
+            refreshCard.textContent = '🔄';
+          }, 2000);
+        }
+        
+        showToast('Failed to load statistics', 'error');
+      }
+    }
+
+    function setupStatisticsRefresh() {
+      // Set up event listeners for statistics refresh
+      window.statisticsManager.setupStatisticsUpdater(loadStatistics);
+      
+      // Refresh statistics every 5 minutes while page is active
+      setInterval(async () => {
+        if (!document.hidden) {
+          console.log('📊 Auto-refreshing statistics...');
+          await loadStatistics();
+        }
+      }, 5 * 60 * 1000); // 5 minutes
+    }
+
+    // Function to trigger statistics refresh (can be called after session completion)
+    window.refreshStatistics = loadStatistics;
+
+    // Function to handle session completion
+    async function handleSessionCompletion(sessionData) {
+      console.log('📊 Session completed, updating statistics...', sessionData);
+      
+      // Trigger statistics refresh
+      await loadStatistics();
+      
+      // Dispatch custom event for other components
+      window.dispatchEvent(new CustomEvent('sessionCompleted', { 
+        detail: sessionData 
+      }));
+      
+      showToast('Session completed! Statistics updated.', 'success');
+    }
+
+    // Listen for session completion events from annotation room
+    window.addEventListener('message', async (event) => {
+      if (event.data && event.data.type === 'sessionCompleted') {
+        await handleSessionCompletion(event.data.sessionData);
+      }
+    });
+
+    // Check for completed sessions when page loads/becomes visible
+    window.addEventListener('focus', async () => {
+      console.log('📊 Window focused, checking for session updates...');
+      await loadStatistics();
+    });
+
     // Simple authentication check (no authentication required for local use)
-    window.addEventListener('load', () => {
+    window.addEventListener('load', async () => {
       console.log('🎯 Ultrasound Annotation Platform loaded successfully');
       
-      // Load user info without any authentication
-      loadUserInfo();
+      // Load and display real statistics
+      await loadStatistics();
+      
+      // Set up automatic statistics refresh
+      setupStatisticsRefresh();
       
       // Show welcome message
       setTimeout(() => {

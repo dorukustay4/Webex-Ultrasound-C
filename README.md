@@ -1,6 +1,6 @@
-# Ultrasound Webex - Telemedicine Application
+# UltraAnnotate - Local Ultrasound Annotation Platform
 
-A modern Electron-based telemedicine application that integrates Webex video calling with role-based authentication for expert supervisors and resident doctors.
+A modern Electron-based annotation platform designed for ultrasound experts to annotate medical imagery locally while sharing their screens through any web conferencing tool to educate trainees and collaborate with peers.
 
 ## 🚀 Quick Start
 
@@ -22,29 +22,21 @@ A modern Electron-based telemedicine application that integrates Webex video cal
    npm run electron # Terminal 2: Electron app
    ```
 
-## 🔐 Authentication
+## 🎯 Key Features
 
-The application supports two authentication methods:
+- **Local Processing**: All annotation data stays on your machine - no cloud dependencies
+- **Universal Screen Sharing**: Works with any web conferencing platform (Zoom, Teams, Google Meet, etc.)
+- **Expert-Focused Design**: Purpose-built interface for efficient ultrasound annotation workflows
+- **Real-time Collaboration**: Share annotated images instantly while maintaining video calls in your preferred platform
+- **Educational Tools**: Specialized features for training scenarios and peer consultation
 
-### OAuth Authentication (Recommended)
-- Click "Sign in with Webex" 
-- Authenticate using your Webex credentials in the browser
-- Automatic redirect to home page after successful authentication
+## 🔧 Usage
 
-### Personal Access Token (Development)
-- Use your Webex personal access token for development/testing
-- Go to [developer.webex.com](https://developer.webex.com) to get your token
-
-## 👥 Role-Based System
-
-**Expert Supervisor:**
-- Full meeting control
-- Auto-enable video on join
-- Can create and manage meetings
-
-**Resident Doctor:**
-- Standard meeting access
-- Video settings user-controlled
+1. **Start the Application**: Launch the UltraAnnotate platform locally
+2. **Create Session**: Set up annotation session with patient/case information  
+3. **Load Images**: Import ultrasound images for annotation
+4. **Annotate**: Use professional annotation tools to mark and measure
+5. **Share Screen**: Use any web conferencing tool to share your annotated screen with trainees or peers
 
 ## 📁 Project Structure
 
@@ -59,7 +51,6 @@ The application supports two authentication methods:
 │   │   ├── login-oauth.html  # OAuth login page
 │   │   ├── login-clean.html  # Token login page
 │   │   ├── home-clean.html   # Main dashboard
-│   │   ├── profile-clean.html # User profile
 │   │   ├── video-call.html   # Video call interface
 │   │   ├── oauth-callback.html # OAuth callback (embedded)
 │   │   └── oauth-callback-simple.html # OAuth callback (external browser)
@@ -103,7 +94,6 @@ OAuth credentials are configured in `src/js/webex-oauth.js`:
 2. **Set Role:** Select Expert Supervisor or Resident Doctor
 3. **Create Meeting:** Generate meeting ID and link
 4. **Join Call:** Click to join with role-appropriate settings
-5. **Profile:** Manage user settings and role preferences
 
 ## 🚨 Troubleshooting
 

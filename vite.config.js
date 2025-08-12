@@ -30,7 +30,6 @@ export default defineConfig({
         'login-oauth': 'src/pages/login-oauth.html',
         'login-simple': 'src/pages/login-simple.html',
         'home-clean': 'src/pages/home-clean.html',
-        'profile-clean': 'src/pages/profile-clean.html',
         'video-call': 'src/pages/video-call.html',
         'oauth-callback': 'src/pages/oauth-callback.html',
         'oauth-callback-simple': 'src/pages/oauth-callback-simple.html',

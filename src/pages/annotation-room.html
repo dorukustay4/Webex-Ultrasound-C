@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="../js/statistics-manager.js"></script>
   
   <style>
     * {
@@ -767,6 +768,12 @@
             </svg>
             Save Current Annotation
           </button>
+          <button class="tool-button" id="forceSaveBtn" onclick="forceSaveAnnotation()" style="display: none;" title="Force save annotation without VIA (for debugging)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L13.09 8.26L19 7L14.74 12.74L21 14L14.74 15.26L19 21L13.09 19.74L12 26L10.91 19.74L5 21L9.26 15.26L3 14L9.26 12.74L5 7L10.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Force Save (Debug)
+          </button>
           <button class="tool-button" id="testAnnotationBtn" onclick="createTestAnnotation()" style="display: none;" title="Create a test annotation for testing">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -898,6 +905,7 @@
   <script>
     let currentImage = null;
     let currentSession = null;
+    let currentVIAAnnotation = null; // Store VIA annotation until user saves manually
     let sessionAnnotations = [];
     let sessionImages = [];
     let sessionStartTime = null;
@@ -1031,6 +1039,7 @@
       document.getElementById('sessionInfo').textContent = `Session: #${sessionId}`;
       
       document.getElementById('saveAnnotationBtn').style.display = 'block';
+      document.getElementById('forceSaveBtn').style.display = 'block';
       document.getElementById('testAnnotationBtn').style.display = 'block';
       document.getElementById('debugBtn').style.display = 'block';
       document.getElementById('nextAnnotationBtn').style.display = 'block';
@@ -1059,6 +1068,12 @@
         return;
       }
       
+      // Debug: Log current form values before saving
+      console.log('🔍 Form values at save time:', debugCurrentFormValues());
+      
+      // Reset VIA save completion flag
+      window.viaSaveCompleted = false;
+      
       // Get current VIA annotations by requesting them
       try {
         const viaFrame = document.getElementById('via_image_annotator');
@@ -1068,6 +1083,16 @@
           // Request current annotations from VIA
           viaWindow.postMessage({ type: 'get_annotations' }, '*');
           showToast('Requesting annotations from VIA...', 'info');
+          
+          // Set a timeout to save form data even if VIA doesn't respond
+          setTimeout(() => {
+            if (!window.viaSaveCompleted) {
+              console.log('⚠️ VIA did not respond within 3 seconds, saving form data only');
+              saveAnnotationToSession();
+              window.viaSaveCompleted = true;
+            }
+          }, 3000);
+          
           return;
         }
       } catch (error) {
@@ -1078,26 +1103,82 @@
       saveAnnotationToSession();
     }
 
-    function saveAnnotationToSession() {
-      if (!currentSession || !currentImage) {
-        console.log('⚠️ Missing session or image for annotation save');
+    // Force save annotation for debugging (bypasses VIA completely)
+    function forceSaveAnnotation() {
+      console.log('🔧 forceSaveAnnotation() called - Bypassing VIA and saving form data directly');
+      
+      if (!currentSession) {
+        showToast('No active session. Please start a session first.', 'error');
         return;
       }
       
+      if (!currentImage) {
+        showToast('No image loaded to save annotation for', 'error');
+        return;
+      }
+      
+      // Set form to some test values if empty
+      if (!document.getElementById('nerveType').value) {
+        document.getElementById('nerveType').value = 'sciatic';
+        document.getElementById('sideOfBody').value = 'left';
+        document.getElementById('patientPosition').value = 'supine';
+        document.getElementById('visibility').value = 'good';
+        document.getElementById('patientAgeGroup').value = 'adult';
+        document.getElementById('needleApproach').value = 'in-plane';
+        document.getElementById('clinicalNotes').value = 'Test annotation created via force save';
+        console.log('📝 Set default values for testing');
+      }
+      
+      // Directly call saveAnnotationToSession
+      saveAnnotationToSession();
+      showToast('🔧 Force save completed! Check console for detailed logs.', 'success');
+    }
+
+    function saveAnnotationToSession() {
+      console.log('🚀 saveAnnotationToSession() called - Starting annotation save process');
+      
+      if (!currentSession || !currentImage) {
+        console.log('⚠️ Missing session or image for annotation save');
+        console.log('- currentSession:', !!currentSession);
+        console.log('- currentImage:', !!currentImage);
+        return;
+      }
+      
+      // Read current form values and log them for debugging
+      const nerveType = document.getElementById('nerveType').value;
+      const sideOfBody = document.getElementById('sideOfBody').value;
+      const patientPosition = document.getElementById('patientPosition').value;
+      const visibility = document.getElementById('visibility').value;
+      const patientAgeGroup = document.getElementById('patientAgeGroup').value;
+      const needleApproach = document.getElementById('needleApproach').value;
+      const clinicalNotes = document.getElementById('clinicalNotes').value;
+      
+      console.log('📋 Reading form values for annotation:', {
+        nerveType,
+        sideOfBody,
+        patientPosition,
+        visibility,
+        patientAgeGroup,
+        needleApproach,
+        clinicalNotes: clinicalNotes.substring(0, 50) + (clinicalNotes.length > 50 ? '...' : ''),
+        hasVIAAnnotation: !!currentVIAAnnotation,
+        viaAnnotationPoints: currentVIAAnnotation ? currentVIAAnnotation.points?.length : 0
+      });
+      
       const annotation = {
-        id: Date.now().toString(),
-        timestamp: new Date().toISOString(),
+        id: currentVIAAnnotation ? currentVIAAnnotation.id : Date.now().toString(),
+        timestamp: currentVIAAnnotation ? currentVIAAnnotation.timestamp : new Date().toISOString(),
         imageId: currentImage.id,
         imageName: currentImage.filename,
-        annotationType: 'polygon',
-        points: [], // Will be populated by VIA annotations if available
-        nerveType: document.getElementById('nerveType').value,
-        sideOfBody: document.getElementById('sideOfBody').value,
-        patientPosition: document.getElementById('patientPosition').value,
-        visibility: document.getElementById('visibility').value,
-        patientAgeGroup: document.getElementById('patientAgeGroup').value,
-        needleApproach: document.getElementById('needleApproach').value,
-        clinicalNotes: document.getElementById('clinicalNotes').value
+        annotationType: currentVIAAnnotation ? currentVIAAnnotation.type : 'polygon',
+        points: currentVIAAnnotation ? currentVIAAnnotation.points : [], // Use VIA points if available
+        nerveType: nerveType,
+        sideOfBody: sideOfBody,
+        patientPosition: patientPosition,
+        visibility: visibility,
+        patientAgeGroup: patientAgeGroup,
+        needleApproach: needleApproach,
+        clinicalNotes: clinicalNotes
       };
       
       sessionAnnotations.push(annotation);
@@ -1161,24 +1242,84 @@
         timestamp: annotation.timestamp
       };
       
+      console.log('💾 About to save annotation to database:', dbAnnotation);
+      console.log('💾 electronAPI available:', !!window.electronAPI);
+      console.log('💾 dbSaveAnnotation available:', !!(window.electronAPI && window.electronAPI.dbSaveAnnotation));
+      
       if (window.electronAPI && window.electronAPI.dbSaveAnnotation) {
         window.electronAPI.dbSaveAnnotation(dbAnnotation)
           .then(result => {
             if (result.success) {
               console.log('✅ Annotation saved to database:', result);
+              
+              // Immediately verify what was saved by reading it back
+              if (window.electronAPI.dbGetAnnotation) {
+                return window.electronAPI.dbGetAnnotation(dbAnnotation.id);
+              }
             } else {
               console.error('❌ Failed to save annotation to database:', result.error);
             }
           })
+          .then(verifyResult => {
+            if (verifyResult && verifyResult.success) {
+              console.log('🔍 Verification - What was actually saved to database:', verifyResult.annotation);
+              
+              // Compare what we sent vs what was saved
+              console.log('📊 Comparison of sent vs saved data:');
+              console.log('- Sent nerveType:', dbAnnotation.nerveType, '| Saved nerveType:', verifyResult.annotation.nerve_type);
+              console.log('- Sent sideOfBody:', dbAnnotation.sideOfBody, '| Saved sideOfBody:', verifyResult.annotation.side_of_body);
+              console.log('- Sent patientPosition:', dbAnnotation.patientPosition, '| Saved patientPosition:', verifyResult.annotation.patient_position);
+              console.log('- Sent visibility:', dbAnnotation.visibility, '| Saved visibility:', verifyResult.annotation.visibility);
+              console.log('- Sent patientAgeGroup:', dbAnnotation.patientAgeGroup, '| Saved patientAgeGroup:', verifyResult.annotation.patient_age_group);
+              console.log('- Sent needleApproach:', dbAnnotation.needleApproach, '| Saved needleApproach:', verifyResult.annotation.needle_approach);
+            }
+          })
           .catch(error => {
-            console.error('❌ Database annotation save error:', error);
+            console.error('❌ Database annotation save/verify error:', error);
           });
+      } else {
+        console.error('❌ electronAPI or dbSaveAnnotation not available - annotation will not be saved to database!');
+        console.error('❌ This means the annotation will only exist in the session but not be persisted');
+        showToast('⚠️ Database not available - annotation saved to session only', 'warning');
       }
       
-      showToast('Annotation saved to session!', 'success');
+      showToast(`✅ Annotation saved! (${sessionAnnotations.length} total in session)`, 'success');
+      
+      // Automatically proceed to next annotation after successful save
+      setTimeout(() => {
+        showToast('� Loading next annotation interface...', 'info');
+        nextAnnotation();
+      }, 2000); // Increased delay to allow VIA iframe to reload properly
+      
       console.log('💾 Annotation saved to session:', annotation);
       console.log(`📊 Session now has ${sessionAnnotations.length} annotations and ${sessionImages.length} images`);
+      
+      // Clear the stored VIA annotation since we've used it
+      if (currentVIAAnnotation) {
+        console.log('🧹 Clearing stored VIA annotation after save');
+        currentVIAAnnotation = null;
+      }
     }
+
+    // Debug function to check current form values
+    function debugCurrentFormValues() {
+      const formValues = {
+        nerveType: document.getElementById('nerveType').value,
+        sideOfBody: document.getElementById('sideOfBody').value,
+        patientPosition: document.getElementById('patientPosition').value,
+        visibility: document.getElementById('visibility').value,
+        patientAgeGroup: document.getElementById('patientAgeGroup').value,
+        needleApproach: document.getElementById('needleApproach').value,
+        clinicalNotes: document.getElementById('clinicalNotes').value
+      };
+      
+      console.log('🔍 Current form values:', formValues);
+      showToast('Form values logged to console', 'info');
+      return formValues;
+    }
+
+    // Make function available in console for debugging
+    window.debugCurrentFormValues = debugCurrentFormValues;
 
     function nextAnnotation() {
       if (!currentSession) {
@@ -1191,6 +1332,7 @@
       document.getElementById('imageContainer').classList.remove('active');
       document.getElementById('uploadOverlay').style.display = 'flex';
       currentImage = null;
+      currentVIAAnnotation = null; // Clear any stored VIA annotation
       
       // Reset form fields to defaults
       document.getElementById('nerveType').selectedIndex = 0;
@@ -1201,7 +1343,36 @@
       document.getElementById('needleApproach').selectedIndex = 0;
       document.getElementById('clinicalNotes').value = '';
       
-      showToast('Ready for next annotation - upload a new image', 'info');
+      // Clear any VIA annotations from the iframe
+      try {
+        const viaFrame = document.getElementById('via_image_annotator');
+        if (viaFrame && viaFrame.contentWindow) {
+          // Send clear command
+          viaFrame.contentWindow.postMessage({ type: 'clear_annotations' }, '*');
+          console.log('🧹 Sent clear command to VIA iframe');
+        }
+      } catch (error) {
+        console.log('Could not clear VIA annotations:', error);
+      }
+      
+      // Force reload VIA iframe to ensure completely clean state
+      setTimeout(() => {
+        try {
+          const viaFrame = document.getElementById('via_image_annotator');
+          if (viaFrame) {
+            const currentSrc = viaFrame.src;
+            viaFrame.src = 'about:blank';
+            setTimeout(() => {
+              viaFrame.src = currentSrc;
+              console.log('🔄 VIA iframe completely reloaded for clean state');
+            }, 200);
+          }
+        } catch (error) {
+          console.log('Could not reload VIA iframe:', error);
+        }
+      }, 300);
+      
+      showToast(`📷 Ready for next image! (Session has ${sessionAnnotations.length} annotations so far)`, 'info');
     }
 
     function showEndSessionModal() {
@@ -1330,7 +1501,14 @@
     }
 
     function endSession() {
-      if (!currentSession) return;
+      console.log('🏁 endSession() called');
+      console.log('🔍 Debug - currentSession at start:', currentSession);
+      console.log('🔍 Debug - sessionAnnotations at start:', sessionAnnotations);
+      
+      if (!currentSession) {
+        console.error('❌ No current session found when trying to end session');
+        return;
+      }
       
       currentSession.endTime = new Date().toISOString();
       currentSession.status = 'completed';
@@ -1358,23 +1536,41 @@
       
       // Ensure all annotations are saved to database before ending session
       const saveAllAnnotations = async () => {
-        if (sessionAnnotations.length > 0) {
+        if (!currentSession || !currentSession.id) {
+          console.error('❌ No valid current session found for saving annotations');
+          return;
+        }
+        
+        if (sessionAnnotations && sessionAnnotations.length > 0) {
           console.log(`🔄 Ensuring ${sessionAnnotations.length} annotations are saved to database...`);
+          console.log('🔍 Debug - sessionAnnotations array:', sessionAnnotations);
+          
           for (const annotation of sessionAnnotations) {
+            // Add null checks to prevent errors
+            if (!annotation || !annotation.id) {
+              console.warn('⚠️ Skipping annotation with missing id:', annotation);
+              continue;
+            }
+            
+            if (!annotation.imageId) {
+              console.warn('⚠️ Skipping annotation with missing imageId:', annotation);
+              continue;
+            }
+            
             const dbAnnotation = {
               id: annotation.id,
               sessionId: currentSession.id,
               imageId: annotation.imageId,
-              annotationType: annotation.annotationType,
-              points: JSON.stringify(annotation.points),
-              nerveType: annotation.nerveType,
-              sideOfBody: annotation.sideOfBody,
-              patientPosition: annotation.patientPosition,
-              visibility: annotation.visibility,
-              patientAgeGroup: annotation.patientAgeGroup,
-              needleApproach: annotation.needleApproach,
-              clinicalNotes: annotation.clinicalNotes,
-              timestamp: annotation.timestamp
+              annotationType: annotation.annotationType || 'polygon',
+              points: JSON.stringify(annotation.points || []),
+              nerveType: annotation.nerveType || '',
+              sideOfBody: annotation.sideOfBody || '',
+              patientPosition: annotation.patientPosition || '',
+              visibility: annotation.visibility || '',
+              patientAgeGroup: annotation.patientAgeGroup || '',
+              needleApproach: annotation.needleApproach || '',
+              clinicalNotes: annotation.clinicalNotes || '',
+              timestamp: annotation.timestamp || new Date().toISOString()
             };
             
             try {
@@ -1389,6 +1585,7 @@
       
       // Save annotations first, then save session
       if (window.electronAPI && window.electronAPI.dbSaveSession) {
+        console.log('🔍 Debug - About to call saveAllAnnotations, currentSession:', currentSession);
         // First ensure all annotations are in database
         saveAllAnnotations().then(() => {
           // Then save the session with the correct count
@@ -1397,18 +1594,53 @@
           if (result.success) {
             console.log('✅ Session saved to database successfully:', result);
             showToast('Session data saved to library!', 'success');
+            
+            // Notify home page about session completion for statistics update
+            try {
+              if (window.opener && !window.opener.closed) {
+                window.opener.postMessage({
+                  type: 'sessionCompleted',
+                  sessionData: sessionData
+                }, '*');
+                console.log('📊 Notified home page about session completion');
+              }
+              
+              // Also dispatch event for local listeners
+              window.dispatchEvent(new CustomEvent('sessionCompleted', { 
+                detail: sessionData 
+              }));
+            } catch (error) {
+              console.warn('Could not notify home page about session completion:', error);
+            }
+            
           } else {
             console.error('❌ Failed to save session to database:', result.error);
             showToast('Session completed but save failed', 'error');
           }
+          
+          // Clean up session AFTER all async operations complete
+          performSessionCleanup();
+          
         }).catch(error => {
           console.error('❌ Database save error:', error);
           showToast('Session completed but save failed', 'error');
+          
+          // Clean up session even on error
+          performSessionCleanup();
         });
       } else {
         console.error('❌ electronAPI or dbSaveSession not available');
         showToast('Database not available - session not saved', 'error');
+        
+        // Clean up session even when database not available
+        performSessionCleanup();
       }
+    }
+
+    // Separate function to handle all session cleanup
+    function performSessionCleanup() {
+      console.log('🏁 Starting session cleanup, currentSession:', currentSession);
+      const endedSessionId = currentSession ? currentSession.id : 'unknown';
       
       // Clean up localStorage
       localStorage.removeItem('currentSession');
@@ -1419,6 +1651,7 @@
       document.getElementById('sessionControls').style.display = 'none';
       
       document.getElementById('saveAnnotationBtn').style.display = 'none';
+      document.getElementById('forceSaveBtn').style.display = 'none';
       document.getElementById('testAnnotationBtn').style.display = 'none';
       document.getElementById('debugBtn').style.display = 'none';
       document.getElementById('nextAnnotationBtn').style.display = 'none';
@@ -1431,10 +1664,7 @@
       
       closeEndSessionModal();
       
-      console.log('🏁 Session ended:', currentSession);
-      const endedSessionId = currentSession.id;
-      
-      // Clear session data IMMEDIATELY
+      // Clear session data AFTER all database operations
       currentSession = null;
       sessionAnnotations = [];
       sessionImages = [];
@@ -1626,6 +1856,17 @@
     function displayImage(imageSrc) {
       console.log('🎨 Display image function called');
       
+      // Clear any existing VIA annotations before loading new image
+      try {
+        const viaFrame = document.getElementById('via_image_annotator');
+        if (viaFrame && viaFrame.contentWindow) {
+          viaFrame.contentWindow.postMessage({ type: 'clear_annotations' }, '*');
+          console.log('🧹 Cleared VIA annotations before loading new image');
+        }
+      } catch (error) {
+        console.log('Could not clear VIA annotations:', error);
+      }
+      
       const uploadOverlay = document.getElementById('uploadOverlay');
       const imageContainer = document.getElementById('imageContainer');
       const mainImage = document.getElementById('mainImage');
@@ -1702,17 +1943,24 @@
         const viaWindow = viaFrame.contentWindow;
         
         if (viaWindow && currentImage) {
-          viaWindow.postMessage({
-            type: 'load_image',
-            data: {
-              src: currentImage.data,
-              filename: currentImage.filename,
-              id: currentImage.id
-            }
-          }, '*');
+          // Clear any existing annotations before loading new image
+          viaWindow.postMessage({ type: 'clear_annotations' }, '*');
+          console.log('🧹 Cleared VIA before sending new image');
           
-          console.log('✅ Image sent to local VIA successfully');
-          showToast('Local VGG Image Annotator ready!', 'success');
+          // Small delay to ensure clearing is processed
+          setTimeout(() => {
+            viaWindow.postMessage({
+              type: 'load_image',
+              data: {
+                src: currentImage.data,
+                filename: currentImage.filename,
+                id: currentImage.id
+              }
+            }, '*');
+            
+            console.log('✅ Image sent to local VIA successfully');
+            showToast('Local VGG Image Annotator ready!', 'success');
+          }, 100);
         }
         
       } catch (error) {
@@ -1731,27 +1979,31 @@
       switch (type) {
         case 'annotation_created':
           console.log('💾 Annotation received from VIA:', data);
-          saveMedicalAnnotationFromVIA(data);
-          showToast('Annotation saved successfully!', 'success');
+          // Store the VIA annotation but don't save it yet - wait for user to click "Save Annotation"
+          currentVIAAnnotation = data;
+          console.log('📝 VIA annotation stored, waiting for user to set attributes and save manually');
+          showToast('Polygon created! Set your attributes and click "Save Annotation"', 'info');
           break;
         case 'annotations_export':
-          console.log('📤 Exporting annotations from VIA:', data);
-          exportVIAAnnotations(data);
+          console.log('📤 VIA requested export, but ignoring to prevent unwanted popups during save');
+          // No automatic export - only allow manual export from End Session modal
           break;
         case 'get_annotations':
           // Handle get annotations response
           console.log('📥 Received annotations from VIA:', data);
+          window.viaSaveCompleted = true; // Mark that VIA responded
+          
           if (data && data.length > 0) {
             // Process each annotation from VIA (save to current session only)
             data.forEach(annotation => {
               console.log('Processing VIA annotation for current session:', annotation);
               saveMedicalAnnotationFromVIA(annotation);
             });
-            showToast(`Saved ${data.length} annotation(s) from VIA to current session!`, 'success');
+            showToast(`✅ Saved ${data.length} annotation(s) with polygons! (${sessionAnnotations.length} total)`, 'success');
           } else {
             // No VIA annotations, save form data only to current session
             saveAnnotationToSession();
-            showToast('Saved annotation with medical attributes to current session', 'success');
+            showToast('✅ Annotation saved with medical attributes!', 'success');
           }
           break;
         case 'get_annotations_for_save':
@@ -1772,6 +2024,26 @@
         return;
       }
       
+      // Read current form values and log them for debugging
+      const nerveType = document.getElementById('nerveType').value;
+      const sideOfBody = document.getElementById('sideOfBody').value;
+      const patientPosition = document.getElementById('patientPosition').value;
+      const visibility = document.getElementById('visibility').value;
+      const patientAgeGroup = document.getElementById('patientAgeGroup').value;
+      const needleApproach = document.getElementById('needleApproach').value;
+      const clinicalNotes = document.getElementById('clinicalNotes').value;
+      
+      console.log('📋 Reading form values for VIA annotation:', {
+        nerveType,
+        sideOfBody,
+        patientPosition,
+        visibility,
+        patientAgeGroup,
+        needleApproach,
+        clinicalNotes: clinicalNotes.substring(0, 50) + (clinicalNotes.length > 50 ? '...' : ''),
+        viaAnnotation: viaAnnotation
+      });
+      
       const medicalAnnotation = {
         id: viaAnnotation.id || Date.now(),
         timestamp: viaAnnotation.timestamp || new Date().toISOString(),
@@ -1779,13 +2051,13 @@
         imageName: currentImage?.filename,
         annotationType: viaAnnotation.type || 'polygon',
         points: viaAnnotation.points || [],
-        nerveType: document.getElementById('nerveType').value,
-        sideOfBody: document.getElementById('sideOfBody').value,
-        patientPosition: document.getElementById('patientPosition').value,
-        visibility: document.getElementById('visibility').value,
-        patientAgeGroup: document.getElementById('patientAgeGroup').value,
-        needleApproach: document.getElementById('needleApproach').value,
-        clinicalNotes: document.getElementById('clinicalNotes').value
+        nerveType: nerveType,
+        sideOfBody: sideOfBody,
+        patientPosition: patientPosition,
+        visibility: visibility,
+        patientAgeGroup: patientAgeGroup,
+        needleApproach: needleApproach,
+        clinicalNotes: clinicalNotes
       };
       
       // Add to CURRENT SESSION arrays only (NOT localStorage)
@@ -2260,7 +2532,7 @@
       
       console.log('🧪 Creating test annotation:', testAnnotation);
       saveMedicalAnnotationFromVIA(testAnnotation);
-      showToast('Test annotation created and saved!', 'success');
+      showToast(`🧪 Test annotation created! (${sessionAnnotations.length} total in session)`, 'success');
     }
 
     // Populate dropdown menus with options from MEDICAL_ATTRIBUTES
@@ -2372,6 +2644,7 @@
           document.getElementById('sessionInfo').textContent = `Session: #${currentSession.id}`;
           
           document.getElementById('saveAnnotationBtn').style.display = 'block';
+          document.getElementById('forceSaveBtn').style.display = 'block';
           document.getElementById('testAnnotationBtn').style.display = 'block';
           document.getElementById('debugBtn').style.display = 'block';
           document.getElementById('nextAnnotationBtn').style.display = 'block';
