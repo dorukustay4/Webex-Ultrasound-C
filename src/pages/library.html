@@ -166,25 +166,6 @@
       align-items: center;
     }
 
-    .refresh-btn {
-      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 0.5rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .refresh-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
-    }
-
     .page-title {
       font-size: 2rem;
       font-weight: 700;
@@ -365,14 +346,14 @@
       background: rgba(16, 185, 129, 0.2);
     }
 
-    .action-btn.save {
-      background: rgba(245, 158, 11, 0.1);
-      color: #f59e0b;
-      border-color: rgba(245, 158, 11, 0.2);
+    .action-btn.delete {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, 0.2);
     }
 
-    .action-btn.save:hover {
-      background: rgba(245, 158, 11, 0.2);
+    .action-btn.delete:hover {
+      background: rgba(239, 68, 68, 0.2);
     }
 
     .empty-state {
@@ -431,7 +412,7 @@
       font-weight: 500;
     }
 
-    .status {
+    .session-category-badge {
       padding: 0.25rem 0.5rem;
       border-radius: 0.375rem;
       font-size: 0.75rem;
@@ -440,16 +421,22 @@
       letter-spacing: 0.025em;
     }
 
-    .status-completed {
+    .category-consultation {
+      background: rgba(59, 130, 246, 0.1);
+      color: #3b82f6;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .category-training {
+      background: rgba(245, 158, 11, 0.1);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .category-annotation-session {
       background: rgba(16, 185, 129, 0.1);
       color: #10b981;
       border: 1px solid rgba(16, 185, 129, 0.2);
-    }
-
-    .status-archived {
-      background: rgba(107, 114, 128, 0.1);
-      color: #9ca3af;
-      border: 1px solid rgba(107, 114, 128, 0.2);
     }
 
     .annotation-stats {
@@ -505,6 +492,211 @@
         gap: 0.25rem;
       }
     }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 2% auto;
+      padding: 0;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+      color: white;
+      padding: 20px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .close {
+      color: white;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .close:hover,
+    .close:focus {
+      opacity: 1;
+    }
+
+    .modal-body {
+      padding: 30px;
+      max-height: calc(90vh - 100px);
+      overflow-y: auto;
+    }
+
+    .session-info {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 25px;
+      border-left: 4px solid #3b82f6;
+    }
+
+    .session-info h3 {
+      color: #1e293b;
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .session-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .session-info-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .session-info-label {
+      font-size: 0.85rem;
+      color: #64748b;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .session-info-value {
+      color: #1e293b;
+      font-weight: 500;
+    }
+
+    .annotations-list {
+      background: white;
+    }
+
+    .annotations-list h3 {
+      color: #1e293b;
+      margin-bottom: 20px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 10px;
+    }
+
+    .annotation-card {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+    }
+
+    .annotation-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-color: #3b82f6;
+    }
+
+    .annotation-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .annotation-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .annotation-timestamp {
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    .annotation-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .annotation-detail {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .annotation-detail-label {
+      font-size: 0.8rem;
+      color: #64748b;
+      font-weight: 500;
+      margin-bottom: 3px;
+    }
+
+    .annotation-detail-value {
+      color: #1e293b;
+      font-weight: 500;
+      padding: 4px 8px;
+      background: white;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .clinical-notes {
+      grid-column: 1 / -1;
+      margin-top: 10px;
+    }
+
+    .clinical-notes-content {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 12px;
+      min-height: 60px;
+      font-style: italic;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    .empty-annotations {
+      text-align: center;
+      color: #64748b;
+      font-style: italic;
+      padding: 40px 20px;
+    }
   </style>
 </head>
 <body>
@@ -523,7 +715,7 @@
               </linearGradient>
             </defs>
           </svg>
-          <h2>Ultrasound Webex</h2>
+          <h2>Ultrasound Annotation</h2>
         </div>
       </div>
       
@@ -535,6 +727,14 @@
           <span>Home</span>
         </a>
         
+        <a href="test.html" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 5C2 3.89543 2.89543 3 4 3H16C17.1046 3 18 3.89543 18 5V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Test</span>
+        </a>
+        
         <a href="library.html" class="nav-item active">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M4 4C4 2.89543 4.89543 2 6 2H14C15.1046 2 16 2.89543 16 4V16C16 17.1046 15.1046 18 14 18H6C4.89543 18 4 17.1046 4 16V4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -543,6 +743,24 @@
             <path d="M8 14H10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <span>Library</span>
+        </a>
+
+        <a href="faq.html" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+            <path d="M7.5 7.5C7.5 6.5 8.5 5.5 10 5.5C11.5 5.5 12.5 6.5 12.5 7.5C12.5 8.5 10 9 10 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="10" cy="13" r="1" fill="currentColor"/>
+          </svg>
+          <span>FAQ</span>
+        </a>
+
+        <a href="help.html" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+            <path d="M10 6V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M10 14H10.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span>Help</span>
         </a>
         
         <a href="about.html" class="nav-item">
@@ -575,56 +793,10 @@
           <div class="page-header-text">
             <h1 class="page-title">Session Library</h1>
             <p class="page-subtitle">View your session history, annotations, and shared ultrasound appointments</p>
-            <p style="color: #f59e0b; font-weight: 500; margin-top: 8px;">🚀 DEBUG MODE: Showing ALL sessions without filtering</p>
-          </div>
-          <div class="page-header-actions">
-            <button class="refresh-btn" onclick="refreshLibrary()" title="Refresh sessions from database">
-              🔄 Refresh
-            </button>
           </div>
         </div>
       </div>
 
-      <!-- Filters - DISABLED FOR DEBUGGING -->
-      <div class="library-filters" style="display: none;">
-        <div class="filter-row">
-          <div class="filter-group">
-            <label class="filter-label">Search sessions</label>
-            <input type="text" class="filter-input" placeholder="Search by title or notes..." id="search-filter">
-          </div>
-          
-          <div class="filter-group">
-            <label class="filter-label">Date range</label>
-            <select class="filter-select" id="date-filter">
-              <option value="all">All time</option>
-              <option value="today">Today</option>
-              <option value="week">This week</option>
-              <option value="month">This month</option>
-              <option value="quarter">Last 3 months</option>
-            </select>
-          </div>
-          
-          <div class="filter-group">
-            <label class="filter-label">Status</label>
-            <select class="filter-select" id="status-filter">
-              <option value="all">All status</option>
-              <option value="completed">Completed</option>
-              <option value="archived">Archived</option>
-            </select>
-          </div>
-          
-          <div class="filter-group">
-            <label class="filter-label">Resident Doctor</label>
-            <select class="filter-select" id="resident-filter">
-              <option value="all">All residents</option>
-              <option value="Dr. Sarah Johnson">Dr. Sarah Johnson</option>
-              <option value="Dr. Emma Rodriguez">Dr. Emma Rodriguez</option>
-              <option value="Dr. James Wilson">Dr. James Wilson</option>
-              <option value="Dr. Alex Thompson">Dr. Alex Thompson</option>
-            </select>
-          </div>
-        </div>
-      </div>
 
       <!-- Sessions List -->
       <div class="calls-list" id="calls-list">
@@ -635,7 +807,7 @@
               <th>Session Title</th>
               <th>Resident Doctor</th>
               <th>Duration</th>
-              <th>Status</th>
+              <th>Category</th>
               <th>Annotations</th>
               <th>Actions</th>
             </tr>
@@ -655,12 +827,25 @@
     </main>
   </div>
 
-  <!-- Load auth system -->
-  <script src="../js/simple-auth-fixed.js"></script>
+  <!-- Authentication system loaded via main app - removed broken import -->
 
   <script>
     let allSessions = [];
     let filteredSessions = [];
+
+    // Manual refresh function for debugging
+    async function manualRefresh() {
+      console.log('🔄 Manual refresh triggered');
+      try {
+        await loadSessionsFromDatabase();
+        console.log('✅ Manual refresh completed');
+      } catch (error) {
+        console.error('❌ Manual refresh failed:', error);
+      }
+    }
+    
+    // Make manual refresh available globally
+    window.manualRefresh = manualRefresh;
 
     // Toast notification function
     function showToast(message, type = 'info') {
@@ -693,32 +878,6 @@
           }
         }, 300);
       }, 4000);
-    }
-
-    // Refresh library function
-    async function refreshLibrary() {
-      const refreshBtn = document.querySelector('.refresh-btn');
-      if (refreshBtn) {
-        refreshBtn.textContent = '🔄 Refreshing...';
-        refreshBtn.disabled = true;
-      }
-      
-      console.log('🔄 Manually refreshing library...');
-      showToast('Refreshing sessions from database...', 'info');
-      
-      try {
-        await loadSessionsFromDatabase();
-        showToast('Library refreshed successfully!', 'success');
-        console.log('✅ Refresh complete - all sessions should be visible now');
-      } catch (error) {
-        console.error('❌ Refresh failed:', error);
-        showToast('Failed to refresh library', 'error');
-      }
-      
-      if (refreshBtn) {
-        refreshBtn.textContent = '🔄 Refresh';
-        refreshBtn.disabled = false;
-      }
     }
 
     // Debug function to check library state
@@ -764,7 +923,6 @@
 
     // Make debug function available globally
     window.debugLibrary = debugLibrary;
-    window.refreshLibrary = refreshLibrary;
 
     // Test function to add sample data if database is empty
     function addTestSession() {
@@ -1203,6 +1361,31 @@
     // Initialize page
     document.addEventListener('DOMContentLoaded', async function() {
       console.log('📚 Session Library page loading...');
+      console.log('📚 DOM fully loaded, starting initialization');
+      console.log('📚 Window.electronAPI available:', !!window.electronAPI);
+      
+      // Check if essential DOM elements exist
+      const tbody = document.getElementById('calls-tbody');
+      const emptyState = document.getElementById('empty-state');
+      const callsList = document.getElementById('calls-list');
+      console.log('📚 DOM elements check:', {
+        tbody: !!tbody,
+        emptyState: !!emptyState, 
+        callsList: !!callsList
+      });
+      
+      // Test database connectivity immediately
+      if (window.electronAPI && window.electronAPI.dbGetSessions) {
+        console.log('📚 Testing database connection...');
+        try {
+          const testResult = await window.electronAPI.dbGetSessions();
+          console.log('📚 Database test result:', testResult);
+        } catch (error) {
+          console.error('📚 Database test error:', error);
+        }
+      } else {
+        console.error('📚 Database API not available!');
+      }
       
       // Load authentication state
       initializeAuth();
@@ -1211,9 +1394,16 @@
       setupEventListeners();
       
       // Load sessions from database
-      await loadSessionsFromDatabase();
+      console.log('📚 About to call loadSessionsFromDatabase...');
+      try {
+        await loadSessionsFromDatabase();
+        console.log('📚 loadSessionsFromDatabase completed');
+      } catch (error) {
+        console.error('📚 loadSessionsFromDatabase failed:', error);
+      }
       
       console.log('✅ Session Library initialized');
+      console.log('📚 Final state - allSessions.length:', allSessions.length);
     });
 
     // Initialize authentication
@@ -1232,24 +1422,7 @@
       }
     }
 
-    // Update user display in sidebar
-    function updateUserDisplay(user) {
-      const sidebarUser = document.getElementById('sidebar-user');
-      const userAvatar = document.getElementById('user-avatar');
-      const userName = document.getElementById('user-name');
-      const userEmail = document.getElementById('user-email');
 
-      if (sidebarUser && userAvatar && userName && userEmail) {
-        sidebarUser.style.display = 'flex';
-        
-        const displayName = user.displayName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'User';
-        const email = user.emails?.[0] || user.email || 'user@domain.com';
-        
-        userAvatar.textContent = displayName.charAt(0).toUpperCase();
-        userName.textContent = displayName;
-        userEmail.textContent = email;
-      }
-    }
 
     // Set up event listeners - DISABLED FOR DEBUGGING
     function setupEventListeners() {
@@ -1273,10 +1446,9 @@
       
       const searchTerm = document.getElementById('search-filter')?.value?.toLowerCase() || '';
       const dateRange = document.getElementById('date-filter')?.value || 'all';
-      const status = document.getElementById('status-filter')?.value || 'all';
       const resident = document.getElementById('resident-filter')?.value || 'all';
 
-      console.log('🔧 Filter values:', { searchTerm, dateRange, status, resident });
+      console.log('🔧 Filter values:', { searchTerm, dateRange, resident });
 
       filteredSessions = allSessions.filter(session => {
         // Search filter
@@ -1303,22 +1475,10 @@
           matchesDate = sessionDate >= quarterAgo;
         }
 
-        // Status filter - handle missing/null status gracefully
-        let matchesStatus = true;
-        if (status !== 'all') {
-          // If filtering for 'completed', also include 'active' sessions and null/undefined status
-          // since ended sessions should be considered completed regardless of stored status
-          if (status === 'completed') {
-            matchesStatus = !session.status || session.status === 'active' || session.status === 'completed';
-          } else {
-            matchesStatus = session.status === status;
-          }
-        }
-
         // Resident filter
         const matchesResident = resident === 'all' || session.attendees === resident;
 
-        const matches = matchesSearch && matchesDate && matchesStatus && matchesResident;
+        const matches = matchesSearch && matchesDate && matchesResident;
         
         if (!matches) {
           console.log(`🔧 Session "${session.title}" filtered out:`, {
@@ -1382,19 +1542,19 @@
 
     // Create session row HTML
     function createSessionRow(session) {
-      console.log('🎨 Creating row for session:', session);
-      
       try {
+        console.log('🎨 Creating row for:', session.id);
+        
         const row = document.createElement('tr');
         
         // Safely get date with fallbacks
-        const dateValue = session.createdAt || session.start_time || session.date || new Date().toISOString();
+        const dateValue = session.date || session.start_time || session.createdAt || new Date().toISOString();
         const sessionDate = new Date(dateValue);
         
         // Check if date is valid
         if (isNaN(sessionDate.getTime())) {
           console.warn('Invalid date for session:', session.id, 'using current date');
-          sessionDate = new Date();
+          sessionDate.setTime(Date.now());
         }
         
         const formattedDate = sessionDate.toLocaleDateString('en-US', {
@@ -1407,82 +1567,59 @@
           minute: '2-digit'
         });
 
-        // Safely format duration
-        const duration = formatDuration(session.duration || 0);
-
-        // Safely format session properties with fallbacks
-        const title = session.title || session.session_title || 'Untitled Session';
-        const attendees = session.attendees || session.doctor_name || 'Unknown';
+        // Format session category for display
         const category = session.category || 'annotation_session';
-        const annotations = session.annotations || session.total_annotations || 0;
-        const images = session.images || session.total_images || 0;
-
-        // Format status - treat all ended sessions as completed
-        let statusClass, statusText;
-        if (session.status === 'archived') {
-          statusClass = 'status-archived';
-          statusText = 'Archived';
+        const sessionCategory = formatCategory(category);
+        let categoryClass = 'session-category-badge';
+        
+        // Add specific class based on category from database
+        if (category === 'consultation') {
+          categoryClass += ' category-consultation';
+        } else if (category === 'training') {
+          categoryClass += ' category-training';
+        } else if (category === 'annotation_session') {
+          categoryClass += ' category-annotation-session';
         } else {
-          // Treat null, undefined, 'active', 'completed' as completed for ended sessions
-          statusClass = 'status-completed';
-          statusText = 'Completed';
+          // Fallback for any other category
+          categoryClass += ' category-annotation-session';
         }
 
-        console.log('🎨 Row data:', { title, attendees, category, annotations, images, formattedDate, formattedTime });
-        
+        // Create avatar from doctor name - safely
+        const attendees = session.attendees || session.doctor_name || 'DR';
+        const avatar = attendees.split(' ').map(n => n[0] || 'D').join('');
+
+        // Format duration from seconds - safely
+        const duration = formatDuration(session.duration || 0);
+
         row.innerHTML = `
+          <td class="call-date-cell">
+            <div>${formattedDate}</div>
+            <div style="font-size: 0.75rem; color: #6b7280;">${formattedTime}</div>
+          </td>
+          <td class="call-title-cell">${escapeHtml(session.title || 'Untitled Session')}</td>
           <td>
-            <div class="session-date">
-              <div class="date">${formattedDate}</div>
-              <div class="time">${formattedTime}</div>
+            <div class="resident-info">
+              <div class="resident-avatar">${escapeHtml(avatar)}</div>
+              <span>${escapeHtml(attendees)}</span>
             </div>
           </td>
+          <td>${duration}</td>
           <td>
-            <div class="session-title">
-              <strong>${escapeHtml(title)}</strong>
-              <div class="session-category">${formatCategory(category)}</div>
-            </div>
+            <span class="${categoryClass}">${sessionCategory}</span>
           </td>
           <td>
-            <div class="attendee-info">
-              <span class="attendee-name">${escapeHtml(attendees)}</span>
-            </div>
-          </td>
-          <td>
-            <span class="duration">${duration}</span>
-          </td>
-          <td>
-            <span class="status ${statusClass}">${statusText}</span>
-          </td>
-          <td>
-            <div class="annotation-stats">
-              <span class="annotation-count">${annotations}</span>
-              <span class="annotation-label">annotations</span>
-              ${images > 0 ? `<br><span class="image-count">${images} images</span>` : ''}
-            </div>
+            <span class="annotations-count">${session.annotations || session.total_annotations || 0}</span>
           </td>
           <td>
             <div class="action-buttons">
-              <button class="action-btn" onclick="viewSessionDetails('${session.id}')" title="View Details">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z" stroke="currentColor" stroke-width="2"/>
-                  <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
-                </svg>
+              <button class="action-btn" onclick="viewSessionDetails('${session.id}')">
                 View
               </button>
-              <button class="action-btn export" onclick="exportSession('${session.id}')" title="Export Session">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M21 15V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                Export
-              </button>
-              <button class="action-btn save" onclick="deleteSession('${session.id}')" title="Delete Session">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3 6H5H21M19 6V20C19 21.1046 18.1046 22 17 22H7C5.89543 22 5 21.1046 5 20V6M8 6V4C8 2.89543 8.89543 2 10 2H14C15.1046 2 16 2.89543 16 4V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+              <button class="action-btn delete" onclick="deleteSession('${session.id}')">
                 Delete
+              </button>
+              <button class="action-btn export" onclick="exportSession('${session.id}')">
+                Export
               </button>
             </div>
           </td>
@@ -1528,10 +1665,9 @@
       
       const searchTerm = document.getElementById('search-input').value.toLowerCase();
       const dateRange = document.getElementById('date-filter').value;
-      const status = document.getElementById('status-filter').value;
       const resident = document.getElementById('resident-filter').value;
 
-      console.log('- Filter values:', { searchTerm, dateRange, status, resident });
+      console.log('- Filter values:', { searchTerm, dateRange, resident });
 
       const now = new Date();
       
@@ -1562,25 +1698,11 @@
         }
         console.log(`  - Date match (${dateRange}):`, matchesDate);
 
-        // Status filter - check against actual session status from database
-        // Handle cases where status might be null, undefined, or 'active'
-        let matchesStatus = true;
-        if (status !== 'all') {
-          // If filtering for 'completed', also include 'active' sessions and null/undefined status
-          // since ended sessions should be considered completed regardless of stored status
-          if (status === 'completed') {
-            matchesStatus = !session.status || session.status === 'active' || session.status === 'completed';
-          } else {
-            matchesStatus = session.status === status;
-          }
-        }
-        console.log(`  - Status match (filter: ${status}, session: ${session.status}):`, matchesStatus);
-
         // Resident filter - using attendees name
         const matchesResident = resident === 'all' || session.attendees === resident;
         console.log(`  - Resident match (${resident}):`, matchesResident);
 
-        const finalMatch = matchesSearch && matchesDate && matchesStatus && matchesResident;
+        const finalMatch = matchesSearch && matchesDate && matchesResident;
         console.log(`  - Final match:`, finalMatch);
         
         return finalMatch;
@@ -1608,87 +1730,6 @@
       callsTbody.innerHTML = filteredSessions.map(session => createSessionRow(session)).join('');
     }
 
-    // Create session row HTML
-    function createSessionRow(session) {
-      try {
-        console.log('🎨 [Second createSessionRow] Creating row for:', session.id);
-        
-        const row = document.createElement('tr');
-        
-        // Safely get date with fallbacks
-        const dateValue = session.date || session.start_time || session.createdAt || new Date().toISOString();
-        const sessionDate = new Date(dateValue);
-        
-        // Check if date is valid
-        if (isNaN(sessionDate.getTime())) {
-          console.warn('Invalid date for session:', session.id, 'using current date');
-          sessionDate.setTime(Date.now());
-        }
-        
-        const formattedDate = sessionDate.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        });
-        const formattedTime = sessionDate.toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit'
-        });
-
-        const statusClass = 'completed';
-        const statusText = 'Completed';
-
-        // Create avatar from doctor name - safely
-        const attendees = session.attendees || session.doctor_name || 'DR';
-        const avatar = attendees.split(' ').map(n => n[0] || 'D').join('');
-
-        // Format duration from seconds - safely
-        const duration = formatDuration(session.duration || 0);
-
-        row.innerHTML = `
-          <td class="call-date-cell">
-            <div>${formattedDate}</div>
-            <div style="font-size: 0.75rem; color: #6b7280;">${formattedTime}</div>
-          </td>
-          <td class="call-title-cell">${escapeHtml(session.title || 'Untitled Session')}</td>
-          <td>
-            <div class="resident-info">
-              <div class="resident-avatar">${escapeHtml(avatar)}</div>
-              <span>${escapeHtml(attendees)}</span>
-            </div>
-          </td>
-          <td>${duration}</td>
-          <td>
-            <span class="call-status ${statusClass}">${statusText}</span>
-          </td>
-          <td>
-            <span class="annotations-count">${session.annotations || session.total_annotations || 0}</span>
-          </td>
-          <td>
-            <div class="action-buttons">
-              <button class="action-btn" onclick="viewSessionDetails('${session.id}')">
-                View
-              </button>
-              <button class="action-btn save" onclick="saveSession('${session.id}')">
-                Save
-              </button>
-              <button class="action-btn export" onclick="exportSession('${session.id}')">
-                Export
-              </button>
-            </div>
-          </td>
-        `;
-        
-        console.log('✅ [Second createSessionRow] Row created successfully for session:', session.id);
-        return row;
-        
-      } catch (error) {
-        console.error('❌ [Second createSessionRow] Error creating row for session:', session.id, error);
-        console.error('Session data:', session);
-        return null;
-      }
-    }
-
     // View session details
     async function viewSessionDetails(sessionId) {
       try {
@@ -1702,26 +1743,109 @@
             const annotations = result.annotations || [];
             const images = result.images || [];
             
-            // Create a detailed modal or alert
-            const detailsHtml = `
-Session Details:
-
-📋 Title: ${session.title || 'Untitled Session'}
-📅 Date: ${new Date(session.start_time || session.created_at).toLocaleString()}
-⏱️ Duration: ${formatDuration(session.duration)}
-👨‍⚕️ Doctor: ${session.attendees || session.doctor_name || 'Not specified'}
-📁 Category: ${formatCategory(session.category)}
-📊 Status: ${session.status || 'completed'}
-
-📈 Statistics:
-• ${annotations.length} annotations
-• ${images.length} images
-• Session ID: ${session.id}
-
-📝 Notes: ${session.notes || 'No notes available'}
+            // Display session info
+            const sessionInfoHtml = `
+              <h3>Session Information</h3>
+              <div class="session-info-grid">
+                <div class="session-info-item">
+                  <span class="session-info-label">Session Title</span>
+                  <span class="session-info-value">${session.title || 'Untitled Session'}</span>
+                </div>
+                <div class="session-info-item">
+                  <span class="session-info-label">Date & Time</span>
+                  <span class="session-info-value">${new Date(session.start_time || session.created_at).toLocaleString()}</span>
+                </div>
+                <div class="session-info-item">
+                  <span class="session-info-label">Duration</span>
+                  <span class="session-info-value">${formatDuration(session.duration)}</span>
+                </div>
+                <div class="session-info-item">
+                  <span class="session-info-label">Doctor</span>
+                  <span class="session-info-value">${session.attendees || session.doctor_name || 'Not specified'}</span>
+                </div>
+                <div class="session-info-item">
+                  <span class="session-info-label">Category</span>
+                  <span class="session-info-value">${formatCategory(session.category)}</span>
+                </div>
+                <div class="session-info-item">
+                  <span class="session-info-label">Status</span>
+                  <span class="session-info-value">${session.status || 'completed'}</span>
+                </div>
+                <div class="session-info-item">
+                  <span class="session-info-label">Total Annotations</span>
+                  <span class="session-info-value">${annotations.length}</span>
+                </div>
+                <div class="session-info-item">
+                  <span class="session-info-label">Images</span>
+                  <span class="session-info-value">${images.length}</span>
+                </div>
+              </div>
             `;
             
-            alert(detailsHtml);
+            // Display annotations
+            let annotationsHtml = '<h3>Annotation Details</h3>';
+            
+            if (annotations.length === 0) {
+              annotationsHtml += '<div class="empty-annotations">No annotations found for this session.</div>';
+            } else {
+              annotations.forEach((annotation, index) => {
+                const annotationData = {
+                  nerveType: annotation.nerveType || annotation.nerve_type || 'Not specified',
+                  sideOfBody: annotation.sideOfBody || annotation.side_of_body || 'Not specified',
+                  patientPosition: annotation.patientPosition || annotation.patient_position || 'Not specified',
+                  visibility: annotation.visibility || 'Not specified',
+                  patientAgeGroup: annotation.patientAgeGroup || annotation.patient_age_group || 'Not specified',
+                  needleApproach: annotation.needleApproach || annotation.needle_approach || 'Not specified',
+                  clinicalNotes: annotation.clinicalNotes || annotation.clinical_notes || 'No clinical notes provided'
+                };
+                
+                annotationsHtml += `
+                  <div class="annotation-card">
+                    <div class="annotation-header">
+                      <div class="annotation-title">Annotation ${index + 1}</div>
+                      <div class="annotation-timestamp">${annotation.timestamp ? new Date(annotation.timestamp).toLocaleString() : 'Time not recorded'}</div>
+                    </div>
+                    <div class="annotation-details">
+                      <div class="annotation-detail">
+                        <span class="annotation-detail-label">Nerve Type</span>
+                        <span class="annotation-detail-value">${annotationData.nerveType}</span>
+                      </div>
+                      <div class="annotation-detail">
+                        <span class="annotation-detail-label">Side of Body</span>
+                        <span class="annotation-detail-value">${annotationData.sideOfBody}</span>
+                      </div>
+                      <div class="annotation-detail">
+                        <span class="annotation-detail-label">Patient Position</span>
+                        <span class="annotation-detail-value">${annotationData.patientPosition}</span>
+                      </div>
+                      <div class="annotation-detail">
+                        <span class="annotation-detail-label">Visibility</span>
+                        <span class="annotation-detail-value">${annotationData.visibility}</span>
+                      </div>
+                      <div class="annotation-detail">
+                        <span class="annotation-detail-label">Patient Age Group</span>
+                        <span class="annotation-detail-value">${annotationData.patientAgeGroup}</span>
+                      </div>
+                      <div class="annotation-detail">
+                        <span class="annotation-detail-label">Needle Approach</span>
+                        <span class="annotation-detail-value">${annotationData.needleApproach}</span>
+                      </div>
+                      <div class="annotation-detail clinical-notes">
+                        <span class="annotation-detail-label">Clinical Notes</span>
+                        <div class="clinical-notes-content">${annotationData.clinicalNotes}</div>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              });
+            }
+            
+            // Update modal content
+            document.getElementById('sessionInfo').innerHTML = sessionInfoHtml;
+            document.getElementById('annotationsList').innerHTML = annotationsHtml;
+            
+            // Show modal
+            document.getElementById('annotationModal').style.display = 'block';
             
           } else {
             console.error('❌ Failed to load session details:', result.error);
@@ -1780,16 +1904,79 @@ Session Details:
             const annotations = result.annotations || [];
             const images = result.images || [];
             
+            console.log(`📊 Export data: ${annotations.length} annotations, ${images.length} images`);
+            
+            // Debug: Log first annotation structure
+            if (annotations.length > 0) {
+              console.log('🔍 First annotation structure:', {
+                id: annotations[0].id,
+                pointsType: typeof annotations[0].points,
+                pointsValue: annotations[0].points,
+                hasImageId: !!annotations[0].imageId,
+                imageId: annotations[0].imageId || annotations[0].image_id
+              });
+            }
+            
+            // Debug: Log first image structure
+            if (images.length > 0) {
+              console.log('🔍 First image structure:', {
+                id: images[0].id,
+                availableFields: Object.keys(images[0]),
+                hasData: !!images[0].data,
+                hasImageData: !!images[0].imageData,
+                hasBase64: !!images[0].base64,
+                hasContent: !!images[0].content
+              });
+            }
+            
             // Create flattened annotation-image pairs
             const flattenedAnnotations = annotations.map(annotation => {
-              const associatedImage = images.find(img => img.id === annotation.imageId);
+              const associatedImage = images.find(img => img.id === annotation.imageId || img.id === annotation.image_id);
+              
+              // Debug: Log image association for first annotation
+              if (annotation === annotations[0]) {
+                console.log('🔍 Image association for first annotation:', {
+                  annotationImageId: annotation.imageId || annotation.image_id,
+                  foundImage: !!associatedImage,
+                  imageFields: associatedImage ? Object.keys(associatedImage) : 'No image found'
+                });
+              }
+              
+              // Safely parse annotation points
+              let annotationPoints = [];
+              try {
+                if (annotation.points) {
+                  if (typeof annotation.points === 'string') {
+                    annotationPoints = JSON.parse(annotation.points);
+                  } else if (Array.isArray(annotation.points)) {
+                    annotationPoints = annotation.points;
+                  } else if (typeof annotation.points === 'object') {
+                    annotationPoints = annotation.points;
+                  }
+                }
+              } catch (error) {
+                console.warn('Failed to parse annotation points for annotation', annotation.id, ':', error);
+                annotationPoints = [];
+              }
+              
+              // Get image data from multiple possible field names
+              let imageData = null;
+              if (associatedImage) {
+                imageData = associatedImage.image_data || // New database column
+                           associatedImage.data || 
+                           associatedImage.imageData || 
+                           associatedImage.base64 || 
+                           associatedImage.content || 
+                           associatedImage.file_data ||
+                           null;
+              }
               
               return {
                 // Annotation data
                 annotationId: annotation.id,
                 annotationTimestamp: annotation.timestamp || annotation.created_at,
                 annotationType: annotation.annotationType || annotation.type || 'polygon',
-                annotationPoints: annotation.points ? JSON.parse(annotation.points) : [],
+                annotationPoints: annotationPoints,
                 
                 // Medical attributes
                 nerveType: annotation.nerveType || annotation.nerve_type,
@@ -1802,11 +1989,11 @@ Session Details:
                 
                 // Image data paired with annotation
                 imageId: annotation.imageId || annotation.image_id,
-                imageName: associatedImage?.filename || 'Unknown',
-                imageData: associatedImage?.data || null,
-                imageSize: associatedImage?.fileSize || associatedImage?.file_size,
-                imageType: associatedImage?.fileType || associatedImage?.file_type,
-                imageUploadedAt: associatedImage?.uploadedAt || associatedImage?.uploaded_at
+                imageName: associatedImage?.filename || associatedImage?.name || associatedImage?.file_name || 'Unknown',
+                imageData: imageData,
+                imageSize: associatedImage?.fileSize || associatedImage?.file_size || associatedImage?.size,
+                imageType: associatedImage?.fileType || associatedImage?.file_type || associatedImage?.type || associatedImage?.mimeType,
+                imageUploadedAt: associatedImage?.uploadedAt || associatedImage?.uploaded_at || associatedImage?.created_at
               };
             });
             
@@ -1830,21 +2017,31 @@ Session Details:
               annotations: flattenedAnnotations
             };
             
-            // Download the export
-            const dataStr = JSON.stringify(exportData, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `session_${session.id}_${session.category || 'annotations'}_${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showToast(`Exported ${annotations.length} annotations with images`, 'success');
-            console.log(`📤 Successfully exported session "${session.title}" with ${annotations.length} annotations`);
+            // Download the export with error handling
+            try {
+              console.log('📝 Converting export data to JSON...');
+              const dataStr = JSON.stringify(exportData, null, 2);
+              console.log('✅ JSON conversion successful');
+              
+              const dataBlob = new Blob([dataStr], { type: 'application/json' });
+              const url = URL.createObjectURL(dataBlob);
+              
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `session_${session.id}_${session.category || 'annotations'}_${new Date().toISOString().split('T')[0]}.json`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+              
+              showToast(`Exported ${annotations.length} annotations with images`, 'success');
+              console.log(`📤 Successfully exported session "${session.title}" with ${annotations.length} annotations`);
+              
+            } catch (jsonError) {
+              console.error('❌ Error converting to JSON:', jsonError);
+              console.error('Problematic export data:', exportData);
+              showToast('Error creating export file - invalid data format', 'error');
+            }
             
           } else {
             console.error('❌ Failed to load session for export:', result.error);
@@ -1931,6 +2128,54 @@ Session Details:
       .image-count { font-size: 0.75rem; color: #94a3b8; }
     `;
     document.head.appendChild(toastStyles);
+  </script>
+  
+  <!-- Annotation Details Modal -->
+  <div id="annotationModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Session Annotation Details</h2>
+        <span class="close">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div id="sessionInfo" class="session-info"></div>
+        <div id="annotationsList" class="annotations-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Modal event handlers
+    document.addEventListener('DOMContentLoaded', function() {
+      const modal = document.getElementById('annotationModal');
+      const closeBtn = document.querySelector('.close');
+      
+      // Close modal when clicking the X button
+      if (closeBtn) {
+        closeBtn.onclick = function() {
+          modal.style.display = 'none';
+        };
+      }
+      
+      // Close modal when clicking outside of it
+      window.onclick = function(event) {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      };
+      
+      // Close modal with Escape key
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && modal.style.display === 'block') {
+          modal.style.display = 'none';
+        }
+      });
+    });
+
+    // Test script to verify JavaScript execution
+    console.log('🔧 JavaScript is executing - testing library page');
+    console.log('🔧 Page title:', document.title);
+    console.log('🔧 calls-tbody element exists:', !!document.getElementById('calls-tbody'));
   </script>
 </body>
 </html>

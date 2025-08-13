@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Help - Ultrasound Annotation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: rgba(30, 41, 59, 0.95);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(59, 130, 246, 0.2);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      z-index: 1000;
+    }
+
+    .sidebar-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo h2 {
+      background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .sidebar-menu {
+      flex: 1;
+      padding: 1rem 0;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.875rem 1.5rem;
+      color: #94a3b8;
+      text-decoration: none;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-item:hover {
+      background: rgba(59, 130, 246, 0.1);
+      color: #e2e8f0;
+    }
+
+    .nav-item.active {
+      background: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+      border-left-color: #3b82f6;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      margin-left: 280px;
+      padding: 2rem;
+    }
+
+    .page-header {
+      margin-bottom: 2rem;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-subtitle {
+      color: #94a3b8;
+      font-size: 1.1rem;
+    }
+
+    /* Help Content */
+    .help-container {
+      max-width: 900px;
+    }
+
+    .help-section {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      overflow: hidden;
+    }
+
+    .help-section h2 {
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+      color: #3b82f6;
+      font-size: 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .help-content {
+      padding: 1.5rem;
+    }
+
+    .help-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .help-card {
+      background: rgba(30, 41, 59, 0.6);
+      border-radius: 8px;
+      padding: 1.5rem;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .help-card h3 {
+      color: #10b981;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .help-card p {
+      color: #94a3b8;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .help-card ul, .help-card ol {
+      color: #94a3b8;
+      line-height: 1.6;
+      padding-left: 1.5rem;
+    }
+
+    .help-card li {
+      margin-bottom: 0.5rem;
+    }
+
+    .step-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .step-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background: rgba(59, 130, 246, 0.1);
+      border-radius: 8px;
+    }
+
+    .step-number {
+      background: #3b82f6;
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .shortcut-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .shortcut-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: rgba(30, 41, 59, 0.6);
+      border-radius: 6px;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .shortcut-action {
+      color: #e2e8f0;
+      font-weight: 500;
+    }
+
+    .shortcut-keys {
+      background: rgba(59, 130, 246, 0.2);
+      color: #3b82f6;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 0.875rem;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .contact-card {
+      background: rgba(30, 41, 59, 0.6);
+      border-radius: 8px;
+      padding: 1.5rem;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      text-align: center;
+    }
+
+    .contact-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 1rem;
+      background: rgba(59, 130, 246, 0.2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .contact-title {
+      color: #10b981;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .contact-info {
+      color: #94a3b8;
+      margin-bottom: 1rem;
+    }
+
+    .contact-button {
+      background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.2s;
+    }
+
+    .contact-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .highlight {
+      background: rgba(59, 130, 246, 0.2);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      color: #3b82f6;
+      font-weight: 500;
+    }
+
+    .warning {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+      color: #fca5a5;
+    }
+
+    .tip {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+      color: #6ee7b7;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="16" fill="url(#gradient)"/>
+            <path d="M12 10L20 16L12 22V10Z" fill="white"/>
+            <defs>
+              <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#3b82f6"/>
+                <stop offset="1" stop-color="#10b981"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <h2>Ultrasound Annotation</h2>
+        </div>
+      </div>
+      
+      <div class="sidebar-menu">
+        <a href="home-clean.html" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 2L3 7V18C3 18.5523 3.44772 19 4 19H7V14H13V19H16C16.5523 19 17 18.5523 17 18V7L10 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Home</span>
+        </a>
+        
+        <a href="test.html" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 5C2 3.89543 2.89543 3 4 3H16C17.1046 3 18 3.89543 18 5V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Test</span>
+        </a>
+        
+        <a href="library.html" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 4C4 2.89543 4.89543 2 6 2H14C15.1046 2 16 2.89543 16 4V16C16 17.1046 15.1046 18 14 18H6C4.89543 18 4 17.1046 4 16V4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 6H12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 10H12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 14H10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Library</span>
+        </a>
+
+        <a href="faq.html" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+            <path d="M7.5 7.5C7.5 6.5 8.5 5.5 10 5.5C11.5 5.5 12.5 6.5 12.5 7.5C12.5 8.5 10 9 10 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="10" cy="13" r="1" fill="currentColor"/>
+          </svg>
+          <span>FAQ</span>
+        </a>
+
+        <a href="help.html" class="nav-item active">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+            <path d="M10 6V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M10 14H10.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span>Help</span>
+        </a>
+        
+        <a href="about.html" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10 6V10L13 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>About</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="page-header">
+        <h1 class="page-title">Help & Documentation</h1>
+        <p class="page-subtitle">Complete guide to using the Ultrasound Annotation System</p>
+      </header>
+
+      <div class="help-container">
+        <!-- Quick Start Guide -->
+        <div class="help-section">
+          <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              <path d="M8 14S9.5 16 12 16 16 14 16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M9 9H9.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M15 9H15.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Quick Start Guide
+          </h2>
+          <div class="help-content">
+            <p>Follow these steps to get started with annotating ultrasound images:</p>
+            
+            <ol class="step-list">
+              <li>
+                <div class="step-number">1</div>
+                <div>
+                  <strong>Start a New Session</strong><br>
+                  Navigate to the Home page and click <span class="highlight">"Start Session"</span>. This will initialize a new annotation session and take you to the annotation interface.
+                </div>
+              </li>
+              <li>
+                <div class="step-number">2</div>
+                <div>
+                  <strong>Upload Images</strong><br>
+                  Click the <span class="highlight">"Upload Images"</span> button to select your ultrasound images. You can upload multiple images at once.
+                </div>
+              </li>
+              <li>
+                <div class="step-number">3</div>
+                <div>
+                  <strong>Configure Session Details</strong><br>
+                  Fill in the doctor name and select the appropriate category for your annotation session.
+                </div>
+              </li>
+              <li>
+                <div class="step-number">4</div>
+                <div>
+                  <strong>Start Annotating</strong><br>
+                  Use the annotation tools to mark nerve structures and other anatomical features in your images.
+                </div>
+              </li>
+              <li>
+                <div class="step-number">5</div>
+                <div>
+                  <strong>Save and Export</strong><br>
+                  Save your annotations and export the session data when complete.
+                </div>
+              </li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Annotation Tools -->
+        <div class="help-section">
+          <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Annotation Tools
+          </h2>
+          <div class="help-content">
+            <div class="help-grid">
+              <div class="help-card">
+                <h3>Polygon Tool</h3>
+                <p>The primary tool for outlining nerve structures and anatomical features.</p>
+                <ul>
+                  <li>Click to place points around the structure</li>
+                  <li>Double-click or press Enter to complete</li>
+                  <li>Right-click to cancel current polygon</li>
+                </ul>
+              </div>
+
+              <div class="help-card">
+                <h3>Pan & Zoom</h3>
+                <p>Navigate around the image for detailed annotation work.</p>
+                <ul>
+                  <li>Mouse wheel to zoom in/out</li>
+                  <li>Click and drag to pan</li>
+                  <li>Double-click to reset view</li>
+                </ul>
+              </div>
+
+              <div class="help-card">
+                <h3>Selection Tool</h3>
+                <p>Select and modify existing annotations.</p>
+                <ul>
+                  <li>Click on annotations to select</li>
+                  <li>Drag corner handles to resize</li>
+                  <li>Press Delete to remove selected</li>
+                </ul>
+              </div>
+
+              <div class="help-card">
+                <h3>Medical Attributes</h3>
+                <p>Specify clinical details for each annotation.</p>
+                <ul>
+                  <li>Nerve type and location</li>
+                  <li>Visibility assessment</li>
+                  <li>Patient positioning</li>
+                  <li>Clinical observations</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Keyboard Shortcuts -->
+        <div class="help-section">
+          <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+              <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="2"/>
+              <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Keyboard Shortcuts
+          </h2>
+          <div class="help-content">
+            <div class="shortcut-grid">
+              <div class="shortcut-item">
+                <span class="shortcut-action">Start new polygon</span>
+                <span class="shortcut-keys">P</span>
+              </div>
+              <div class="shortcut-item">
+                <span class="shortcut-action">Complete polygon</span>
+                <span class="shortcut-keys">Enter</span>
+              </div>
+              <div class="shortcut-item">
+                <span class="shortcut-action">Cancel polygon</span>
+                <span class="shortcut-keys">Esc</span>
+              </div>
+              <div class="shortcut-item">
+                <span class="shortcut-action">Delete selected</span>
+                <span class="shortcut-keys">Delete</span>
+              </div>
+              <div class="shortcut-item">
+                <span class="shortcut-action">Zoom in</span>
+                <span class="shortcut-keys">+</span>
+              </div>
+              <div class="shortcut-item">
+                <span class="shortcut-action">Zoom out</span>
+                <span class="shortcut-keys">-</span>
+              </div>
+              <div class="shortcut-item">
+                <span class="shortcut-action">Reset view</span>
+                <span class="shortcut-keys">R</span>
+              </div>
+              <div class="shortcut-item">
+                <span class="shortcut-action">Select all</span>
+                <span class="shortcut-keys">Ctrl+A</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Best Practices -->
+        <div class="help-section">
+          <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Best Practices
+          </h2>
+          <div class="help-content">
+            <div class="help-grid">
+              <div class="help-card">
+                <h3>Annotation Quality</h3>
+                <ul>
+                  <li>Follow nerve boundaries precisely</li>
+                  <li>Use adequate zoom for detail work</li>
+                  <li>Double-check polygon closure</li>
+                  <li>Verify medical attributes</li>
+                </ul>
+              </div>
+
+              <div class="help-card">
+                <h3>Session Management</h3>
+                <ul>
+                  <li>Save frequently during long sessions</li>
+                  <li>Use descriptive session names</li>
+                  <li>Export data before ending sessions</li>
+                  <li>Review annotations before saving</li>
+                </ul>
+              </div>
+
+              <div class="help-card">
+                <h3>Data Organization</h3>
+                <ul>
+                  <li>Group related images in sessions</li>
+                  <li>Use consistent naming conventions</li>
+                  <li>Include relevant clinical notes</li>
+                  <li>Backup exported data regularly</li>
+                </ul>
+              </div>
+
+              <div class="help-card">
+                <h3>Quality Assurance</h3>
+                <ul>
+                  <li>Review all annotations before saving</li>
+                  <li>Verify medical attribute accuracy</li>
+                  <li>Check for incomplete polygons</li>
+                  <li>Validate export data format</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="tip">
+              <strong>💡 Tip:</strong> Use the Library page to review and manage your completed annotation sessions. You can view detailed information about each session and export data as needed.
+            </div>
+
+            <div class="warning">
+              <strong>⚠️ Important:</strong> Always export your session data before deleting sessions from the library. Deleted sessions cannot be recovered.
+            </div>
+          </div>
+        </div>
+
+        <!-- System Requirements -->
+        <div class="help-section">
+          <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" stroke="currentColor" stroke-width="2"/>
+              <line x1="7" y1="2" x2="7" y2="22" stroke="currentColor" stroke-width="2"/>
+              <line x1="17" y1="2" x2="17" y2="22" stroke="currentColor" stroke-width="2"/>
+              <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2"/>
+              <line x1="2" y1="7" x2="7" y2="7" stroke="currentColor" stroke-width="2"/>
+              <line x1="2" y1="17" x2="7" y2="17" stroke="currentColor" stroke-width="2"/>
+              <line x1="17" y1="17" x2="22" y2="17" stroke="currentColor" stroke-width="2"/>
+              <line x1="17" y1="7" x2="22" y2="7" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            System Requirements
+          </h2>
+          <div class="help-content">
+            <div class="help-grid">
+              <div class="help-card">
+                <h3>Minimum Requirements</h3>
+                <ul>
+                  <li>4GB RAM</li>
+                  <li>2GB free disk space</li>
+                  <li>Modern web browser</li>
+                  <li>Screen resolution 1024x768</li>
+                </ul>
+              </div>
+
+              <div class="help-card">
+                <h3>Recommended</h3>
+                <ul>
+                  <li>8GB+ RAM</li>
+                  <li>10GB+ free disk space</li>
+                  <li>Chrome/Firefox latest version</li>
+                  <li>Screen resolution 1920x1080+</li>
+                </ul>
+              </div>
+
+              <div class="help-card">
+                <h3>Supported Browsers</h3>
+                <ul>
+                  <li>Google Chrome 90+</li>
+                  <li>Mozilla Firefox 88+</li>
+                  <li>Microsoft Edge 90+</li>
+                  <li>Safari 14+ (macOS)</li>
+                </ul>
+              </div>
+
+              <div class="help-card">
+                <h3>Operating Systems</h3>
+                <ul>
+                  <li>Windows 10/11</li>
+                  <li>macOS 10.15+</li>
+                  <li>Ubuntu 20.04+</li>
+                  <li>Other Linux distributions</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support & Contact -->
+        <div class="help-section">
+          <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Support & Contact
+          </h2>
+          <div class="help-content">
+            <p>Need additional help? Get in touch with our support team:</p>
+            
+            <div class="contact-grid">
+              <div class="contact-card">
+                <div class="contact-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2"/>
+                    <polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                </div>
+                <div class="contact-title">Email Support</div>
+                <div class="contact-info">Get help via email<br>Response within 24 hours</div>
+                <a href="mailto:support@ultrasound-annotation.com" class="contact-button">Send Email</a>
+              </div>
+
+              <div class="contact-card">
+                <div class="contact-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" stroke="currentColor" stroke-width="2"/>
+                    <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                </div>
+                <div class="contact-title">Documentation</div>
+                <div class="contact-info">Access detailed guides<br>and API documentation</div>
+                <a href="#" class="contact-button">View Docs</a>
+              </div>
+
+              <div class="contact-card">
+                <div class="contact-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                </div>
+                <div class="contact-title">GitHub Issues</div>
+                <div class="contact-info">Report bugs and<br>request features</div>
+                <a href="https://github.com/ultrasound-annotation/issues" class="contact-button">Open Issue</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

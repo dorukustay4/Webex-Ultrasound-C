@@ -101,9 +101,71 @@ class DatabaseManager {
             return;
           } else {
             console.log('Database tables created successfully');
-            resolve();
+            
+            // Add image_data column to images table if it doesn't exist
+            this.addImageDataColumn()
+              .then(() => {
+                // Update existing sessions to have default category if they don't have one
+                return this.updateExistingSessions();
+              })
+              .then(() => resolve())
+              .catch(reject);
           }
         });
+      });
+    });
+  }
+
+  // Update existing sessions to have default category
+  async updateExistingSessions() {
+    return new Promise((resolve, reject) => {
+      this.db.run(`
+        UPDATE sessions 
+        SET category = 'annotation_session' 
+        WHERE category IS NULL OR category = ''
+      `, (err) => {
+        if (err) {
+          console.error('Error updating existing sessions:', err.message);
+          reject(err);
+        } else {
+          console.log('✅ Updated existing sessions with default category');
+          resolve();
+        }
+      });
+    });
+  }
+
+  // Add image_data column to images table if it doesn't exist
+  async addImageDataColumn() {
+    return new Promise((resolve, reject) => {
+      // Check if column already exists
+      this.db.all("PRAGMA table_info(images)", (err, columns) => {
+        if (err) {
+          console.error('Error checking images table structure:', err.message);
+          reject(err);
+          return;
+        }
+
+        const hasImageDataColumn = columns.some(col => col.name === 'image_data');
+        
+        if (!hasImageDataColumn) {
+          console.log('🔧 Adding image_data column to images table...');
+          this.db.run(`
+            ALTER TABLE images 
+            ADD COLUMN image_data TEXT
+          `, (err) => {
+            if (err) {
+              console.error('Error adding image_data column:', err.message);
+              reject(err);
+            } else {
+              console.log('✅ Successfully added image_data column to images table');
+              resolve();
+            }
+          });
+        } else {
+          console.log('✅ image_data column already exists in images table');
+          resolve();
+        }
       });
     });
   }
@@ -170,27 +232,29 @@ class DatabaseManager {
     return new Promise((resolve, reject) => {
       console.log('🔍 DatabaseManager.saveImage received data:', imageData);
       
-      const { id, sessionId, filename, filePath, fileSize, fileType, uploadedAt } = imageData;
+      const { id, sessionId, filename, filePath, fileSize, fileType, uploadedAt, imageDataBase64 } = imageData;
 
       console.log('🔍 Image data mapping:', {
-        id, sessionId, filename, filePath, fileSize, fileType, uploadedAt
+        id, sessionId, filename, filePath, fileSize, fileType, uploadedAt,
+        hasImageData: !!imageDataBase64
       });
 
       const sql = `
         INSERT OR REPLACE INTO images 
-        (id, session_id, filename, file_path, file_size, file_type, uploaded_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        (id, session_id, filename, file_path, file_size, file_type, uploaded_at, image_data)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
-      this.db.run(sql, [id, sessionId, filename, filePath, fileSize, fileType, uploadedAt], function(err) {
+      this.db.run(sql, [id, sessionId, filename, filePath, fileSize, fileType, uploadedAt, imageDataBase64], function(err) {
         if (err) {
           console.error('❌ Error saving image to database:', err.message);
           console.error('❌ SQL:', sql);
-          console.error('❌ Parameters:', [id, sessionId, filename, filePath, fileSize, fileType, uploadedAt]);
+          console.error('❌ Parameters:', [id, sessionId, filename, filePath, fileSize, fileType, uploadedAt, imageDataBase64 ? 'BASE64_DATA_PROVIDED' : 'NO_BASE64_DATA']);
           reject(err);
         } else {
           console.log('✅ Image saved to database with ID:', id);
           console.log('✅ Database changes:', this.changes);
+          console.log('✅ Image data included:', !!imageDataBase64);
           resolve({ id, changes: this.changes });
         }
       });
@@ -380,6 +444,62 @@ class DatabaseManager {
               console.log('Session deleted:', sessionId);
               resolve({ changes: this.changes });
             }
+          });
+        });
+      });
+    });
+  }
+
+  // Get annotation statistics for charts
+  async getAnnotationStats() {
+    return new Promise((resolve, reject) => {
+      this.db.serialize(() => {
+        const nerveTypeStats = {};
+        const ageGroupStats = {};
+        
+        // Get nerve type distribution
+        this.db.all(`
+          SELECT nerve_type, COUNT(*) as count 
+          FROM annotations 
+          WHERE nerve_type IS NOT NULL AND nerve_type != '' 
+          GROUP BY nerve_type
+        `, (err, nerveRows) => {
+          if (err) {
+            console.error('Error getting nerve type stats:', err.message);
+            reject(err);
+            return;
+          }
+          
+          nerveRows.forEach(row => {
+            nerveTypeStats[row.nerve_type] = row.count;
+          });
+          
+          // Get age group distribution
+          this.db.all(`
+            SELECT patient_age_group, COUNT(*) as count 
+            FROM annotations 
+            WHERE patient_age_group IS NOT NULL AND patient_age_group != '' 
+            GROUP BY patient_age_group
+          `, (err, ageRows) => {
+            if (err) {
+              console.error('Error getting age group stats:', err.message);
+              reject(err);
+              return;
+            }
+            
+            ageRows.forEach(row => {
+              ageGroupStats[row.patient_age_group] = row.count;
+            });
+            
+            console.log('📊 Chart stats retrieved:', {
+              nerveTypes: nerveTypeStats,
+              ageGroups: ageGroupStats
+            });
+            
+            resolve({
+              nerveTypes: nerveTypeStats,
+              ageGroups: ageGroupStats
+            });
           });
         });
       });

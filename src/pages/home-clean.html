@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="../js/statistics-manager.js"></script>
   <style>
     * {
@@ -175,26 +176,73 @@
       font-size: 0.9rem;
     }
 
-    .stat-card.refresh-stats {
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border-color: #10b981;
+    /* Charts Section */
+    .charts-section {
+      margin-top: 2rem;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 16px;
+      padding: 2rem;
+      backdrop-filter: blur(20px);
     }
 
-    .stat-card.refresh-stats:hover {
-      background: rgba(16, 185, 129, 0.1);
-      border-color: #10b981;
-      transform: translateY(-2px);
+    .charts-header {
+      margin-bottom: 2rem;
+      text-align: center;
     }
 
-    .stat-card.refresh-stats .stat-value {
-      color: #10b981;
+    .charts-header h3 {
+      color: #1e293b;
       font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
     }
 
-    .stat-card.refresh-stats .stat-label {
-      color: #10b981;
-      font-weight: 500;
+    .charts-header p {
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+    }
+
+    .chart-container {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 12px;
+      padding: 1.5rem;
+      min-height: 400px;
+    }
+
+    .chart-header {
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .chart-header h4 {
+      color: #1e293b;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .chart-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+      position: relative;
+    }
+
+    .chart-no-data {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+      color: #94a3b8;
+      font-style: italic;
     }
 
     /* Video Call Interface */
@@ -359,6 +407,24 @@
           </svg>
           <span>Library</span>
         </a>
+
+        <a href="faq.html" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+            <path d="M7.5 7.5C7.5 6.5 8.5 5.5 10 5.5C11.5 5.5 12.5 6.5 12.5 7.5C12.5 8.5 10 9 10 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="10" cy="13" r="1" fill="currentColor"/>
+          </svg>
+          <span>FAQ</span>
+        </a>
+
+        <a href="help.html" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+            <path d="M10 6V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M10 14H10.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span>Help</span>
+        </a>
         
         <a href="about.html" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -373,8 +439,8 @@
     <!-- Main Content -->
     <main class="main-content">
       <header class="page-header">
-        <h1 class="page-title">Welcome to Ultrasound Annotation Platform</h1>
-        <p class="page-subtitle">Advanced image annotation platform for medical professionals</p>
+        <h1 class="page-title">Welcome to Ultrasound Annotation Dashboard</h1>
+        <p class="page-subtitle">Your UGRA Annotation Hub — Track your contributions, monitor dataset growth, and see the impact your work has on building expert-validated training data for AI models.</p>
       </header>
 
       <div class="quick-actions">
@@ -410,64 +476,43 @@
           <div class="stat-value">0</div>
           <div class="stat-label">Collaborators</div>
         </div>
+      </div>
+
+      <!-- Analytics Charts Section -->
+      <div class="charts-section">
+        <div class="charts-header">
+          <h3>Annotation Analytics</h3>
+          <p>Distribution of nerve types and patient age groups</p>
+        </div>
         
-        <div class="stat-card refresh-stats" onclick="refreshStatistics()" title="Refresh statistics">
-          <div class="stat-value">🔄</div>
-          <div class="stat-label">Refresh Stats</div>
-        </div>
-      </div>
-
-      <!-- Video Call Interface -->
-      <div class="video-interface" id="video-interface">
-        <div class="annotation-info" id="annotation-info">
-          <h4>Annotation Session</h4>
-          <div>Project: <span class="project-name" id="project-name">Ready to annotate</span></div>
-          <div>Images: <span id="image-count">0 loaded</span></div>
-        </div>
-
-        <div class="video-container">
-          <div class="video-main">
-            <video id="remote-video" autoplay playsinline style="width: 100%; height: 100%; border-radius: 12px; object-fit: cover;"></video>
-            <div class="video-placeholder" id="remote-placeholder">
-              Remote participant video will appear here
+        <div class="charts-grid">
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4>Nerve Type Distribution</h4>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="nerveTypeChart" width="300" height="300"></canvas>
+              <div class="chart-no-data" id="nerveTypeNoData" style="display: none;">
+                <p>No nerve type data available</p>
+              </div>
             </div>
           </div>
           
-          <div class="video-preview">
-            <video id="local-video" autoplay playsinline muted style="width: 100%; height: 100%; border-radius: 12px; object-fit: cover;"></video>
-            <div class="video-placeholder" id="local-placeholder">
-              📷 Your video preview
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4>Patient Age Group Distribution</h4>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="ageGroupChart" width="300" height="300"></canvas>
+              <div class="chart-no-data" id="ageGroupNoData" style="display: none;">
+                <p>No age group data available</p>
+              </div>
             </div>
           </div>
         </div>
-
-        <div class="video-controls">
-          <button class="control-btn mute" id="mute-btn" onclick="toggleMute()" title="Mute/Unmute">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 1C12.5523 1 13 1.44772 13 2V22C13 22.5523 12.5523 23 12 23C11.4477 23 11 22.5523 11 22V2C11 1.44772 11.4477 1 12 1Z" fill="currentColor"/>
-              <path d="M8 6C8.55228 6 9 6.44772 9 7V17C9 17.5523 8.55228 18 8 18C7.44772 18 7 17.5523 7 17V7C7 6.44772 7.44772 6 8 6Z" fill="currentColor"/>
-              <path d="M16 6C16.5523 6 17 6.44772 17 7V17C17 17.5523 16.5523 18 16 18C15.4477 18 15 17.5523 15 17V7C15 6.44772 15.4477 6 16 6Z" fill="currentColor"/>
-            </svg>
-          </button>
-          
-          <button class="control-btn video" id="video-btn" onclick="toggleVideo()" title="Start/Stop Video">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M23 7L16 12L23 17V7Z" fill="currentColor"/>
-              <rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none"/>
-            </svg>
-          </button>
-          
-          <button class="control-btn leave" id="leave-btn" onclick="leaveCall()" title="Leave Call">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M22 16.92V18.96C22 19.96 21.96 20.46 20.96 20.46H18.96C16.92 20.46 15.92 19.46 15.92 18.96V16.92C15.92 15.92 16.92 14.92 18.96 14.92H20.96C21.96 14.92 22 15.42 22 16.92Z" fill="currentColor"/>
-              <path d="M14 12H10L12 14V10L14 12Z" fill="currentColor"/>
-              <path d="M9 12H5C3.89543 12 3 11.1046 3 10C3 8.89543 3.89543 8 5 8H9V12Z" fill="currentColor"/>
-            </svg>
-          </button>
-        </div>
       </div>
-    </main>
-  </div>
+
+      
 
   <!-- Start Session Modal -->
   <div class="modal-overlay" id="startSessionModal">
@@ -740,22 +785,7 @@
       }
     }
 
-    // Logout function (simplified for annotation platform)
-    function logout() {
-      if (confirm('Are you sure you want to logout?')) {
-        // Clear any stored annotation data or session data
-        localStorage.removeItem('annotationProjects');
-        localStorage.removeItem('userSession');
-        sessionStorage.clear();
-        
-        showToast('Logged out successfully', 'info');
-        
-        // Redirect to login page
-        setTimeout(() => {
-          window.location.href = 'login-clean.html';
-        }, 1000);
-      }
-    }
+
 
     // Toast notification function
     function showToast(message, type = 'success') {
@@ -819,23 +849,12 @@
     async function loadStatistics() {
       console.log('📊 Loading real statistics from database...');
       
-      // Show loading state
-      const refreshCard = document.querySelector('.refresh-stats .stat-value');
-      if (refreshCard) {
-        refreshCard.textContent = '⏳';
-      }
-      
       try {
         const stats = await window.statisticsManager.loadStatsFromDatabase();
         console.log('📊 Statistics loaded:', stats);
         
         // Update the display
         window.statisticsManager.updateStatsDisplay(stats);
-        
-        // Reset refresh button
-        if (refreshCard) {
-          refreshCard.textContent = '🔄';
-        }
         
         // Show last updated info
         if (stats.totalSessions > 0) {
@@ -849,15 +868,6 @@
         
       } catch (error) {
         console.error('❌ Failed to load statistics:', error);
-        
-        // Reset refresh button on error
-        if (refreshCard) {
-          refreshCard.textContent = '❌';
-          setTimeout(() => {
-            refreshCard.textContent = '🔄';
-          }, 2000);
-        }
-        
         showToast('Failed to load statistics', 'error');
       }
     }
@@ -876,7 +886,10 @@
     }
 
     // Function to trigger statistics refresh (can be called after session completion)
-    window.refreshStatistics = loadStatistics;
+    window.refreshStatistics = async function() {
+      await loadStatistics();
+      await refreshCharts();
+    };
 
     // Function to handle session completion
     async function handleSessionCompletion(sessionData) {
@@ -893,10 +906,187 @@
       showToast('Session completed! Statistics updated.', 'success');
     }
 
+    // Chart management
+    let nerveTypeChart = null;
+    let ageGroupChart = null;
+
+    // Initialize charts
+    function initializeCharts() {
+      const nerveTypeCtx = document.getElementById('nerveTypeChart').getContext('2d');
+      const ageGroupCtx = document.getElementById('ageGroupChart').getContext('2d');
+
+      // Nerve Type Chart
+      nerveTypeChart = new Chart(nerveTypeCtx, {
+        type: 'pie',
+        data: {
+          labels: [],
+          datasets: [{
+            data: [],
+            backgroundColor: [
+              '#7c9cc7', '#6ba88a', '#c9a876', '#c97878', '#a087c7',
+              '#6fb3c7', '#a5b573', '#c79670', '#c795a8', '#8a9199'
+            ],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 20,
+                usePointStyle: true,
+                font: {
+                  size: 12
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = ((value / total) * 100).toFixed(1);
+                  return `${label}: ${value} (${percentage}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // Age Group Chart
+      ageGroupChart = new Chart(ageGroupCtx, {
+        type: 'pie',
+        data: {
+          labels: [],
+          datasets: [{
+            data: [],
+            backgroundColor: [
+              '#7c9cc7', '#6ba88a', '#c9a876', '#c97878', '#a087c7',
+              '#6fb3c7', '#a5b573', '#c79670', '#c795a8', '#8a9199'
+            ],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 20,
+                usePointStyle: true,
+                font: {
+                  size: 12
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = ((value / total) * 100).toFixed(1);
+                  return `${label}: ${value} (${percentage}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Load and update charts
+    async function loadChartData() {
+      try {
+        console.log('📊 Loading chart data...');
+        
+        if (!window.electronAPI || !window.electronAPI.dbGetAnnotationStats) {
+          console.warn('Chart data API not available');
+          showEmptyCharts();
+          return;
+        }
+
+        console.log('📊 Calling dbGetAnnotationStats...');
+        const response = await window.electronAPI.dbGetAnnotationStats();
+        console.log('📊 Chart data response:', response);
+        
+        if (response.success && response.stats) {
+          console.log('📊 Updating charts with stats:', response.stats);
+          updateCharts(response.stats);
+        } else {
+          console.error('Failed to load chart data:', response.error);
+          showEmptyCharts();
+        }
+      } catch (error) {
+        console.error('Error loading chart data:', error);
+        showEmptyCharts();
+      }
+    }
+
+    // Update charts with new data
+    function updateCharts(stats) {
+      // Update nerve type chart
+      const nerveTypes = stats.nerveTypes || {};
+      const nerveTypeLabels = Object.keys(nerveTypes);
+      const nerveTypeData = Object.values(nerveTypes);
+
+      if (nerveTypeLabels.length > 0) {
+        nerveTypeChart.data.labels = nerveTypeLabels;
+        nerveTypeChart.data.datasets[0].data = nerveTypeData;
+        nerveTypeChart.update();
+        document.getElementById('nerveTypeChart').style.display = 'block';
+        document.getElementById('nerveTypeNoData').style.display = 'none';
+      } else {
+        document.getElementById('nerveTypeChart').style.display = 'none';
+        document.getElementById('nerveTypeNoData').style.display = 'flex';
+      }
+
+      // Update age group chart
+      const ageGroups = stats.ageGroups || {};
+      const ageGroupLabels = Object.keys(ageGroups);
+      const ageGroupData = Object.values(ageGroups);
+
+      if (ageGroupLabels.length > 0) {
+        ageGroupChart.data.labels = ageGroupLabels;
+        ageGroupChart.data.datasets[0].data = ageGroupData;
+        ageGroupChart.update();
+        document.getElementById('ageGroupChart').style.display = 'block';
+        document.getElementById('ageGroupNoData').style.display = 'none';
+      } else {
+        document.getElementById('ageGroupChart').style.display = 'none';
+        document.getElementById('ageGroupNoData').style.display = 'flex';
+      }
+    }
+
+    // Show empty state for charts
+    function showEmptyCharts() {
+      document.getElementById('nerveTypeChart').style.display = 'none';
+      document.getElementById('nerveTypeNoData').style.display = 'flex';
+      document.getElementById('ageGroupChart').style.display = 'none';
+      document.getElementById('ageGroupNoData').style.display = 'flex';
+    }
+
+    // Refresh charts data
+    async function refreshCharts() {
+      console.log('📊 Refreshing chart data...');
+      await loadChartData();
+    }
+
     // Listen for session completion events from annotation room
     window.addEventListener('message', async (event) => {
       if (event.data && event.data.type === 'sessionCompleted') {
         await handleSessionCompletion(event.data.sessionData);
+        // Also refresh charts when session completes
+        await refreshCharts();
       }
     });
 
@@ -904,14 +1094,21 @@
     window.addEventListener('focus', async () => {
       console.log('📊 Window focused, checking for session updates...');
       await loadStatistics();
+      await refreshCharts();
     });
 
     // Simple authentication check (no authentication required for local use)
     window.addEventListener('load', async () => {
       console.log('🎯 Ultrasound Annotation Platform loaded successfully');
       
+      // Initialize charts first
+      initializeCharts();
+      
       // Load and display real statistics
       await loadStatistics();
+      
+      // Load chart data
+      await loadChartData();
       
       // Set up automatic statistics refresh
       setupStatisticsRefresh();

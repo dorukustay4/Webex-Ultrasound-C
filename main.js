@@ -434,6 +434,7 @@ function setupIPCHandlers() {
           id: session.id,
           title: session.title,
           attendees: session.attendees,
+          category: session.category,
           total_annotations: session.total_annotations,
           actual_annotations: session.actual_annotations,
           status: session.status
@@ -477,6 +478,20 @@ function setupIPCHandlers() {
       return { success: true, result };
     } catch (error) {
       console.error('❌ Failed to delete session:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Get annotation statistics for charts
+  ipcMain.handle('db-get-annotation-stats', async (event) => {
+    try {
+      if (!dbManager) {
+        throw new Error('Database not initialized');
+      }
+      const stats = await dbManager.getAnnotationStats();
+      return { success: true, stats };
+    } catch (error) {
+      console.error('❌ Failed to get annotation stats:', error);
       return { success: false, error: error.message };
     }
   });

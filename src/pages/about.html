@@ -379,6 +379,14 @@
           <span>Home</span>
         </a>
         
+        <a href="test.html" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 5C2 3.89543 2.89543 3 4 3H16C17.1046 3 18 3.89543 18 5V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Test</span>
+        </a>
+        
         <a href="library.html" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M4 4C4 2.89543 4.89543 2 6 2H14C15.1046 2 16 2.89543 16 4V16C16 17.1046 15.1046 18 14 18H6C4.89543 18 4 17.1046 4 16V4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -387,6 +395,24 @@
             <path d="M8 14H10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <span>Library</span>
+        </a>
+
+        <a href="faq.html" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+            <path d="M7.5 7.5C7.5 6.5 8.5 5.5 10 5.5C11.5 5.5 12.5 6.5 12.5 7.5C12.5 8.5 10 9 10 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="10" cy="13" r="1" fill="currentColor"/>
+          </svg>
+          <span>FAQ</span>
+        </a>
+
+        <a href="help.html" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+            <path d="M10 6V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M10 14H10.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span>Help</span>
         </a>
         
         <a href="about.html" class="nav-item active">
@@ -398,19 +424,7 @@
         </a>
       </div>
       
-      <div class="sidebar-user" id="sidebar-user" style="display: none;">
-        <div class="user-avatar" id="user-avatar">U</div>
-        <div class="user-info">
-          <span class="user-name" id="user-name">User</span>
-          <span class="user-email" id="user-email">user@example.com</span>
-        </div>
-        <button class="logout-btn" onclick="logout()" title="Sign Out">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M9 3H5C3.89543 3 3 3.89543 3 5V15C3 16.1046 3.89543 17 5 17H9M13 7L17 11M17 11L13 15M17 11H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </div>
-    </nav>
+
 
     <!-- Main Content -->
     <main class="main-content">
@@ -532,64 +546,4 @@
     </main>
   </div>
 
-  <!-- Load auth system -->
-  <script src="../js/simple-auth-fixed.js"></script>
 
-  <script>
-    // Initialize the page
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('About page loading...');
-      
-      // Check authentication
-      initializeAuth();
-      
-      // Set last updated date
-      document.getElementById('last-updated').textContent = new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-    });
-
-    // Initialize authentication
-    function initializeAuth() {
-      if (isAuthenticated()) {
-        const user = getCurrentUser();
-        if (user) {
-          updateUserDisplay(user);
-        }
-      } else {
-        // Still show page content for about page, but hide user info
-        console.log('User not authenticated');
-      }
-    }
-
-    // Update user display in sidebar
-    function updateUserDisplay(user) {
-      const sidebarUser = document.getElementById('sidebar-user');
-      const userAvatar = document.getElementById('user-avatar');
-      const userName = document.getElementById('user-name');
-      const userEmail = document.getElementById('user-email');
-
-      if (sidebarUser && userAvatar && userName && userEmail) {
-        sidebarUser.style.display = 'flex';
-        
-        const displayName = user.displayName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'User';
-        const email = user.emails?.[0] || user.email || 'user@domain.com';
-        
-        userAvatar.textContent = displayName.charAt(0).toUpperCase();
-        userName.textContent = displayName;
-        userEmail.textContent = email;
-      }
-    }
-
-    // Logout function
-    function logout() {
-      if (typeof window.logout === 'function') {
-        window.logout();
-      }
-      window.location.href = 'home-clean.html';
-    }
-  </script>
-</body>
-</html>

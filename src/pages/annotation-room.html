@@ -768,30 +768,6 @@
             </svg>
             Save Current Annotation
           </button>
-          <button class="tool-button" id="forceSaveBtn" onclick="forceSaveAnnotation()" style="display: none;" title="Force save annotation without VIA (for debugging)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2L13.09 8.26L19 7L14.74 12.74L21 14L14.74 15.26L19 21L13.09 19.74L12 26L10.91 19.74L5 21L9.26 15.26L3 14L9.26 12.74L5 7L10.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Force Save (Debug)
-          </button>
-          <button class="tool-button" id="testAnnotationBtn" onclick="createTestAnnotation()" style="display: none;" title="Create a test annotation for testing">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Create Test Annotation
-          </button>
-          <button class="tool-button" id="debugBtn" onclick="debugSessionData()" style="display: none;" title="Debug current session data">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 8V12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Debug Session Data
-          </button>
-          <button class="tool-button" id="nextAnnotationBtn" onclick="nextAnnotation()" style="display: none;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Next Annotation
-          </button>
           <button class="tool-button" id="endSessionBtn" onclick="showEndSessionModal()" style="display: none;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1039,10 +1015,6 @@
       document.getElementById('sessionInfo').textContent = `Session: #${sessionId}`;
       
       document.getElementById('saveAnnotationBtn').style.display = 'block';
-      document.getElementById('forceSaveBtn').style.display = 'block';
-      document.getElementById('testAnnotationBtn').style.display = 'block';
-      document.getElementById('debugBtn').style.display = 'block';
-      document.getElementById('nextAnnotationBtn').style.display = 'block';
       document.getElementById('endSessionBtn').style.display = 'block';
       
       // Save session data to localStorage for persistence
@@ -1103,37 +1075,6 @@
       saveAnnotationToSession();
     }
 
-    // Force save annotation for debugging (bypasses VIA completely)
-    function forceSaveAnnotation() {
-      console.log('🔧 forceSaveAnnotation() called - Bypassing VIA and saving form data directly');
-      
-      if (!currentSession) {
-        showToast('No active session. Please start a session first.', 'error');
-        return;
-      }
-      
-      if (!currentImage) {
-        showToast('No image loaded to save annotation for', 'error');
-        return;
-      }
-      
-      // Set form to some test values if empty
-      if (!document.getElementById('nerveType').value) {
-        document.getElementById('nerveType').value = 'sciatic';
-        document.getElementById('sideOfBody').value = 'left';
-        document.getElementById('patientPosition').value = 'supine';
-        document.getElementById('visibility').value = 'good';
-        document.getElementById('patientAgeGroup').value = 'adult';
-        document.getElementById('needleApproach').value = 'in-plane';
-        document.getElementById('clinicalNotes').value = 'Test annotation created via force save';
-        console.log('📝 Set default values for testing');
-      }
-      
-      // Directly call saveAnnotationToSession
-      saveAnnotationToSession();
-      showToast('🔧 Force save completed! Check console for detailed logs.', 'success');
-    }
-
     function saveAnnotationToSession() {
       console.log('🚀 saveAnnotationToSession() called - Starting annotation save process');
       
@@ -1190,7 +1131,8 @@
           id: currentImage.id,
           sessionId: currentSession.id,
           filename: currentImage.filename,
-          data: currentImage.data, // Ensure base64 image data is included
+          data: currentImage.data, // Keep for local session storage
+          imageDataBase64: currentImage.data, // Add for database storage
           filePath: null,
           fileSize: currentImage.size,
           fileType: currentImage.type,
@@ -1204,6 +1146,7 @@
           filename: imageData.filename,
           id: imageData.id,
           hasData: !!imageData.data,
+          hasImageDataBase64: !!imageData.imageDataBase64,
           dataLength: imageData.data ? imageData.data.length : 0
         });
         
@@ -1651,10 +1594,6 @@
       document.getElementById('sessionControls').style.display = 'none';
       
       document.getElementById('saveAnnotationBtn').style.display = 'none';
-      document.getElementById('forceSaveBtn').style.display = 'none';
-      document.getElementById('testAnnotationBtn').style.display = 'none';
-      document.getElementById('debugBtn').style.display = 'none';
-      document.getElementById('nextAnnotationBtn').style.display = 'none';
       document.getElementById('endSessionBtn').style.display = 'none';
       
       // Reset workspace
@@ -2391,26 +2330,6 @@
       showToast(`Current session VIA annotations exported (${allCurrentAnnotations.length} total)!`, 'success');
     }
 
-    // Helper function to debug session data (for development)
-    function debugSessionData() {
-      console.log('🔍 DEBUG: Current Session Data:');
-      console.log('- Current Session:', currentSession);
-      console.log('- Session Annotations Count:', sessionAnnotations.length);
-      console.log('- Session Images Count:', sessionImages.length);
-      console.log('- Session Annotations:', sessionAnnotations);
-      console.log('- Session Images:', sessionImages);
-      
-      console.log('🔍 DEBUG: LocalStorage Data:');
-      const localAnnotations = JSON.parse(localStorage.getItem('medical_annotations') || '[]');
-      const localImages = JSON.parse(localStorage.getItem('session_images') || '[]');
-      console.log('- LocalStorage Annotations Count:', localAnnotations.length);
-      console.log('- LocalStorage Images Count:', localImages.length);
-      console.log('- LocalStorage Annotations:', localAnnotations);
-      console.log('- LocalStorage Images:', localImages);
-      
-      showToast(`Current session: ${sessionAnnotations.length} annotations. LocalStorage: ${localAnnotations.length} annotations.`, 'info');
-    }
-
     // Helper function to compress image data for export
     function compressImageForExport(imageDataUrl, maxWidth = 800, quality = 0.7) {
       return new Promise((resolve) => {
@@ -2508,31 +2427,6 @@
         document.getElementById('uploadOverlay').style.display = 'flex';
         currentImage = null;
       }
-    }
-
-    // Test function to create a sample annotation for testing (global scope)
-    function createTestAnnotation() {
-      if (!currentSession) {
-        showToast('Please start a session first', 'error');
-        return;
-      }
-      
-      if (!currentImage) {
-        showToast('Please upload an image first', 'error');
-        return;
-      }
-      
-      // Create a test annotation with sample polygon points
-      const testAnnotation = {
-        id: 'test_' + Date.now(),
-        timestamp: new Date().toISOString(),
-        type: 'polygon',
-        points: [[100, 100], [200, 100], [200, 200], [100, 200]], // Sample rectangle
-      };
-      
-      console.log('🧪 Creating test annotation:', testAnnotation);
-      saveMedicalAnnotationFromVIA(testAnnotation);
-      showToast(`🧪 Test annotation created! (${sessionAnnotations.length} total in session)`, 'success');
     }
 
     // Populate dropdown menus with options from MEDICAL_ATTRIBUTES
@@ -2644,10 +2538,6 @@
           document.getElementById('sessionInfo').textContent = `Session: #${currentSession.id}`;
           
           document.getElementById('saveAnnotationBtn').style.display = 'block';
-          document.getElementById('forceSaveBtn').style.display = 'block';
-          document.getElementById('testAnnotationBtn').style.display = 'block';
-          document.getElementById('debugBtn').style.display = 'block';
-          document.getElementById('nextAnnotationBtn').style.display = 'block';
           document.getElementById('endSessionBtn').style.display = 'block';
           
           showToast(`Session #${currentSession.id} loaded successfully! You can now upload images.`, 'success');
