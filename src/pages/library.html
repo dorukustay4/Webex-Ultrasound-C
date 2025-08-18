@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Session Library - Ultrasound Webex</title>
+  <title>Session Library - Neurotate</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <style>
     * {
@@ -59,6 +59,9 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      font-family: 'Orbitron', 'Inter', sans-serif;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
 
     .sidebar-menu {
@@ -715,7 +718,7 @@
               </linearGradient>
             </defs>
           </svg>
-          <h2>Ultrasound Annotation</h2>
+          <h2>Neurotate</h2>
         </div>
       </div>
       
@@ -727,13 +730,6 @@
           <span>Home</span>
         </a>
         
-        <a href="test.html" class="nav-item">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M2 5C2 3.89543 2.89543 3 4 3H16C17.1046 3 18 3.89543 18 5V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span>Test</span>
-        </a>
         
         <a href="library.html" class="nav-item active">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -771,19 +767,6 @@
           <span>About</span>
         </a>
       </div>
-      
-      <div class="sidebar-user" id="sidebar-user" style="display: none;">
-        <div class="user-avatar" id="user-avatar">U</div>
-        <div class="user-info">
-          <span class="user-name" id="user-name">User</span>
-          <span class="user-email" id="user-email">user@example.com</span>
-        </div>
-        <button class="logout-btn" onclick="logout()" title="Sign Out">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M9 3H5C3.89543 3 3 3.89543 3 5V15C3 16.1046 3.89543 17 5 17H9M13 7L17 11M17 11L13 15M17 11H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </div>
     </nav>
 
     <!-- Main Content -->
@@ -797,6 +780,36 @@
         </div>
       </div>
 
+      <!-- Library Filters -->
+      <div class="library-filters">
+        <div class="filter-row">
+          <div class="filter-group">
+            <label for="search-filter">Search Sessions</label>
+            <input type="text" id="search-filter" class="filter-input" placeholder="Search by title, doctor, or notes...">
+          </div>
+          
+          <div class="filter-group">
+            <label for="date-filter">Time Period</label>
+            <select id="date-filter" class="filter-select">
+              <option value="all">All Time</option>
+              <option value="today">Today</option>
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="quarter">Last 3 Months</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="category-filter">Category</label>
+            <select id="category-filter" class="filter-select">
+              <option value="all">All Categories</option>
+              <option value="training">Training</option>
+              <option value="consultation">Consultation</option>
+              <option value="annotation_session">Annotation Session</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
       <!-- Sessions List -->
       <div class="calls-list" id="calls-list">
@@ -1286,9 +1299,9 @@
             // Show success message
             showToast(`Loaded ${allSessions.length} sessions from database`, 'success');
             
-            // SKIP FILTERING - RENDER ALL SESSIONS DIRECTLY
-            console.log('🚀 SKIPPING ALL FILTERS - RENDERING ALL SESSIONS DIRECTLY');
-            renderAllSessions();
+            // Apply current filters and render sessions
+            console.log('� Applying filters and rendering sessions...');
+            applyFilters();
             
           } else {
             console.warn('⚠️ No sessions found or failed to load. Details:');
@@ -1426,18 +1439,24 @@
 
     // Set up event listeners - DISABLED FOR DEBUGGING
     function setupEventListeners() {
-      console.log('🚀 Event listeners DISABLED - no filtering will be applied');
-      // const searchFilter = document.getElementById('search-filter');
-      // const dateFilter = document.getElementById('date-filter');
-      // const statusFilter = document.getElementById('status-filter');
-      // const residentFilter = document.getElementById('resident-filter');
+      console.log('� Setting up filter event listeners...');
+      const searchFilter = document.getElementById('search-filter');
+      const dateFilter = document.getElementById('date-filter');
+      const categoryFilter = document.getElementById('category-filter');
 
-      // [searchFilter, dateFilter, statusFilter, residentFilter].forEach(filter => {
-      //   if (filter) {
-      //     filter.addEventListener('change', applyFilters);
-      //     filter.addEventListener('input', applyFilters);
-      //   }
-      // });
+      console.log('🔧 Filter elements found:', {
+        searchFilter: !!searchFilter,
+        dateFilter: !!dateFilter,
+        categoryFilter: !!categoryFilter
+      });
+
+      [searchFilter, dateFilter, categoryFilter].forEach(filter => {
+        if (filter) {
+          filter.addEventListener('change', applyFilters);
+          filter.addEventListener('input', applyFilters);
+          console.log('🔧 Event listeners added to:', filter.id);
+        }
+      });
     }
 
     // Apply filters to sessions
@@ -1446,9 +1465,9 @@
       
       const searchTerm = document.getElementById('search-filter')?.value?.toLowerCase() || '';
       const dateRange = document.getElementById('date-filter')?.value || 'all';
-      const resident = document.getElementById('resident-filter')?.value || 'all';
+      const category = document.getElementById('category-filter')?.value || 'all';
 
-      console.log('🔧 Filter values:', { searchTerm, dateRange, resident });
+      console.log('🔧 Filter values:', { searchTerm, dateRange, category });
 
       filteredSessions = allSessions.filter(session => {
         // Search filter
@@ -1475,14 +1494,14 @@
           matchesDate = sessionDate >= quarterAgo;
         }
 
-        // Resident filter
-        const matchesResident = resident === 'all' || session.attendees === resident;
+        // Category filter
+        const matchesCategory = category === 'all' || session.category === category;
 
-        const matches = matchesSearch && matchesDate && matchesResident;
+        const matches = matchesSearch && matchesDate && matchesCategory;
         
         if (!matches) {
           console.log(`🔧 Session "${session.title}" filtered out:`, {
-            matchesSearch, matchesDate, matchesStatus, matchesResident
+            matchesSearch, matchesDate, matchesCategory
           });
         }
 
@@ -1658,78 +1677,6 @@
       }
     }
 
-    // Apply current filters to sessions
-    function applyFilters() {
-      console.log('🔍 Applying filters to sessions...');
-      console.log('- allSessions count:', allSessions.length);
-      
-      const searchTerm = document.getElementById('search-input').value.toLowerCase();
-      const dateRange = document.getElementById('date-filter').value;
-      const resident = document.getElementById('resident-filter').value;
-
-      console.log('- Filter values:', { searchTerm, dateRange, resident });
-
-      const now = new Date();
-      
-      const filtered = allSessions.filter(session => {
-        console.log(`Checking session: ${session.id} - ${session.title}`);
-        
-        // Search filter
-        const searchableText = `${session.title} ${session.attendees} ${session.category}`.toLowerCase();
-        const matchesSearch = !searchTerm || searchableText.includes(searchTerm);
-        console.log(`  - Search match (${searchTerm}):`, matchesSearch);
-
-        // Date filter
-        let matchesDate = true;
-        const sessionDate = new Date(session.date || session.startTime || session.createdAt);
-        
-        if (dateRange === 'today') {
-          const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-          matchesDate = sessionDate >= today;
-        } else if (dateRange === 'week') {
-          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-          matchesDate = sessionDate >= weekAgo;
-        } else if (dateRange === 'month') {
-          const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-          matchesDate = sessionDate >= monthAgo;
-        } else if (dateRange === 'quarter') {
-          const quarterAgo = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
-          matchesDate = sessionDate >= quarterAgo;
-        }
-        console.log(`  - Date match (${dateRange}):`, matchesDate);
-
-        // Resident filter - using attendees name
-        const matchesResident = resident === 'all' || session.attendees === resident;
-        console.log(`  - Resident match (${resident}):`, matchesResident);
-
-        const finalMatch = matchesSearch && matchesDate && matchesResident;
-        console.log(`  - Final match:`, finalMatch);
-        
-        return finalMatch;
-      });
-      
-      console.log(`✅ Filtered ${filtered.length} sessions from ${allSessions.length} total`);
-      return filtered;
-    }
-
-    // Render sessions list
-    function renderSessions() {
-      const callsList = document.getElementById('calls-list');
-      const callsTbody = document.getElementById('calls-tbody');
-      const emptyState = document.getElementById('empty-state');
-
-      if (filteredSessions.length === 0) {
-        callsList.style.display = 'none';
-        emptyState.style.display = 'block';
-        return;
-      }
-
-      callsList.style.display = 'block';
-      emptyState.style.display = 'none';
-
-      callsTbody.innerHTML = filteredSessions.map(session => createSessionRow(session)).join('');
-    }
-
     // View session details
     async function viewSessionDetails(sessionId) {
       try {
@@ -1869,20 +1816,52 @@
       
       try {
         console.log(`🗑️ Deleting session ${sessionId}`);
+        console.log('🗑️ Session ID type:', typeof sessionId);
+        console.log('🗑️ Session ID value:', sessionId);
+        
+        // Test database connectivity first
+        console.log('🔍 Testing database connectivity...');
+        try {
+          const testResult = await window.electronAPI.dbGetSessions();
+          console.log('🔍 Database test result:', testResult?.success ? 'Connected' : 'Failed');
+          
+          // Skip health check for now to test basic functionality
+          console.log('⚠️ Skipping health check, proceeding with delete...');
+        } catch (testError) {
+          console.error('🔍 Database test failed:', testError);
+        }
         
         if (window.electronAPI && window.electronAPI.dbDeleteSession) {
-          const result = await window.electronAPI.dbDeleteSession(sessionId);
+          console.log('🗑️ About to call electronAPI.dbDeleteSession...');
           
-          if (result.success) {
+          // Add timeout to catch hanging IPC calls
+          const deletePromise = window.electronAPI.dbDeleteSession(sessionId);
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Delete operation timed out after 5 seconds')), 5000);
+          });
+          
+          const result = await Promise.race([deletePromise, timeoutPromise]);
+          
+          console.log('🗑️ Delete result received:', result);
+          console.log('🗑️ Result type:', typeof result);
+          console.log('🗑️ Result success property:', result?.success);
+          
+          if (result && result.success) {
+            console.log('🗑️ Delete was successful, showing toast and reloading...');
             showToast('Session deleted successfully', 'success');
+            console.log('🔄 Reloading sessions after successful deletion...');
             // Reload sessions from database
             await loadSessionsFromDatabase();
+            console.log('🔄 Session reload completed');
           } else {
-            console.error('❌ Failed to delete session:', result.error);
-            showToast('Failed to delete session', 'error');
+            console.error('❌ Failed to delete session:', result?.error || result);
+            console.error('❌ Full result object:', result);
+            showToast(`Failed to delete session: ${result?.error || 'Unknown error'}`, 'error');
           }
         } else {
           console.error('❌ Database API not available');
+          console.error('❌ electronAPI exists:', !!window.electronAPI);
+          console.error('❌ dbDeleteSession exists:', !!(window.electronAPI && window.electronAPI.dbDeleteSession));
           showToast('Database connection not available', 'error');
         }
       } catch (error) {
@@ -1891,7 +1870,460 @@
       }
     }
 
-    // Export session annotations with flattened format
+    // Export session annotations (clean working version)
+    async function exportSession(sessionId) {
+      console.log(`📤 Exporting session ${sessionId}`);
+      
+      if (!window.electronAPI || !window.electronAPI.dbGetSessionDetails) {
+        showToast('Database not available', 'error');
+        return;
+      }
+      
+      try {
+        const result = await window.electronAPI.dbGetSessionDetails(sessionId);
+        
+        if (!result.success || !result.session) {
+          showToast('Session not found', 'error');
+          return;
+        }
+        
+        const session = result.session;
+        const annotations = result.annotations || [];
+        const images = result.images || [];
+        
+        console.log(`📊 Export data: ${annotations.length} annotations, ${images.length} images`);
+        
+        const exportData = {
+          sessionInfo: {
+            id: session.id,
+            title: session.title,
+            attendees: session.attendees || session.doctor_name,
+            category: session.category,
+            startTime: session.start_time || session.startTime,
+            endTime: session.end_time || session.endTime,
+            totalAnnotations: annotations.length,
+            totalImages: images.length,
+            status: session.status
+          },
+          format: 'flattened_annotation_image_pairs',
+          description: 'Session export from database',
+          annotations: annotations.map(annotation => {
+            // Find associated image for this annotation
+            const associatedImage = images.find(img => 
+              img.id === (annotation.imageId || annotation.image_id)
+            );
+            
+            // Get image data from multiple possible field names
+            let imageData = null;
+            if (associatedImage) {
+              imageData = associatedImage.image_data || 
+                         associatedImage.data || 
+                         associatedImage.imageData || 
+                         associatedImage.base64 || 
+                         associatedImage.content || 
+                         associatedImage.file_data ||
+                         null;
+            }
+            
+            // Safely parse annotation points (for database data)
+            let annotationPoints = [];
+            try {
+              const points = annotation.points;
+              if (points) {
+                if (typeof points === 'string') {
+                  annotationPoints = JSON.parse(points);
+                } else if (Array.isArray(points) || typeof points === 'object') {
+                  annotationPoints = points;
+                }
+              }
+            } catch (error) {
+              console.warn('Failed to parse annotation points for annotation', annotation.id, ':', error);
+              annotationPoints = [];
+            }
+            
+            return {
+              // Annotation data
+              annotationId: annotation.id,
+              annotationTimestamp: annotation.timestamp || annotation.created_at,
+              annotationType: annotation.annotationType || annotation.type || 'polygon',
+              annotationPoints: annotationPoints,
+              
+              // Medical attributes
+              nerveType: annotation.nerveType || annotation.nerve_type,
+              sideOfBody: annotation.sideOfBody || annotation.side_of_body,
+              patientPosition: annotation.patientPosition || annotation.patient_position,
+              visibility: annotation.visibility,
+              patientAgeGroup: annotation.patientAgeGroup || annotation.patient_age_group,
+              needleApproach: annotation.needleApproach || annotation.needle_approach,
+              clinicalNotes: annotation.clinicalNotes || annotation.clinical_notes,
+              
+              // Image data paired with annotation
+              imageId: annotation.imageId || annotation.image_id,
+              imageName: associatedImage?.filename || associatedImage?.name || associatedImage?.file_name || 'Unknown',
+              imageData: imageData,
+              imageSize: associatedImage?.fileSize || associatedImage?.file_size || associatedImage?.size,
+              imageType: associatedImage?.fileType || associatedImage?.file_type || associatedImage?.type || associatedImage?.mimeType,
+              imageUploadedAt: associatedImage?.uploadedAt || associatedImage?.uploaded_at || associatedImage?.created_at
+            };
+          })
+        };
+
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `session_${session.id}_${session.category || 'annotations'}_${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast(`Exported ${annotations.length} annotations`, 'success');
+        
+      } catch (error) {
+        console.error('❌ Export error:', error);
+        showToast('Export failed', 'error');
+      }
+    }
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      toast.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: ${type === 'error' ? '#ef4444' : type === 'info' ? '#3b82f6' : '#10b981'};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        z-index: 10000;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+      `;
+
+      document.body.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(0)';
+      });
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+          }
+        }, 300);
+      }, 3000);
+    }
+
+    // Initialize the library when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('📚 Library page loaded, initializing...');
+      loadSessionsFromDatabase();
+    });
+  </script>
+
+  <!-- Annotation Details Modal -->
+        const result = await window.electronAPI.dbGetSessionDetails(sessionId);
+        
+        if (!result.success || !result.session) {
+          showToast('Session not found', 'error');
+          return;
+        }
+        
+        const session = result.session;
+        const annotations = result.annotations || [];
+        
+        const exportData = {
+          sessionInfo: {
+            id: session.id,
+            title: session.title,
+            attendees: session.attendees || session.doctor_name,
+            category: session.category,
+            startTime: session.start_time || session.startTime,
+            endTime: session.end_time || session.endTime,
+            totalAnnotations: annotations.length,
+            status: session.status
+          },
+          format: 'flattened_annotation_image_pairs',
+          description: 'Session export from database',
+          annotations: annotations.map(annotation => ({
+            annotationId: annotation.id,
+            annotationTimestamp: annotation.timestamp || annotation.created_at,
+            annotationType: annotation.annotationType || annotation.type || 'polygon',
+            annotationPoints: annotation.points,
+            nerveType: annotation.nerveType || annotation.nerve_type,
+            sideOfBody: annotation.sideOfBody || annotation.side_of_body,
+            patientPosition: annotation.patientPosition || annotation.patient_position,
+            visibility: annotation.visibility,
+            patientAgeGroup: annotation.patientAgeGroup || annotation.patient_age_group,
+            needleApproach: annotation.needleApproach || annotation.needle_approach,
+            clinicalNotes: annotation.clinicalNotes || annotation.clinical_notes,
+            imageId: annotation.imageId || annotation.image_id
+          }))
+        };
+
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `session_${session.id}_${session.category || 'annotations'}_${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast(`Exported ${annotations.length} annotations`, 'success');
+        
+      } catch (error) {
+        console.error('❌ Export error:', error);
+        showToast('Export failed', 'error');
+      }
+    }
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      toast.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: ${type === 'error' ? '#ef4444' : type === 'info' ? '#3b82f6' : '#10b981'};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        z-index: 10000;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+      `;
+
+      document.body.appendChild(toast);
+
+      // Trigger animation
+      requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(0)';
+      });
+
+      // Auto dismiss
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+          }
+        }, 300);
+      }, 3000);
+    }
+
+    // Initialize the library when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('📚 Library page loaded, initializing...');
+      
+      // Add some basic styling for toasts
+      if (!document.getElementById('toast-styles')) {
+        const toastStyles = document.createElement('style');
+        toastStyles.id = 'toast-styles';
+        toastStyles.textContent = `
+        .duration { font-family: monospace; }
+        .annotation-label { font-size: 0.75rem; color: #94a3b8; display: block; }
+        .image-count { font-size: 0.75rem; color: #94a3b8; }
+      `;
+      document.head.appendChild(toastStyles);
+      }
+      
+      // Load sessions from database
+      loadSessionsFromDatabase();
+    });
+
+    // Style for toast notifications 
+    const toastStyles = document.createElement('style');
+    toastStyles.textContent = `
+      .duration { font-family: monospace; }
+      .annotation-label { font-size: 0.75rem; color: #94a3b8; display: block; }
+      .image-count { font-size: 0.75rem; color: #94a3b8; }
+    `;
+    document.head.appendChild(toastStyles);
+      
+      try {
+        const result = await window.electronAPI.dbGetSessionDetails(sessionId);
+        
+        if (!result.success || !result.session) {
+          showToast('Session not found', 'error');
+          return;
+        }
+        
+        const session = result.session;
+        const annotations = result.annotations || [];
+        
+        const exportData = {
+          sessionInfo: {
+            id: session.id,
+            title: session.title,
+            attendees: session.attendees || session.doctor_name,
+            category: session.category,
+            startTime: session.start_time || session.startTime,
+            endTime: session.end_time || session.endTime,
+            totalAnnotations: annotations.length,
+            status: session.status
+          },
+          format: 'flattened_annotation_image_pairs',
+          description: 'Session export from database',
+          annotations: annotations.map(annotation => ({
+            annotationId: annotation.id,
+            annotationTimestamp: annotation.timestamp || annotation.created_at,
+            annotationType: annotation.annotationType || annotation.type || 'polygon',
+            annotationPoints: annotation.points,
+            nerveType: annotation.nerveType || annotation.nerve_type,
+            sideOfBody: annotation.sideOfBody || annotation.side_of_body,
+            patientPosition: annotation.patientPosition || annotation.patient_position,
+            visibility: annotation.visibility,
+            patientAgeGroup: annotation.patientAgeGroup || annotation.patient_age_group,
+            needleApproach: annotation.needleApproach || annotation.needle_approach,
+            clinicalNotes: annotation.clinicalNotes || annotation.clinical_notes,
+            imageId: annotation.imageId || annotation.image_id
+          }))
+        };
+
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `session_${session.id}_${session.category || 'annotations'}_${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast(`Exported ${annotations.length} annotations`, 'success');
+        
+      } catch (error) {
+        console.error('❌ Export error:', error);
+        showToast('Export failed', 'error');
+      }
+    }
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      toast.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: ${type === 'error' ? '#ef4444' : type === 'info' ? '#3b82f6' : '#10b981'};
+        color: white;
+      });
+
+      // Create flattened annotation-image pairs
+      const flattenedAnnotations = annotationsData.map(annotation => {
+        // Find associated image (handle both in-memory and database field names)
+        const associatedImage = imagesData.find(img => 
+          img.id === (annotation.imageId || annotation.image_id)
+        );
+
+        // Handle image data
+        let imageData = null;
+        if (associatedImage) {
+          imageData = associatedImage.image_data || 
+                     associatedImage.data || 
+                     associatedImage.imageData || 
+                     associatedImage.base64 || 
+                     associatedImage.content || 
+                     associatedImage.file_data ||
+                     null;
+        }
+
+        // Safely parse annotation points (for database data)
+        let annotationPoints = [];
+        try {
+          const points = annotation.points;
+          if (points) {
+            if (typeof points === 'string') {
+              annotationPoints = JSON.parse(points);
+            } else if (Array.isArray(points) || typeof points === 'object') {
+              annotationPoints = points;
+            }
+          }
+        } catch (error) {
+          console.warn('Failed to parse annotation points for annotation', annotation.id, ':', error);
+          annotationPoints = [];
+        }
+
+        return {
+          // Annotation data (handle both field name formats)
+          annotationId: annotation.id,
+          annotationTimestamp: annotation.timestamp || annotation.created_at,
+          annotationType: annotation.annotationType || annotation.type || 'polygon',
+          annotationPoints: annotationPoints,
+          
+          // Medical attributes (handle both field name formats)
+          nerveType: annotation.nerveType || annotation.nerve_type,
+          sideOfBody: annotation.sideOfBody || annotation.side_of_body,
+          patientPosition: annotation.patientPosition || annotation.patient_position,
+          visibility: annotation.visibility,
+          patientAgeGroup: annotation.patientAgeGroup || annotation.patient_age_group,
+          needleApproach: annotation.needleApproach || annotation.needle_approach,
+          clinicalNotes: annotation.clinicalNotes || annotation.clinical_notes,
+          
+          // Image data (handle both field name formats)
+          imageId: annotation.imageId || annotation.image_id,
+          imageName: associatedImage?.filename || associatedImage?.name || associatedImage?.file_name || associatedImage?.imageName || 'Unknown',
+          imageData: imageData,
+          imageSize: associatedImage?.fileSize || associatedImage?.file_size || associatedImage?.size,
+          imageType: associatedImage?.fileType || associatedImage?.file_type || associatedImage?.type || associatedImage?.mimeType,
+          imageUploadedAt: associatedImage?.uploadedAt || associatedImage?.uploaded_at || associatedImage?.created_at
+        };
+      });
+
+      // Create export data structure
+      const exportData = {
+        sessionInfo: {
+          id: sessionData.id,
+          title: sessionData.title,
+          attendees: sessionData.attendees || sessionData.doctor_name,
+          category: sessionData.category,
+          startTime: sessionData.startTime || sessionData.start_time,
+          endTime: sessionData.endTime || sessionData.end_time,
+          totalAnnotations: annotationsData.length,
+          totalImages: imagesData.length,
+          status: sessionData.status
+        },
+        format: 'flattened_annotation_image_pairs',
+        description: `Session export with annotation-image pairs in flattened format (${dataSource})`,
+        annotations: flattenedAnnotations
+      };
+
+      return exportData;
+    }
+
+    // Export session annotations (simplified backup version)
     async function exportSession(sessionId) {
       try {
         console.log(`📤 Exporting session ${sessionId}`);
@@ -1904,100 +2336,7 @@
             const annotations = result.annotations || [];
             const images = result.images || [];
             
-            console.log(`📊 Export data: ${annotations.length} annotations, ${images.length} images`);
-            
-            // Debug: Log first annotation structure
-            if (annotations.length > 0) {
-              console.log('🔍 First annotation structure:', {
-                id: annotations[0].id,
-                pointsType: typeof annotations[0].points,
-                pointsValue: annotations[0].points,
-                hasImageId: !!annotations[0].imageId,
-                imageId: annotations[0].imageId || annotations[0].image_id
-              });
-            }
-            
-            // Debug: Log first image structure
-            if (images.length > 0) {
-              console.log('🔍 First image structure:', {
-                id: images[0].id,
-                availableFields: Object.keys(images[0]),
-                hasData: !!images[0].data,
-                hasImageData: !!images[0].imageData,
-                hasBase64: !!images[0].base64,
-                hasContent: !!images[0].content
-              });
-            }
-            
-            // Create flattened annotation-image pairs
-            const flattenedAnnotations = annotations.map(annotation => {
-              const associatedImage = images.find(img => img.id === annotation.imageId || img.id === annotation.image_id);
-              
-              // Debug: Log image association for first annotation
-              if (annotation === annotations[0]) {
-                console.log('🔍 Image association for first annotation:', {
-                  annotationImageId: annotation.imageId || annotation.image_id,
-                  foundImage: !!associatedImage,
-                  imageFields: associatedImage ? Object.keys(associatedImage) : 'No image found'
-                });
-              }
-              
-              // Safely parse annotation points
-              let annotationPoints = [];
-              try {
-                if (annotation.points) {
-                  if (typeof annotation.points === 'string') {
-                    annotationPoints = JSON.parse(annotation.points);
-                  } else if (Array.isArray(annotation.points)) {
-                    annotationPoints = annotation.points;
-                  } else if (typeof annotation.points === 'object') {
-                    annotationPoints = annotation.points;
-                  }
-                }
-              } catch (error) {
-                console.warn('Failed to parse annotation points for annotation', annotation.id, ':', error);
-                annotationPoints = [];
-              }
-              
-              // Get image data from multiple possible field names
-              let imageData = null;
-              if (associatedImage) {
-                imageData = associatedImage.image_data || // New database column
-                           associatedImage.data || 
-                           associatedImage.imageData || 
-                           associatedImage.base64 || 
-                           associatedImage.content || 
-                           associatedImage.file_data ||
-                           null;
-              }
-              
-              return {
-                // Annotation data
-                annotationId: annotation.id,
-                annotationTimestamp: annotation.timestamp || annotation.created_at,
-                annotationType: annotation.annotationType || annotation.type || 'polygon',
-                annotationPoints: annotationPoints,
-                
-                // Medical attributes
-                nerveType: annotation.nerveType || annotation.nerve_type,
-                sideOfBody: annotation.sideOfBody || annotation.side_of_body,
-                patientPosition: annotation.patientPosition || annotation.patient_position,
-                visibility: annotation.visibility,
-                patientAgeGroup: annotation.patientAgeGroup || annotation.patient_age_group,
-                needleApproach: annotation.needleApproach || annotation.needle_approach,
-                clinicalNotes: annotation.clinicalNotes || annotation.clinical_notes,
-                
-                // Image data paired with annotation
-                imageId: annotation.imageId || annotation.image_id,
-                imageName: associatedImage?.filename || associatedImage?.name || associatedImage?.file_name || 'Unknown',
-                imageData: imageData,
-                imageSize: associatedImage?.fileSize || associatedImage?.file_size || associatedImage?.size,
-                imageType: associatedImage?.fileType || associatedImage?.file_type || associatedImage?.type || associatedImage?.mimeType,
-                imageUploadedAt: associatedImage?.uploadedAt || associatedImage?.uploaded_at || associatedImage?.created_at
-              };
-            });
-            
-            // Create export data
+            // Simple export data structure
             const exportData = {
               sessionInfo: {
                 id: session.id,
@@ -2006,19 +2345,57 @@
                 category: session.category,
                 startTime: session.start_time || session.startTime,
                 endTime: session.end_time || session.endTime,
-                duration: session.duration,
-                exportTime: new Date().toISOString(),
                 totalAnnotations: annotations.length,
                 totalImages: images.length,
                 status: session.status
               },
               format: 'flattened_annotation_image_pairs',
               description: 'Session export with annotation-image pairs in flattened format from SQLite database',
-              annotations: flattenedAnnotations
+              annotations: annotations.map(annotation => ({
+                annotationId: annotation.id,
+                annotationTimestamp: annotation.timestamp || annotation.created_at,
+                annotationType: annotation.annotationType || annotation.type || 'polygon',
+                annotationPoints: annotation.points,
+                nerveType: annotation.nerveType || annotation.nerve_type,
+                sideOfBody: annotation.sideOfBody || annotation.side_of_body,
+                patientPosition: annotation.patientPosition || annotation.patient_position,
+                visibility: annotation.visibility,
+                patientAgeGroup: annotation.patientAgeGroup || annotation.patient_age_group,
+                needleApproach: annotation.needleApproach || annotation.needle_approach,
+                clinicalNotes: annotation.clinicalNotes || annotation.clinical_notes,
+                imageId: annotation.imageId || annotation.image_id,
+                imageName: 'Export Image',
+                imageData: null
+              }))
             };
+
+            // Download export
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
             
-            // Download the export with error handling
-            try {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `session_${session.id}_${session.category || 'annotations'}_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast(`Exported ${annotations.length} annotations`, 'success');
+            
+          } else {
+            showToast('Session not found', 'error');
+          }
+        } else {
+          showToast('Database not available', 'error');
+        }
+        
+      } catch (error) {
+        console.error('❌ Export error:', error);
+        showToast(`Export failed: ${error.message}`, 'error');
+      }
+    } {
               console.log('📝 Converting export data to JSON...');
               const dataStr = JSON.stringify(exportData, null, 2);
               console.log('✅ JSON conversion successful');
@@ -2034,26 +2411,11 @@
               document.body.removeChild(a);
               URL.revokeObjectURL(url);
               
-              showToast(`Exported ${annotations.length} annotations with images`, 'success');
-              console.log(`📤 Successfully exported session "${session.title}" with ${annotations.length} annotations`);
-              
-            } catch (jsonError) {
-              console.error('❌ Error converting to JSON:', jsonError);
-              console.error('Problematic export data:', exportData);
-              showToast('Error creating export file - invalid data format', 'error');
-            }
-            
-          } else {
-            console.error('❌ Failed to load session for export:', result.error);
-            showToast('Failed to load session data for export', 'error');
-          }
-        } else {
-          console.error('❌ Database API not available');
-          showToast('Database connection not available', 'error');
-        }
+              showToast(`Exported ${annotations.length} annotations`, 'success');
+        
       } catch (error) {
-        console.error('❌ Error exporting session:', error);
-        showToast('Error exporting session', 'error');
+        console.error('❌ Export error:', error);
+        showToast('Export failed', 'error');
       }
     }
 

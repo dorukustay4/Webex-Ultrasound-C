@@ -116,6 +116,42 @@
         .annotation-item:hover {
             background: #27ae60;
         }
+        
+        .slider-group {
+            padding: 0.5rem 0;
+        }
+        
+        .slider-group input[type="range"] {
+            width: 100%;
+            height: 4px;
+            background: #34495e;
+            outline: none;
+            border-radius: 2px;
+            margin: 0.25rem 0;
+        }
+        
+        .slider-group input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #27ae60;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .slider-group input[type="range"]::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: #27ae60;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .tool-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -125,6 +161,26 @@
                 <div class="tool-title">Drawing Tools</div>
                 <button class="tool-btn active" id="polygonBtn">Polygon</button>
                 <button class="tool-btn" id="selectBtn">Select</button>
+            </div>
+            
+            <div class="tool-section">
+                <div class="tool-title">History</div>
+                <button class="tool-btn" id="undoBtn">Undo</button>
+                <button class="tool-btn" id="redoBtn">Redo</button>
+            </div>
+            
+            <div class="tool-section">
+                <div class="tool-title">Image Settings</div>
+                <button class="tool-btn" id="brightnessBtn">Brightness/Contrast</button>
+                <div class="slider-group" id="imageControls" style="display: none; margin-top: 0.5rem;">
+                    <label style="font-size: 0.7rem; color: #bdc3c7;">Brightness</label>
+                    <input type="range" id="brightnessSlider" min="0" max="200" value="100" 
+                           style="width: 100%; margin: 0.25rem 0;">
+                    <label style="font-size: 0.7rem; color: #bdc3c7;">Contrast</label>
+                    <input type="range" id="contrastSlider" min="0" max="200" value="100" 
+                           style="width: 100%; margin: 0.25rem 0;">
+                    <button class="tool-btn" id="resetImageBtn" style="margin-top: 0.25rem; font-size: 0.7rem;">Reset</button>
+                </div>
             </div>
             
             <div class="tool-section">
@@ -162,6 +218,14 @@
         let allPolygons = [];
         let selectedPolygon = null;
         
+        // History management
+        let history = [];
+        let historyStep = -1;
+        
+        // Image filters
+        let brightness = 100;
+        let contrast = 100;
+        
         // Initialize VIA
         function initVIA() {
             canvas = document.getElementById('viaCanvas');
@@ -180,13 +244,113 @@
             document.getElementById('deleteBtn').addEventListener('click', deleteSelected);
             document.getElementById('clearBtn').addEventListener('click', clearAll);
             
+            // History buttons
+            document.getElementById('undoBtn').addEventListener('click', undo);
+            document.getElementById('redoBtn').addEventListener('click', redo);
+            
+            // Image controls
+            document.getElementById('brightnessBtn').addEventListener('click', toggleImageControls);
+            document.getElementById('brightnessSlider').addEventListener('input', updateBrightness);
+            document.getElementById('contrastSlider').addEventListener('input', updateContrast);
+            document.getElementById('resetImageBtn').addEventListener('click', resetImageSettings);
+            
             // Canvas events
             canvas.addEventListener('click', handleCanvasClick);
             canvas.addEventListener('dblclick', completePolygon);
             canvas.addEventListener('mousemove', handleMouseMove);
             
+            // Keyboard events
+            document.addEventListener('keydown', handleKeyDown);
+            
             // Listen for messages from parent
             window.addEventListener('message', handleParentMessage);
+        }
+        
+        // Handle keyboard shortcuts
+        function handleKeyDown(e) {
+            // Only handle if canvas/VIA is focused or no input elements are focused
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                return;
+            }
+            
+            // Prevent default for handled shortcuts
+            let handled = false;
+            
+            switch (e.key) {
+                case 'Enter':
+                    if (currentPolygon.length >= 3) {
+                        completePolygon();
+                        handled = true;
+                    }
+                    break;
+                case 'Escape':
+                    if (currentPolygon.length > 0) {
+                        cancelCurrentPolygon();
+                        handled = true;
+                    }
+                    break;
+                case 'Delete':
+                case 'Backspace':
+                    if (selectedPolygon !== null) {
+                        deleteSelected();
+                        handled = true;
+                    }
+                    break;
+                case 'z':
+                    if (e.ctrlKey || e.metaKey) {
+                        if (e.shiftKey) {
+                            redo();
+                        } else {
+                            undo();
+                        }
+                        handled = true;
+                    }
+                    break;
+                case 'y':
+                    if (e.ctrlKey || e.metaKey) {
+                        redo();
+                        handled = true;
+                    }
+                    break;
+                case 's':
+                    if (e.ctrlKey || e.metaKey) {
+                        // Save current annotation and move to next image
+                        saveAndMoveToNext();
+                        handled = true;
+                    } else if (!e.ctrlKey && !e.metaKey) {
+                        setTool('select');
+                        handled = true;
+                    }
+                    break;
+                case 'p':
+                    if (!e.ctrlKey && !e.metaKey) {
+                        setTool('polygon');
+                        handled = true;
+                    }
+                    break;
+                case 'c':
+                    if (e.ctrlKey || e.metaKey) {
+                        if (e.shiftKey) {
+                            clearAll();
+                            handled = true;
+                        }
+                    }
+                    break;
+            }
+            
+            if (handled) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }
+        
+        // Save current annotation and move to next image
+        function saveAndMoveToNext() {
+            // Send message to parent to save current annotation
+            window.parent.postMessage({
+                type: 'save_current_annotation'
+            }, '*');
+            updateStatus('Saving annotation and moving to next image...');
         }
         
         // Handle messages from parent window
@@ -205,6 +369,21 @@
                     break;
                 case 'clear_all':
                     clearAll();
+                    break;
+                case 'complete_polygon':
+                    completePolygon();
+                    break;
+                case 'cancel_polygon':
+                    cancelCurrentPolygon();
+                    break;
+                case 'undo':
+                    undo();
+                    break;
+                case 'redo':
+                    redo();
+                    break;
+                case 'save_and_next':
+                    saveAndMoveToNext();
                     break;
             }
         }
@@ -237,6 +416,12 @@
                 img.style.width = displayWidth + 'px';
                 img.style.height = displayHeight + 'px';
                 
+                // Initialize history
+                history = [[]];
+                historyStep = 0;
+                updateHistoryButtons();
+                
+                applyImageFilters();
                 updateStatus('Image loaded - Ready for annotation');
                 redrawCanvas();
             };
@@ -278,7 +463,10 @@
         
         // Complete current polygon
         function completePolygon() {
-            if (currentPolygon.length < 3) return;
+            if (currentPolygon.length < 3) {
+                updateStatus('Need at least 3 points to complete polygon');
+                return;
+            }
             
             const annotation = {
                 id: Date.now(),
@@ -291,12 +479,24 @@
             allPolygons.push(annotation);
             currentPolygon = [];
             
+            saveToHistory();
             redrawCanvas();
             updateAnnotationList();
             updateStatus(`Polygon completed! Total: ${allPolygons.length}`);
             
             // Send to parent
             sendAnnotationToParent(annotation);
+        }
+        
+        // Cancel current polygon
+        function cancelCurrentPolygon() {
+            if (currentPolygon.length > 0) {
+                currentPolygon = [];
+                redrawCanvas();
+                updateStatus('Current polygon cancelled');
+            } else {
+                updateStatus('No polygon to cancel');
+            }
         }
         
         // Select polygon at point
@@ -331,10 +531,50 @@
             if (selectedPolygon !== null) {
                 allPolygons.splice(selectedPolygon, 1);
                 selectedPolygon = null;
+                saveToHistory();
                 redrawCanvas();
                 updateAnnotationList();
                 updateStatus('Selected polygon deleted');
             }
+        }
+        
+        // History management
+        function saveToHistory() {
+            historyStep++;
+            if (historyStep < history.length) {
+                history.length = historyStep;
+            }
+            history.push(JSON.parse(JSON.stringify(allPolygons)));
+            updateHistoryButtons();
+        }
+        
+        function undo() {
+            if (historyStep > 0) {
+                historyStep--;
+                allPolygons = JSON.parse(JSON.stringify(history[historyStep]));
+                selectedPolygon = null;
+                redrawCanvas();
+                updateAnnotationList();
+                updateStatus('Undo completed');
+                updateHistoryButtons();
+            }
+        }
+        
+        function redo() {
+            if (historyStep < history.length - 1) {
+                historyStep++;
+                allPolygons = JSON.parse(JSON.stringify(history[historyStep]));
+                selectedPolygon = null;
+                redrawCanvas();
+                updateAnnotationList();
+                updateStatus('Redo completed');
+                updateHistoryButtons();
+            }
+        }
+        
+        function updateHistoryButtons() {
+            document.getElementById('undoBtn').style.opacity = historyStep > 0 ? '1' : '0.5';
+            document.getElementById('redoBtn').style.opacity = historyStep < history.length - 1 ? '1' : '0.5';
         }
         
         // Clear all polygons
@@ -343,9 +583,50 @@
                 allPolygons = [];
                 currentPolygon = [];
                 selectedPolygon = null;
+                saveToHistory();
                 redrawCanvas();
                 updateAnnotationList();
                 updateStatus('All annotations cleared');
+            }
+        }
+        
+        // Image controls
+        function toggleImageControls() {
+            const controls = document.getElementById('imageControls');
+            const btn = document.getElementById('brightnessBtn');
+            if (controls.style.display === 'none') {
+                controls.style.display = 'block';
+                btn.classList.add('active');
+            } else {
+                controls.style.display = 'none';
+                btn.classList.remove('active');
+            }
+        }
+        
+        function updateBrightness() {
+            brightness = document.getElementById('brightnessSlider').value;
+            applyImageFilters();
+            updateStatus(`Brightness: ${brightness}%`);
+        }
+        
+        function updateContrast() {
+            contrast = document.getElementById('contrastSlider').value;
+            applyImageFilters();
+            updateStatus(`Contrast: ${contrast}%`);
+        }
+        
+        function resetImageSettings() {
+            brightness = 100;
+            contrast = 100;
+            document.getElementById('brightnessSlider').value = 100;
+            document.getElementById('contrastSlider').value = 100;
+            applyImageFilters();
+            updateStatus('Image settings reset');
+        }
+        
+        function applyImageFilters() {
+            if (img.src) {
+                img.style.filter = `brightness(${brightness}%) contrast(${contrast}%)`;
             }
         }
         

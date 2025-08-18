@@ -405,45 +405,119 @@ class DatabaseManager {
     });
   }
 
+  // Database health check
+  async checkDatabaseHealth() {
+    return new Promise((resolve, reject) => {
+      const db = this.db;
+      
+      console.log('🏥 Running database health check...');
+      
+      // Check if we can perform basic operations
+      db.get('SELECT COUNT(*) as count FROM sessions', (err, result) => {
+        if (err) {
+          console.error('❌ Database health check failed:', err);
+          reject(err);
+          return;
+        }
+        
+        console.log('✅ Database health check passed, session count:', result.count);
+        resolve({ healthy: true, sessionCount: result.count });
+      });
+    });
+  }
+
   // Delete session and all related data
   async deleteSession(sessionId) {
     return new Promise((resolve, reject) => {
-      this.db.serialize(() => {
-        this.db.run('BEGIN TRANSACTION');
-
-        // Delete annotations
-        this.db.run('DELETE FROM annotations WHERE session_id = ?', [sessionId], (err) => {
-          if (err) {
-            this.db.run('ROLLBACK');
-            reject(err);
+      const db = this.db; // Capture db reference to avoid 'this' context issues
+      
+      console.log('🗑️ Starting delete operation for session:', sessionId);
+      console.log('🗑️ Session ID type:', typeof sessionId);
+      
+      // Add a timeout to prevent hanging
+      const timeoutId = setTimeout(() => {
+        console.error('❌ Database delete operation timed out after 3 seconds');
+        reject(new Error('Database operation timed out'));
+      }, 3000);
+      
+      const cleanupAndResolve = (result) => {
+        clearTimeout(timeoutId);
+        resolve(result);
+      };
+      
+      const cleanupAndReject = (error) => {
+        clearTimeout(timeoutId);
+        reject(error);
+      };
+      
+      // Try a simple approach: delete in reverse order without transactions first
+      console.log('🗑️ Attempting simple delete without transaction...');
+      
+      // First, check if the session exists
+      db.get('SELECT id FROM sessions WHERE id = ?', [sessionId], (err, row) => {
+        if (err) {
+          console.error('❌ Error checking if session exists:', err);
+          cleanupAndReject(err);
+          return;
+        }
+        
+        if (!row) {
+          console.log('⚠️ Session not found in database:', sessionId);
+          cleanupAndResolve({ 
+            success: false, 
+            error: 'Session not found',
+            sessionId: sessionId 
+          });
+          return;
+        }
+        
+        console.log('✅ Session found:', sessionId);
+        
+        // Delete annotations (no foreign key constraints assumed)
+        db.run('DELETE FROM annotations WHERE session_id = ?', [sessionId], function(annotationErr) {
+          if (annotationErr) {
+            console.error('❌ Failed to delete annotations:', annotationErr);
+            cleanupAndReject(annotationErr);
             return;
           }
-        });
+          console.log(`✅ Deleted ${this.changes} annotations`);
 
-        // Delete images
-        this.db.run('DELETE FROM images WHERE session_id = ?', [sessionId], (err) => {
-          if (err) {
-            this.db.run('ROLLBACK');
-            reject(err);
-            return;
-          }
-        });
-
-        // Delete session
-        this.db.run('DELETE FROM sessions WHERE id = ?', [sessionId], function(err) {
-          if (err) {
-            this.db.run('ROLLBACK');
-            reject(err);
-            return;
-          }
-
-          this.db.run('COMMIT', (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              console.log('Session deleted:', sessionId);
-              resolve({ changes: this.changes });
+          // Delete images
+          db.run('DELETE FROM images WHERE session_id = ?', [sessionId], function(imageErr) {
+            if (imageErr) {
+              console.error('❌ Failed to delete images:', imageErr);
+              cleanupAndReject(imageErr);
+              return;
             }
+            console.log(`✅ Deleted ${this.changes} images`);
+
+            // Delete session
+            db.run('DELETE FROM sessions WHERE id = ?', [sessionId], function(sessionErr) {
+              if (sessionErr) {
+                console.error('❌ Failed to delete session:', sessionErr);
+                cleanupAndReject(sessionErr);
+                return;
+              }
+              
+              const deletedRows = this.changes;
+              console.log(`✅ Deleted ${deletedRows} session record(s)`);
+              
+              if (deletedRows > 0) {
+                console.log('✅ Session deletion completed successfully');
+                cleanupAndResolve({ 
+                  success: true, 
+                  deletedSessionId: sessionId,
+                  deletedRows: deletedRows
+                });
+              } else {
+                console.log('⚠️ No session was deleted (already deleted?)');
+                cleanupAndResolve({ 
+                  success: false, 
+                  error: 'Session was not found or already deleted',
+                  deletedRows: 0
+                });
+              }
+            });
           });
         });
       });
@@ -502,6 +576,32 @@ class DatabaseManager {
             });
           });
         });
+      });
+    });
+  }
+
+  // Get unique doctors/attendees from sessions
+  async getUniqueDoctors() {
+    return new Promise((resolve, reject) => {
+      console.log('📊 Getting unique doctors from database...');
+      
+      const query = `
+        SELECT DISTINCT attendees 
+        FROM sessions 
+        WHERE attendees IS NOT NULL 
+        AND attendees != '' 
+        ORDER BY attendees ASC
+      `;
+      
+      this.db.all(query, [], (err, rows) => {
+        if (err) {
+          console.error('❌ Error getting unique doctors:', err.message);
+          reject(err);
+        } else {
+          const doctors = rows.map(row => row.attendees).filter(Boolean);
+          console.log('✅ Found unique doctors:', doctors);
+          resolve(doctors);
+        }
       });
     });
   }

@@ -555,6 +555,43 @@
       background: #c53030;
     }
 
+    /* Keyboard Shortcuts Modal Styles */
+    .shortcuts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin: 1.5rem 0;
+    }
+
+    .shortcut-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem;
+      background: #f7fafc;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .shortcut-key {
+      background: #2d3748;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    .shortcut-description {
+      color: #4a5568;
+      font-size: 0.9rem;
+      flex: 1;
+      margin-left: 1rem;
+    }
+
     .stats-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -774,11 +811,19 @@
             </svg>
             End Session
           </button>
-          <button class="tool-button" onclick="clearAnnotations()">
+          <button class="tool-button" onclick="toggleKeyboardShortcuts()" title="Keyboard Shortcuts">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 6H5H21M19 6V20C19 21.1046 18.1046 22 17 22H7C5.89543 22 5 21.1046 5 20V6M8 6V4C8 2.89543 8.89543 2 10 2H14C15.1046 2 16 2.89543 16 4V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none"/>
+              <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="2"/>
+              <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="2"/>
+              <rect x="6" y="7" width="2" height="2" fill="currentColor"/>
+              <rect x="10" y="7" width="2" height="2" fill="currentColor"/>
+              <rect x="14" y="7" width="2" height="2" fill="currentColor"/>
+              <rect x="6" y="11" width="2" height="2" fill="currentColor"/>
+              <rect x="10" y="11" width="2" height="2" fill="currentColor"/>
+              <rect x="14" y="11" width="2" height="2" fill="currentColor"/>
             </svg>
-            Clear All
+            Keyboard Shortcuts
           </button>
         </div>
       </div>
@@ -817,7 +862,10 @@
         
         <div class="form-group">
           <label class="form-label">Doctor Name</label>
-          <input type="text" class="form-input" id="doctorName" placeholder="e.g., Dr. Smith" required>
+          <input type="text" class="form-input" id="doctorName" list="doctorsList" placeholder="e.g., Dr. Smith" required>
+          <datalist id="doctorsList">
+            <!-- Previous doctors will be populated here -->
+          </datalist>
         </div>
         
         <div class="form-group">
@@ -865,7 +913,7 @@
           <div class="stat-label">Session Duration</div>
         </div>
         <div class="stat-item">
-          <div class="stat-number" id="sessionCategory">-</div>
+          <div class="stat-number" id="displaySessionCategory">-</div>
           <div class="stat-label">Category</div>
         </div>
       </div>
@@ -874,6 +922,50 @@
         <button type="button" class="btn-cancel" onclick="closeEndSessionModal()">Continue Session</button>
         <button type="button" class="btn-primary" onclick="exportSessionData()">Export Session Data</button>
         <button type="button" class="btn-danger" onclick="endSession()">End Session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keyboard Shortcuts Modal -->
+  <div class="modal-overlay" id="keyboardShortcutsModal">
+    <div class="modal">
+      <h2 class="modal-title">Keyboard Shortcuts</h2>
+      <div class="shortcuts-list">
+        <div class="shortcut-item">
+          <span class="shortcut-key">Enter</span>
+          <span class="shortcut-description">Complete current polygon</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-key">Esc</span>
+          <span class="shortcut-description">Cancel current polygon / Close modals</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-key">Space</span>
+          <span class="shortcut-description">End current session</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-key">Delete</span>
+          <span class="shortcut-description">Delete selected annotation</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-key">Ctrl + Z</span>
+          <span class="shortcut-description">Undo last action</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-key">Ctrl + Y</span>
+          <span class="shortcut-description">Redo last action</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-key">Ctrl + S</span>
+          <span class="shortcut-description">Save current annotation</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-key">Ctrl + U</span>
+          <span class="shortcut-description">Upload new image</span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-primary" onclick="closeKeyboardShortcutsModal()">Got it!</button>
       </div>
     </div>
   </div>
@@ -967,6 +1059,8 @@
       const sessionId = document.getElementById('sessionId').value;
       
       console.log('🚀 Starting new session with data:', { title, doctorName, category, sessionId });
+      console.log('🔍 Debug - Category element:', document.getElementById('sessionCategory'));
+      console.log('🔍 Debug - Category value:', category);
       
       if (!title || !doctorName || !category) {
         console.error('❌ Form validation failed:', { title: !!title, doctorName: !!doctorName, category: !!category });
@@ -1059,11 +1153,11 @@
           // Set a timeout to save form data even if VIA doesn't respond
           setTimeout(() => {
             if (!window.viaSaveCompleted) {
-              console.log('⚠️ VIA did not respond within 3 seconds, saving form data only');
+              console.log('⚠️ VIA did not respond within 500ms, saving form data only');
               saveAnnotationToSession();
               window.viaSaveCompleted = true;
             }
-          }, 3000);
+          }, 500);
           
           return;
         }
@@ -1229,10 +1323,8 @@
       showToast(`✅ Annotation saved! (${sessionAnnotations.length} total in session)`, 'success');
       
       // Automatically proceed to next annotation after successful save
-      setTimeout(() => {
-        showToast('� Loading next annotation interface...', 'info');
-        nextAnnotation();
-      }, 2000); // Increased delay to allow VIA iframe to reload properly
+      showToast('📷 Loading next annotation interface...', 'info');
+      nextAnnotation();
       
       console.log('💾 Annotation saved to session:', annotation);
       console.log(`📊 Session now has ${sessionAnnotations.length} annotations and ${sessionImages.length} images`);
@@ -1324,6 +1416,9 @@
         return;
       }
       
+      console.log('🔍 Debug - Current session data:', currentSession);
+      console.log('🔍 Debug - Session category:', currentSession.category);
+      
       // Calculate session duration
       const duration = Date.now() - sessionStartTime;
       const minutes = Math.floor(duration / 60000);
@@ -1334,7 +1429,19 @@
       document.getElementById('totalAnnotations').textContent = sessionAnnotations.length;
       document.getElementById('totalImages').textContent = sessionImages.length;
       document.getElementById('sessionDuration').textContent = durationStr;
-      document.getElementById('sessionCategory').textContent = currentSession.category.replace('_', ' ');
+      
+      // Display category with proper fallback and formatting
+      let categoryDisplay = 'Unknown';
+      if (currentSession.category) {
+        // Format category for display (replace underscores with spaces and capitalize)
+        categoryDisplay = currentSession.category
+          .replace('_', ' ')
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+      }
+      console.log('🔍 Debug - Category display:', categoryDisplay);
+      document.getElementById('displaySessionCategory').textContent = categoryDisplay;
       
       document.getElementById('endSessionModal').classList.add('active');
     }
@@ -1343,104 +1450,175 @@
       document.getElementById('endSessionModal').classList.remove('active');
     }
 
+    // Keyboard Shortcuts Modal Functions
+    function toggleKeyboardShortcuts() {
+      console.log('🔴 toggleKeyboardShortcuts called');
+      document.getElementById('keyboardShortcutsModal').classList.add('active');
+    }
+
+    function closeKeyboardShortcutsModal() {
+      console.log('🔴 closeKeyboardShortcutsModal called');
+      document.getElementById('keyboardShortcutsModal').classList.remove('active');
+    }
+
+    // Unified export function that can handle both current session and database data
+    async function createUnifiedExport(sessionData, annotationsData, imagesData, options = {}) {
+      const {
+        useCompression = true,
+        dataSource = 'current_session',
+        maxImageSize = 100000,
+        compressionQuality = 0.8,
+        maxWidth = 800
+      } = options;
+
+      console.log('📤 Creating unified export:', {
+        annotations: annotationsData.length,
+        images: imagesData.length,
+        compression: useCompression
+      });
+
+      showToast('Preparing export with image processing...', 'info');
+
+      // Create flattened annotation-image pairs
+      const flattenedAnnotations = await Promise.all(annotationsData.map(async (annotation) => {
+        // Find associated image (handle both in-memory and database field names)
+        const associatedImage = imagesData.find(img => 
+          img.id === (annotation.imageId || annotation.image_id)
+        );
+
+        // Handle image data and compression
+        let imageInfo = {
+          data: null,
+          compressionNote: 'No image data available'
+        };
+
+        if (associatedImage) {
+          // Get image data from multiple possible field names (database vs in-memory)
+          let rawImageData = associatedImage.image_data || 
+                           associatedImage.data || 
+                           associatedImage.imageData || 
+                           associatedImage.base64 || 
+                           associatedImage.content || 
+                           associatedImage.file_data ||
+                           null;
+
+          if (rawImageData && useCompression && rawImageData.length > maxImageSize) {
+            imageInfo = await compressImageForExport(rawImageData, maxWidth, compressionQuality);
+          } else if (rawImageData) {
+            imageInfo = {
+              data: rawImageData,
+              originalSize: rawImageData.length,
+              compressedSize: rawImageData.length,
+              compressionRatio: 0,
+              note: useCompression ? 'No compression needed (small image)' : 'Compression disabled'
+            };
+          }
+        }
+
+        // Safely parse annotation points (for database data)
+        let annotationPoints = [];
+        try {
+          const points = annotation.points;
+          if (points) {
+            if (typeof points === 'string') {
+              annotationPoints = JSON.parse(points);
+            } else if (Array.isArray(points) || typeof points === 'object') {
+              annotationPoints = points;
+            }
+          }
+        } catch (error) {
+          console.warn('Failed to parse annotation points for annotation', annotation.id, ':', error);
+          annotationPoints = [];
+        }
+
+        return {
+          // Annotation data (handle both field name formats)
+          annotationId: annotation.id,
+          annotationTimestamp: annotation.timestamp || annotation.created_at,
+          annotationType: annotation.annotationType || annotation.type || 'polygon',
+          annotationPoints: annotationPoints,
+          
+          // Medical attributes (handle both field name formats)
+          nerveType: annotation.nerveType || annotation.nerve_type,
+          sideOfBody: annotation.sideOfBody || annotation.side_of_body,
+          patientPosition: annotation.patientPosition || annotation.patient_position,
+          visibility: annotation.visibility,
+          patientAgeGroup: annotation.patientAgeGroup || annotation.patient_age_group,
+          needleApproach: annotation.needleApproach || annotation.needle_approach,
+          clinicalNotes: annotation.clinicalNotes || annotation.clinical_notes,
+          
+          // Image data (handle both field name formats)
+          imageId: annotation.imageId || annotation.image_id,
+          imageName: associatedImage?.filename || associatedImage?.name || associatedImage?.file_name || associatedImage?.imageName || 'Unknown',
+          imageData: imageInfo.data,
+          imageSize: associatedImage?.fileSize || associatedImage?.file_size || associatedImage?.size,
+          imageType: associatedImage?.fileType || associatedImage?.file_type || associatedImage?.type || associatedImage?.mimeType,
+          imageUploadedAt: associatedImage?.uploadedAt || associatedImage?.uploaded_at || associatedImage?.created_at,
+          imageCompression: useCompression ? {
+            originalSize: imageInfo.originalSize || 0,
+            compressedSize: imageInfo.compressedSize || 0,
+            compressionRatio: imageInfo.compressionRatio || 0,
+            note: imageInfo.note || imageInfo.compressionNote
+          } : undefined
+        };
+      }));
+
+      // Create export data structure
+      const exportData = {
+        sessionInfo: {
+          id: sessionData.id,
+          title: sessionData.title,
+          attendees: sessionData.attendees || sessionData.doctor_name,
+          category: sessionData.category,
+          startTime: sessionData.startTime || sessionData.start_time,
+          endTime: sessionData.endTime || sessionData.end_time,
+          totalAnnotations: annotationsData.length,
+          totalImages: imagesData.length,
+          status: sessionData.status
+        },
+        format: 'flattened_annotation_image_pairs',
+        description: `Session export with annotation-image pairs in flattened format (${dataSource})`,
+        annotations: flattenedAnnotations
+      };
+
+      return exportData;
+    }
+
+    // Updated annotation room export function (now uses unified export)
     async function exportSessionData() {
       if (!currentSession) {
         showToast('No active session to export', 'error');
         return;
       }
       
-      const sessionDuration = Date.now() - sessionStartTime;
+      console.log('📤 Exporting current session data');
       
-      console.log('📤 Exporting session data:');
-      console.log('- Session annotations:', sessionAnnotations.length);
-      console.log('- Session images:', sessionImages.length);
-      console.log('- Current session annotations:', currentSession.annotations?.length || 0);
-      
-      // Use ONLY current session annotations (not localStorage)
       const currentSessionAnnotations = sessionAnnotations || [];
       
-      showToast('Preparing export with image compression...', 'info');
-      
-      // Create flattened annotation-image pairs for CURRENT SESSION ONLY
-      const flattenedAnnotations = await Promise.all(currentSessionAnnotations.map(async (annotation) => {
-        const associatedImage = sessionImages.find(img => img.id === annotation.imageId);
-        
-        // Compress image data if it exists
-        let imageInfo = {
-          data: null,
-          compressionNote: 'No image data available'
-        };
-        
-        if (associatedImage?.data) {
-          if (associatedImage.data.length > 100000) { // If larger than ~100KB, compress
-            imageInfo = await compressImageForExport(associatedImage.data, 800, 0.8);
-          } else {
-            imageInfo = {
-              data: associatedImage.data,
-              originalSize: associatedImage.data.length,
-              compressedSize: associatedImage.data.length,
-              compressionRatio: 0,
-              note: 'No compression needed (small image)'
-            };
+      try {
+        const exportData = await createUnifiedExport(
+          currentSession,
+          currentSessionAnnotations,
+          sessionImages,
+          {
+            useCompression: true,
+            dataSource: 'current_session',
+            maxImageSize: 100000,
+            compressionQuality: 0.8,
+            maxWidth: 800
           }
-        }
+        );
+
+        const filename = `session_${currentSession.id}_${currentSession.category}_${new Date().toISOString().split('T')[0]}.json`;
+        downloadJSON(exportData, filename);
         
-        return {
-          // Annotation data
-          annotationId: annotation.id,
-          annotationTimestamp: annotation.timestamp,
-          annotationType: annotation.annotationType,
-          annotationPoints: annotation.points,
-          
-          // Medical attributes
-          nerveType: annotation.nerveType,
-          sideOfBody: annotation.sideOfBody,
-          patientPosition: annotation.patientPosition,
-          visibility: annotation.visibility,
-          patientAgeGroup: annotation.patientAgeGroup,
-          needleApproach: annotation.needleApproach,
-          clinicalNotes: annotation.clinicalNotes,
-          
-          // Image data paired with annotation (current session only)
-          imageId: annotation.imageId,
-          imageName: annotation.imageName,
-          imageData: imageInfo.data,
-          imageSize: associatedImage?.size || associatedImage?.fileSize || null,
-          imageType: associatedImage?.type || associatedImage?.fileType || null,
-          imageUploadedAt: associatedImage?.uploadedAt || null,
-          imageCompression: {
-            originalSize: imageInfo.originalSize || 0,
-            compressedSize: imageInfo.compressedSize || 0,
-            compressionRatio: imageInfo.compressionRatio || 0,
-            note: imageInfo.note || imageInfo.compressionNote
-          }
-        };
-      }));
-      
-      const exportData = {
-        sessionInfo: {
-          id: currentSession.id,
-          title: currentSession.title,
-          attendees: currentSession.doctor_name,
-          category: currentSession.category,
-          startTime: currentSession.startTime,
-          exportTime: new Date().toISOString(),
-          duration: sessionDuration,
-          totalAnnotations: currentSessionAnnotations.length,
-          totalImages: sessionImages.length
-        },
-        format: 'flattened_annotation_image_pairs',
-        description: 'Session export with annotation-image pairs in flattened format (CURRENT SESSION ONLY)',
-        dataSource: 'current_session_only',
-        compressionInfo: 'Images automatically compressed for optimal file size',
-        annotations: flattenedAnnotations
-      };
-      
-      const filename = `session_${currentSession.id}_${currentSession.category}_${new Date().toISOString().split('T')[0]}.json`;
-      downloadJSON(exportData, filename);
-      
-      showToast(`Session data exported with ${currentSessionAnnotations.length} annotations from current session only!`, 'success');
-      console.log('📤 Current session data exported with compression:', exportData);
+        showToast(`Session data exported with ${currentSessionAnnotations.length} annotations from current session!`, 'success');
+        console.log('📤 Current session data exported:', exportData);
+        
+      } catch (error) {
+        console.error('❌ Export failed:', error);
+        showToast('Export failed - please try again', 'error');
+      }
     }
 
     function endSession() {
@@ -1618,6 +1796,11 @@
       showToast(`Session #${endedSessionId} ended successfully! You can start a new session.`, 'success');
       
       console.log('✅ Session data cleared, ready for new session');
+      
+      // Redirect to home page immediately after session cleanup
+      console.log('🏠 Redirecting to home page...');
+      showToast('Redirecting to home page...', 'info');
+      window.location.href = 'home-clean.html';
     }
 
     // Predefined Medical Attributes for Ultrasound-Guided Regional Anesthesia
@@ -1923,6 +2106,11 @@
           console.log('📝 VIA annotation stored, waiting for user to set attributes and save manually');
           showToast('Polygon created! Set your attributes and click "Save Annotation"', 'info');
           break;
+        case 'save_current_annotation':
+          console.log('💾 Save current annotation requested from VIA');
+          // Save current annotation and move to next image
+          saveCurrentAnnotation();
+          break;
         case 'annotations_export':
           console.log('📤 VIA requested export, but ignoring to prevent unwanted popups during save');
           // No automatic export - only allow manual export from End Session modal
@@ -2217,7 +2405,6 @@
         totalAnnotations: flattenedAnnotations.length,
         format: 'flattened_annotation_image_pairs',
         description: 'Current session annotations with paired image data',
-        dataSource: 'current_session_only',
         annotations: flattenedAnnotations
       };
       
@@ -2321,7 +2508,6 @@
         totalAnnotations: allCurrentAnnotations.length,
         format: 'flattened_annotation_image_pairs',
         description: 'Current session annotations with paired image data (VIA + Session)',
-        dataSource: 'current_session_only',
         annotations: allCurrentAnnotations
       };
       
@@ -2506,6 +2692,41 @@
       console.log('✅ Dropdown menus populated with medical attributes');
     }
 
+    // Load unique doctors for dropdown
+    async function loadUniqueDoctors() {
+      console.log('👨‍⚕️ Loading unique doctors for dropdown...');
+      
+      try {
+        if (!window.electronAPI || !window.electronAPI.dbGetUniqueDoctors) {
+          console.warn('👨‍⚕️ Database API not available for doctors');
+          return;
+        }
+
+        const result = await window.electronAPI.dbGetUniqueDoctors();
+        
+        if (result.success && result.doctors && Array.isArray(result.doctors)) {
+          const doctorsList = document.getElementById('doctorsList');
+          if (doctorsList) {
+            // Clear existing options
+            doctorsList.innerHTML = '';
+            
+            // Add each unique doctor as an option
+            result.doctors.forEach(doctor => {
+              const option = document.createElement('option');
+              option.value = doctor;
+              doctorsList.appendChild(option);
+            });
+            
+            console.log(`👨‍⚕️ Loaded ${result.doctors.length} unique doctors:`, result.doctors);
+          }
+        } else {
+          console.warn('👨‍⚕️ No doctors found or failed to load');
+        }
+      } catch (error) {
+        console.error('❌ Failed to load unique doctors:', error);
+      }
+    }
+
     // Initialize Application
     document.addEventListener('DOMContentLoaded', function() {
       console.log('🏥 Annotation Whiteboard initialized');
@@ -2513,6 +2734,9 @@
       
       // Populate dropdown menus first
       populateDropdowns();
+      
+      // Load unique doctors for dropdown
+      loadUniqueDoctors();
       
       // Check for existing session data from home page
       const storedSession = localStorage.getItem('currentSession');
@@ -2632,44 +2856,120 @@
     `;
     document.head.appendChild(toastStyles);
 
-    // Keyboard Shortcuts
+    // Simple keyboard shortcuts test
+    console.log('🔴 Script loaded, testing keyboard shortcuts...');
+    
+    // Add universal keyboard shortcuts that work anywhere
     document.addEventListener('keydown', function(e) {
+      console.log('🔴 Key pressed:', e.key, 'Code:', e.code, 'Ctrl:', e.ctrlKey, 'Target:', e.target.tagName);
+      
+      // Only proceed if not typing in an input field
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+        console.log('🔴 Ignoring key in input field');
+        return;
+      }
+      
+      let handled = false;
+      
       // Escape to close modals or go back
       if (e.key === 'Escape') {
         // Close modals first
         if (document.getElementById('startSessionModal').classList.contains('active')) {
           closeStartSessionModal();
-          return;
-        }
-        if (document.getElementById('endSessionModal').classList.contains('active')) {
+          handled = true;
+        } else if (document.getElementById('endSessionModal').classList.contains('active')) {
           closeEndSessionModal();
-          return;
-        }
-        
-        if (annotationMode && currentPolygon.length > 0) {
-          // Cancel current polygon
-          currentPolygon = [];
-          redrawCanvas();
-          showToast('Current polygon cancelled', 'info');
+          handled = true;
+        } else if (document.getElementById('keyboardShortcutsModal').classList.contains('active')) {
+          closeKeyboardShortcutsModal();
+          handled = true;
         } else if (document.getElementById('viaContainer').classList.contains('active')) {
-          if (confirm('Exit annotation mode? Unsaved work will be lost.')) {
-            clearAnnotations();
+          // Cancel current polygon in VIA
+          try {
+            const viaFrame = document.getElementById('via_image_annotator');
+            const viaWindow = viaFrame.contentWindow;
+            
+            if (viaWindow) {
+              viaWindow.postMessage({
+                type: 'cancel_polygon'
+              }, '*');
+              showToast('Current polygon cancelled', 'info');
+              handled = true;
+            }
+          } catch (error) {
+            console.log('⚠️ Could not communicate with VIA for polygon cancel:', error);
           }
         } else {
           window.location.href = 'home-clean.html';
+          handled = true;
+        }
+      }
+      
+      // Enter to complete polygon
+      else if (e.key === 'Enter') {
+        if (document.getElementById('viaContainer').classList.contains('active')) {
+          try {
+            const viaFrame = document.getElementById('via_image_annotator');
+            const viaWindow = viaFrame.contentWindow;
+            
+            if (viaWindow) {
+              viaWindow.postMessage({
+                type: 'complete_polygon'
+              }, '*');
+              showToast('Polygon completed', 'success');
+              handled = true;
+            }
+          } catch (error) {
+            console.log('⚠️ Could not communicate with VIA for polygon completion:', error);
+            showToast('Press Enter in the VIA annotation area to complete polygon', 'info');
+          }
+        }
+      }
+      
+      // Space to end session
+      else if (e.key === ' ') {
+        const endSessionBtn = document.getElementById('endSessionBtn');
+        if (endSessionBtn && endSessionBtn.style.display !== 'none' && 
+            !document.getElementById('startSessionModal').classList.contains('active') && 
+            !document.getElementById('endSessionModal').classList.contains('active')) {
+          showEndSessionModal();
+          handled = true;
+        }
+      }
+      
+      // Ctrl+S to save annotation
+      else if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        const saveBtn = document.getElementById('saveAnnotationBtn');
+        if (saveBtn && saveBtn.style.display !== 'none') {
+          saveCurrentAnnotation();
+          handled = true;
+        } else {
+          showToast('No annotation to save. Complete a polygon first.', 'info');
+          handled = true;
         }
       }
       
       // Ctrl+E to export
-      if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
-        e.preventDefault();
+      else if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
         exportAnnotations();
+        handled = true;
       }
       
       // Ctrl+U to upload
-      if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
-        e.preventDefault();
+      else if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
         uploadImages();
+        handled = true;
+      }
+      
+      // Help shortcut
+      else if (e.key === 'F1' || (e.ctrlKey && e.key === '/')) {
+        toggleKeyboardShortcuts();
+        handled = true;
+      }
+      
+      if (handled) {
+        e.preventDefault();
+        e.stopPropagation();
       }
     });
 
@@ -2682,6 +2982,10 @@
       // End Session Modal
       if (e.target.id === 'endSessionModal') {
         closeEndSessionModal();
+      }
+      // Keyboard Shortcuts Modal
+      if (e.target.id === 'keyboardShortcutsModal') {
+        closeKeyboardShortcutsModal();
       }
     });
   </script>

@@ -6,22 +6,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Navigation
   navigate: (page) => ipcRenderer.invoke('navigate', page),
   
-  // Webex-related APIs
-  webexOAuth: (authUrl) => ipcRenderer.invoke('webex-oauth', authUrl),
-  openExternal: (url) => ipcRenderer.invoke('open-external', url),
   
   // System info
   getSystemInfo: () => ipcRenderer.invoke('get-system-info'),
   
-  // Media device access
-  getMediaDevices: () => ipcRenderer.invoke('get-media-devices'),
-  
-  // Window management for video calls
-  openVideoWindow: (options) => ipcRenderer.invoke('open-video-window', options),
-  closeVideoWindow: () => ipcRenderer.invoke('close-video-window'),
-  
-  // Screen capture for ultrasound sharing
-  getScreenSources: () => ipcRenderer.invoke('get-screen-sources'),
+
+
   
   // Notification system
   showNotification: (title, body) => ipcRenderer.invoke('show-notification', title, body),
@@ -40,6 +30,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   dbGetAnnotation: (annotationId) => ipcRenderer.invoke('db-get-annotation', annotationId),
   dbGetAnnotationStats: () => ipcRenderer.invoke('db-get-annotation-stats'),
   dbClearDatabase: () => ipcRenderer.invoke('db-clear-database'),
+  dbHealthCheck: () => ipcRenderer.invoke('db-health-check'),
+  dbGetUniqueDoctors: () => ipcRenderer.invoke('db-get-unique-doctors'),
   
   // App lifecycle
   onAppReady: (callback) => ipcRenderer.on('app-ready', callback),

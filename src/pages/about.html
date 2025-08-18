@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About - UltraAnnotate Platform</title>
+  <title>About - Neurotate Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <style>
     * {
@@ -17,8 +17,8 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-      color: #1e293b;
+      background: #fefefe;
+      color: #2d3748;
       min-height: 100vh;
       overflow-x: hidden;
     }
@@ -31,19 +31,20 @@
     /* Sidebar */
     .sidebar {
       width: 280px;
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
-      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      border-right: 1px solid #e2e8f0;
       display: flex;
       flex-direction: column;
       position: fixed;
       height: 100vh;
       z-index: 1000;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
     .sidebar-header {
       padding: 1.5rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid #e2e8f0;
     }
 
     .logo {
@@ -59,39 +60,41 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      font-family: 'Orbitron', 'Inter', sans-serif;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
 
     .sidebar-menu {
       flex: 1;
-      padding: 1.5rem 1rem;
+      padding: 1rem 0;
     }
 
     .nav-item {
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      padding: 0.75rem 1rem;
+      padding: 0.875rem 1.5rem;
       text-decoration: none;
-      color: #94a3b8;
-      border-radius: 0.5rem;
-      margin-bottom: 0.5rem;
+      color: #64748b;
       transition: all 0.2s ease;
+      border-left: 3px solid transparent;
     }
 
     .nav-item:hover {
-      background: rgba(255, 255, 255, 0.05);
-      color: #e2e8f0;
+      background: rgba(59, 130, 246, 0.1);
+      color: #1e293b;
     }
 
     .nav-item.active {
       background: rgba(59, 130, 246, 0.1);
       color: #3b82f6;
-      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-left-color: #3b82f6;
     }
 
     .sidebar-user {
       padding: 1rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-top: 1px solid #e2e8f0;
       display: flex;
       align-items: center;
       gap: 0.75rem;
@@ -116,13 +119,13 @@
     .user-name {
       display: block;
       font-weight: 500;
-      color: #e2e8f0;
+      color: #374151;
     }
 
     .user-email {
       display: block;
       font-size: 0.75rem;
-      color: #94a3b8;
+      color: #6b7280;
     }
 
     .logout-btn {
@@ -144,6 +147,9 @@
       flex: 1;
       margin-left: 280px;
       padding: 2rem;
+      width: calc(100vw - 280px);
+      max-width: calc(100vw - 280px);
+      box-sizing: border-box;
     }
 
     .page-header {
@@ -162,7 +168,7 @@
     }
 
     .page-subtitle {
-      color: #94a3b8;
+      color: #6b7280;
       font-size: 1.25rem;
       max-width: 600px;
       margin: 0 auto;
@@ -170,18 +176,19 @@
 
     /* Content Sections */
     .content-section {
-      background: rgba(30, 41, 59, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid #e5e7eb;
       border-radius: 1rem;
       padding: 2rem;
       margin-bottom: 2rem;
       backdrop-filter: blur(10px);
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     }
 
     .section-title {
       font-size: 1.5rem;
       font-weight: 600;
-      color: #e2e8f0;
+      color: #1f2937;
       margin-bottom: 1rem;
       display: flex;
       align-items: center;
@@ -189,7 +196,7 @@
     }
 
     .section-content {
-      color: #94a3b8;
+      color: #4b5563;
       line-height: 1.6;
     }
 
@@ -201,11 +208,12 @@
     }
 
     .feature-card {
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #e5e7eb;
       border-radius: 0.75rem;
       padding: 1.5rem;
       text-align: center;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     }
 
     .feature-icon {
@@ -216,13 +224,13 @@
     .feature-title {
       font-size: 1.1rem;
       font-weight: 600;
-      color: #e2e8f0;
+      color: #1f2937;
       margin-bottom: 0.5rem;
     }
 
     .feature-description {
       font-size: 0.875rem;
-      color: #94a3b8;
+      color: #6b7280;
     }
 
     .team-grid {
@@ -252,13 +260,13 @@
     .member-name {
       font-size: 1.1rem;
       font-weight: 600;
-      color: #e2e8f0;
+      color: #1f2937;
       margin-bottom: 0.25rem;
     }
 
     .member-role {
       font-size: 0.875rem;
-      color: #94a3b8;
+      color: #6b7280;
     }
 
     .stats-grid {
@@ -269,11 +277,12 @@
     }
 
     .stat-card {
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #e5e7eb;
       border-radius: 0.75rem;
       padding: 1.5rem;
       text-align: center;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     }
 
     .stat-number {
@@ -285,7 +294,7 @@
 
     .stat-label {
       font-size: 0.875rem;
-      color: #94a3b8;
+      color: #6b7280;
       margin-top: 0.5rem;
     }
 
@@ -297,16 +306,17 @@
     }
 
     .contact-card {
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #e5e7eb;
       border-radius: 0.75rem;
       padding: 1.5rem;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     }
 
     .contact-title {
       font-size: 1.1rem;
       font-weight: 600;
-      color: #e2e8f0;
+      color: #1f2937;
       margin-bottom: 1rem;
       display: flex;
       align-items: center;
@@ -314,7 +324,7 @@
     }
 
     .contact-info {
-      color: #94a3b8;
+      color: #4b5563;
       line-height: 1.6;
     }
 
@@ -336,6 +346,8 @@
       .main-content {
         margin-left: 0;
         padding: 1rem;
+        width: 100vw;
+        max-width: 100vw;
       }
       
       .page-title {
@@ -367,7 +379,7 @@
               </linearGradient>
             </defs>
           </svg>
-          <h2>UltraAnnotate</h2>
+          <h2>Neurotate</h2>
         </div>
       </div>
       
@@ -378,14 +390,7 @@
           </svg>
           <span>Home</span>
         </a>
-        
-        <a href="test.html" class="nav-item">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M2 5C2 3.89543 2.89543 3 4 3H16C17.1046 3 18 3.89543 18 5V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span>Test</span>
-        </a>
+
         
         <a href="library.html" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -423,124 +428,283 @@
           <span>About</span>
         </a>
       </div>
-      
+    </nav>  
 
 
     <!-- Main Content -->
     <main class="main-content">
       <div class="page-header">
-        <h1 class="page-title">About UltraAnnotate Platform</h1>
-        <p class="page-subtitle">Local annotation platform for ultrasound experts to educate trainees and collaborate with peers through screen sharing</p>
+        <h1 class="page-title">About Neurotate Platform</h1>
+        <p class="page-subtitle">Developed through UCL's Industry Exchange Network (IXN) programme under the supervision of Prof. Dean Mohamedally from MotionInput Games</p>
       </div>
 
-      <!-- Mission Section -->
+      <!-- About Box Section -->
+      <div class="content-section" style="border: 2px solid #3b82f6; background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%);">
+        <h2 class="section-title">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+            <path d="M10 6V10L13 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          About Neurotate
+        </h2>
+        <div class="section-content" style="text-align: center; padding: 1.5rem;">
+          <div style="background: rgba(255, 255, 255, 0.9); border-radius: 0.75rem; padding: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+            <h3 style="font-size: 1.5rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">Neurotate</h3>
+            <p style="font-size: 1.1rem; color: #374151; margin-bottom: 1rem;">
+              Developed by <strong>Doruk Ustay</strong>, MSc Computer Science<br>
+              Supervised by <strong>Prof Dean Mohamedally</strong><br>
+              In collaboration with <strong>Intel Corp</strong> and <strong>Cisco</strong>
+            </p>
+            <p style="font-size: 1rem; color: #6b7280; margin-bottom: 1.5rem;">
+              <strong>University College London</strong> © 2025+<br>
+              Published by <strong>MotionInput Games Ltd</strong>
+            </p>
+            
+            <!-- VGG Image Annotator Attribution -->
+            <div style="border-top: 1px solid #e5e7eb; padding-top: 1.5rem; margin-top: 1.5rem;">
+              <h4 style="font-size: 1.1rem; font-weight: 600; color: #1f2937; margin-bottom: 0.75rem;">Open Source Attribution</h4>
+              <p style="font-size: 0.9rem; color: #6b7280; text-align: left; line-height: 1.6;">
+                This application integrates the <strong>VGG Image Annotator (VIA)</strong> developed by the Visual Geometry Group at the University of Oxford. 
+                VIA is released under the BSD-2-Clause License and provides the core image annotation functionality within Neurotate.
+              </p>
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem; margin-top: 1rem; text-align: left;">
+                <p style="font-size: 0.85rem; color: #374151; margin-bottom: 0.5rem;"><strong>VGG Image Annotator (VIA)</strong></p>
+                <p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 0.5rem;">
+                  Copyright © 2016-2023, Visual Geometry Group, University of Oxford<br>
+                  Licensed under BSD-2-Clause License
+                </p>
+                <p style="font-size: 0.8rem; color: #6b7280;">
+                  Homepage: <a href="https://www.robots.ox.ac.uk/~vgg/software/via/" target="_blank" style="color: #3b82f6; text-decoration: none;">https://www.robots.ox.ac.uk/~vgg/software/via/</a><br>
+                  Source: <a href="https://gitlab.com/vgg/via" target="_blank" style="color: #3b82f6; text-decoration: none;">https://gitlab.com/vgg/via</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Academic Development Section -->
       <div class="content-section">
         <h2 class="section-title">
-          Our Mission
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 2L13 5L10 8L7 5L10 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10 12V18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7 15L13 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Academic Development
         </h2>
         <div class="section-content">
-          <p>UltraAnnotate is a locally-running annotation platform designed specifically for ultrasound experts to efficiently annotate medical imagery while simultaneously sharing their screens in any web conferencing tool. This enables real-time education of trainees and collaborative consultation with peers.</p>
-          <p style="margin-top: 1rem;">Our platform eliminates the need for proprietary video conferencing solutions by providing powerful local annotation tools that work seamlessly with your existing communication infrastructure, whether it's Zoom, Teams, Google Meet, or any other screen sharing solution.</p>
+          <p>Neurotate was developed as part of the <strong>UCL Industry Exchange Network (IXN)</strong> programme, a prestigious initiative that bridges academic research with real-world industry applications. This project represents the culmination of intensive research and development in medical technology innovation.</p>
+          <p style="margin-top: 1rem;">Under the expert supervision of <strong>Professor Dean Mohamedally</strong> from <strong>MotionInput Games</strong>, this platform demonstrates the power of interdisciplinary collaboration between computer science, medical technology, and human-computer interaction research.</p>
         </div>
       </div>
 
-      <!-- Features Section -->
+      <!-- Supervision & Mentorship Section -->
       <div class="content-section">
         <h2 class="section-title">
-          Key Features
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="10" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+            <path d="M6 21V19C6 16.7909 7.79086 15 10 15C12.2091 15 14 16.7909 14 19V21" stroke="currentColor" stroke-width="2"/>
+            <path d="M15 8C16.1046 8 17 7.10457 17 6C17 4.89543 16.1046 4 15 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Academic Supervision
         </h2>
-        <div class="features-grid">
-          <div class="feature-card">
-            <div class="feature-icon"></div>
-            <div class="feature-title">Local Annotation Tools</div>
-            <div class="feature-description">Powerful annotation capabilities running entirely on your local machine for optimal performance and privacy</div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon"></div>
-            <div class="feature-title">Real-Time Screen Sharing</div>
-            <div class="feature-description">Share your annotated ultrasound images instantly through any web conferencing platform of your choice</div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon"></div>
-            <div class="feature-title">Universal Compatibility</div>
-            <div class="feature-description">Works with Zoom, Teams, Google Meet, or any screen sharing solution - no proprietary video platform required</div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon"></div>
-            <div class="feature-title">Session Library</div>
-            <div class="feature-description">Local storage of annotations and sessions for easy reference, teaching materials, and case studies</div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon"></div>
-            <div class="feature-title">Expert-Designed Interface</div>
-            <div class="feature-description">Purpose-built for medical professionals with intuitive tools for efficient ultrasound annotation workflows</div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon"></div>
-            <div class="feature-title">Educational Focus</div>
-            <div class="feature-description">Specialized features for training scenarios, peer consultation, and knowledge transfer in medical settings</div>
+        <div class="section-content">
+          <p><strong>Professor Dean Mohamedally</strong> provided invaluable guidance throughout the development process, bringing extensive expertise in:</p>
+          <ul style="margin-top: 1rem; padding-left: 2rem; color: #94a3b8;">
+            <li>Human-Computer Interaction (HCI) design principles</li>
+            <li>Accessible technology development</li>
+            <li>Motion-based input systems and gesture recognition</li>
+            <li>Educational technology platforms</li>
+            <li>Industry-academic collaboration frameworks</li>
+          </ul>
+          <p style="margin-top: 1rem;">The mentorship from MotionInput Games ensured that Neurotate not only meets academic standards but also addresses real-world medical education challenges with innovative, practical solutions.</p>
+        </div>
+      </div>
+
+      <!-- UCL IXN Programme Section -->
+      <div class="content-section">
+        <h2 class="section-title">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="4" width="14" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+            <path d="M3 6L10 11L17 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="16" cy="8" r="2" fill="currentColor"/>
+          </svg>
+          UCL Industry Exchange Network
+        </h2>
+        <div class="section-content">
+          <p>The <strong>UCL IXN programme</strong> is a unique academic initiative that connects students with industry partners to tackle complex, real-world challenges. This programme emphasizes:</p>
+          <div class="features-grid" style="margin-top: 1.5rem;">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 11H15M12 8V14M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="feature-title">Research Excellence</div>
+              <div class="feature-description">Combining rigorous academic research with practical industry applications</div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="currentColor" stroke-width="2"/>
+                  <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </div>
+              <div class="feature-title">Industry Partnership</div>
+              <div class="feature-description">Direct collaboration with leading technology companies and research organizations</div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L3 7L12 12L21 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M3 17L12 22L21 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M3 12L12 17L21 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="feature-title">Innovation Focus</div>
+              <div class="feature-description">Developing cutting-edge solutions to contemporary technological challenges</div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                  <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="feature-title">Real-World Impact</div>
+              <div class="feature-description">Creating technologies that address genuine market needs and user requirements</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Statistics Section -->
+      <!-- Project Vision Section -->
       <div class="content-section">
         <h2 class="section-title">
-          Platform Statistics
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 3C6.13401 3 3 6.13401 3 10C3 13.866 6.13401 17 10 17C13.866 17 17 13.866 17 10C17 6.13401 13.866 3 10 3Z" stroke="currentColor" stroke-width="2"/>
+            <path d="M10 7V10L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Project Vision
+        </h2>
+        <div class="section-content">
+          <p>Neurotate represents a paradigm shift in medical education technology, moving away from proprietary, cloud-dependent solutions toward:</p>
+          <ul style="margin-top: 1rem; padding-left: 2rem; color: #94a3b8;">
+            <li><strong>Privacy-First Architecture:</strong> All medical data remains on local machines, ensuring HIPAA compliance and patient confidentiality</li>
+            <li><strong>Universal Compatibility:</strong> Works with any existing video conferencing platform, eliminating vendor lock-in</li>
+            <li><strong>Accessibility Focus:</strong> Designed with Prof. Mohamedally's accessibility expertise to ensure inclusive medical education</li>
+            <li><strong>Cost-Effective Implementation:</strong> No subscription fees or cloud storage costs, making advanced annotation tools accessible to all medical institutions</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Technical Innovation Section -->
+      <div class="content-section">
+        <h2 class="section-title">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13 2L3 14H10L7 18L17 6H10L13 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Technical Innovation
+        </h2>
+        <div class="section-content">
+          <p>The development process incorporated cutting-edge research from multiple domains:</p>
+          <div class="features-grid" style="margin-top: 1.5rem;">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                  <path d="M12 1V3M12 21V23M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M1 12H3M21 12H23M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="feature-title">Neural Network Integration</div>
+              <div class="feature-description">Advanced annotation algorithms inspired by latest AI research</div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <circle cx="8" cy="12" r="2" stroke="currentColor" stroke-width="2"/>
+                  <path d="M14 10L18 14M14 14L18 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="feature-title">Motion Input Technology</div>
+              <div class="feature-description">Leveraging MotionInput Games' expertise in gesture-based interactions</div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="3" y="11" width="18" height="10" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                  <circle cx="12" cy="16" r="1" stroke="currentColor" stroke-width="2"/>
+                  <path d="M7 11V7C7 5.4087 7.63214 3.88258 8.75736 2.75736C9.88258 1.63214 11.4087 1 13 1C14.5913 1 16.1174 1.63214 17.2426 2.75736C18.3679 3.88258 19 5.4087 19 7V11" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </div>
+              <div class="feature-title">Security-by-Design</div>
+              <div class="feature-description">Built with privacy and security as fundamental architectural principles</div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <path d="M8 2V6M16 2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M2 10H22" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </div>
+              <div class="feature-title">Cross-Platform Compatibility</div>
+              <div class="feature-description">Electron-based architecture ensuring consistent experience across all platforms</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Academic Achievements Section -->
+      <div class="content-section">
+        <h2 class="section-title">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 1L13 7H19L14.5 11L16.5 17L10 13L3.5 17L5.5 11L1 7H7L10 1Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+          Academic Achievements
         </h2>
         <div class="stats-grid">
           <div class="stat-card">
+            <span class="stat-number">1st</span>
+            <div class="stat-label">Privacy-First Medical Platform</div>
+          </div>
+          <div class="stat-card">
             <span class="stat-number">100%</span>
-            <div class="stat-label">Local Data Privacy</div>
+            <div class="stat-label">Local Data Control</div>
           </div>
           <div class="stat-card">
-            <span class="stat-number">0ms</span>
-            <div class="stat-label">Network Latency</div>
+            <span class="stat-number">UCL</span>
+            <div class="stat-label">IXN Programme Success</div>
           </div>
           <div class="stat-card">
-            <span class="stat-number">Any</span>
-            <div class="stat-label">Video Platform Supported</div>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number">∞</span>
-            <div class="stat-label">Offline Annotation Capability</div>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number">Zero</span>
-            <div class="stat-label">Cloud Dependencies</div>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number">Local</span>
-            <div class="stat-label">Data Storage</div>
+            <span class="stat-number">2025</span>
+            <div class="stat-label">Innovation Year</div>
           </div>
         </div>
       </div>
 
-      <!-- Technology Section -->
+      <!-- Future Research Section -->
       <div class="content-section">
         <h2 class="section-title">
-          Technology Stack
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 13L10 10L13 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10 17V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M17 7C17 5.89543 16.1046 5 15 5H5C3.89543 5 3 5.89543 3 7V15C3 16.1046 3.89543 17 5 17H15C16.1046 17 17 16.1046 17 15V7Z" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          Future Research Directions
         </h2>
         <div class="section-content">
-          <p><strong>Frontend:</strong> Modern HTML5, CSS3, JavaScript with responsive design principles</p>
-          <p><strong>Local Processing:</strong> Electron framework for native desktop application performance</p>
-          <p><strong>Screen Sharing:</strong> Compatible with any web conferencing platform (Zoom, Teams, Google Meet, etc.)</p>
-          <p><strong>Data Security:</strong> All data stored locally on your machine - no cloud dependencies</p>
-          <p><strong>Annotation Engine:</strong> High-performance local image processing and annotation tools</p>
-          <p><strong>Cross-Platform:</strong> Windows, macOS, and Linux support with consistent user experience</p>
-        </div>
-      </div>
-
-      <!-- Version Info -->
-      <div class="content-section">
-        <h2 class="section-title">
-          Version Information
-        </h2>
-        <div class="section-content">
-          <p><strong>Current Version:</strong> 1.0.0</p>
-          <p><strong>Release Date:</strong> August 12, 2025</p>
-          <p><strong>Platform Support:</strong> Windows 10+, macOS 10.15+, Ubuntu 18.04+</p>
-          <p><strong>Last Updated:</strong> <span id="last-updated"></span></p>
+          <p>Building on the foundation established through the UCL IXN programme, future development will focus on:</p>
+          <ul style="margin-top: 1rem; padding-left: 2rem; color: #94a3b8;">
+            <li><strong>Enhanced Motion Control:</strong> Integrating advanced gesture recognition for hands-free annotation</li>
+            <li><strong>AI-Assisted Annotation:</strong> Machine learning models to suggest anatomical boundaries and structures</li>
+            <li><strong>Collaborative Features:</strong> Multi-user annotation sessions for team-based medical education</li>
+            <li><strong>Extended Modalities:</strong> Support for additional medical imaging types beyond ultrasound</li>
+            <li><strong>Accessibility Enhancements:</strong> Voice control and adaptive interfaces for users with disabilities</li>
+          </ul>
+          <p style="margin-top: 1rem;">The academic foundation provided by UCL and Prof. Mohamedally's guidance ensures that these future developments will maintain the highest standards of research excellence and practical applicability.</p>
         </div>
       </div>
     </main>

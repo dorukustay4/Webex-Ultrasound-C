@@ -470,14 +470,24 @@ function setupIPCHandlers() {
 
   // Delete session
   ipcMain.handle('db-delete-session', async (event, sessionId) => {
+    console.log('📨 IPC: Received delete session request for:', sessionId);
+    console.log('📨 IPC: Session ID type:', typeof sessionId);
+    console.log('📨 IPC: dbManager available:', !!dbManager);
+    
     try {
       if (!dbManager) {
+        console.error('❌ IPC: Database not initialized');
         throw new Error('Database not initialized');
       }
+      
+      console.log('📨 IPC: Calling dbManager.deleteSession...');
       const result = await dbManager.deleteSession(sessionId);
-      return { success: true, result };
+      console.log('📨 IPC: dbManager.deleteSession result:', result);
+      
+      // Return the result directly since deleteSession already returns the proper format
+      return result;
     } catch (error) {
-      console.error('❌ Failed to delete session:', error);
+      console.error('❌ IPC: Failed to delete session:', error);
       return { success: false, error: error.message };
     }
   });
@@ -493,6 +503,44 @@ function setupIPCHandlers() {
     } catch (error) {
       console.error('❌ Failed to get annotation stats:', error);
       return { success: false, error: error.message };
+    }
+  });
+
+  // Database health check
+  ipcMain.handle('db-health-check', async (event) => {
+    console.log('📨 IPC: Received database health check request');
+    
+    try {
+      if (!dbManager) {
+        console.error('❌ IPC: Database not initialized');
+        throw new Error('Database not initialized');
+      }
+      
+      const result = await dbManager.checkDatabaseHealth();
+      console.log('📨 IPC: Database health check result:', result);
+      return { success: true, ...result };
+    } catch (error) {
+      console.error('❌ IPC: Database health check failed:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Get unique doctors/attendees for dropdown
+  ipcMain.handle('db-get-unique-doctors', async (event) => {
+    console.log('📨 IPC: Received get unique doctors request');
+    
+    try {
+      if (!dbManager) {
+        console.error('❌ IPC: Database not initialized');
+        throw new Error('Database not initialized');
+      }
+      
+      const doctors = await dbManager.getUniqueDoctors();
+      console.log('📨 IPC: Returning unique doctors:', doctors);
+      return { success: true, doctors };
+    } catch (error) {
+      console.error('❌ IPC: Get unique doctors failed:', error);
+      return { success: false, error: error.message, doctors: [] };
     }
   });
 

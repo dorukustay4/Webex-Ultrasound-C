@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home - Ultrasound Annotation Platform</title>
+  <title>Home - Neurotate Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="../js/statistics-manager.js"></script>
   <style>
@@ -59,6 +59,9 @@
       background-clip: text;
       font-size: 1.25rem;
       font-weight: 700;
+      font-family: 'Orbitron', 'Inter', sans-serif;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
 
     .sidebar-menu {
@@ -378,7 +381,7 @@
               </linearGradient>
             </defs>
           </svg>
-          <h2>Ultrasound Annotation</h2>
+          <h2>Neurotate</h2>
         </div>
       </div>
       
@@ -390,13 +393,6 @@
           <span>Home</span>
         </a>
         
-        <a href="test.html" class="nav-item">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M2 5C2 3.89543 2.89543 3 4 3H16C17.1046 3 18 3.89543 18 5V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span>Test</span>
-        </a>
         
         <a href="library.html" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -439,7 +435,7 @@
     <!-- Main Content -->
     <main class="main-content">
       <header class="page-header">
-        <h1 class="page-title">Welcome to Ultrasound Annotation Dashboard</h1>
+        <h1 class="page-title">Welcome to Neurotate Dashboard</h1>
         <p class="page-subtitle">Your UGRA Annotation Hub — Track your contributions, monitor dataset growth, and see the impact your work has on building expert-validated training data for AI models.</p>
       </header>
 
@@ -451,7 +447,7 @@
           </svg>
           <div>
             <div style="font-weight: 600;">Start Session</div>
-            <div style="font-size: 0.8rem; opacity: 0.8;">Begin ultrasound annotation</div>
+            <div style="font-size: 0.8rem; opacity: 0.8;">Begin neural annotation</div>
           </div>
         </button>
       </div>
@@ -464,7 +460,7 @@
         
         <div class="stat-card" data-stat="annotations">
           <div class="stat-value">0</div>
-          <div class="stat-label">Annotations Created</div>
+          <div class="stat-label">Sessions</div>
         </div>
         
         <div class="stat-card" data-stat="time">
@@ -530,7 +526,10 @@
         
         <div class="form-group">
           <label class="form-label">Doctor Name</label>
-          <input type="text" class="form-input" id="doctorName" placeholder="e.g., Dr. Smith" required>
+          <input type="text" class="form-input" id="doctorName" list="doctorsList" placeholder="e.g., Dr. Smith" required>
+          <datalist id="doctorsList">
+            <!-- Previous doctors will be populated here -->
+          </datalist>
         </div>
         
         <div class="form-group">
@@ -872,6 +871,41 @@
       }
     }
 
+    // Load unique doctors for dropdown
+    async function loadUniqueDoctors() {
+      console.log('👨‍⚕️ Loading unique doctors for dropdown...');
+      
+      try {
+        if (!window.electronAPI || !window.electronAPI.dbGetUniqueDoctors) {
+          console.warn('👨‍⚕️ Database API not available for doctors');
+          return;
+        }
+
+        const result = await window.electronAPI.dbGetUniqueDoctors();
+        
+        if (result.success && result.doctors && Array.isArray(result.doctors)) {
+          const doctorsList = document.getElementById('doctorsList');
+          if (doctorsList) {
+            // Clear existing options
+            doctorsList.innerHTML = '';
+            
+            // Add each unique doctor as an option
+            result.doctors.forEach(doctor => {
+              const option = document.createElement('option');
+              option.value = doctor;
+              doctorsList.appendChild(option);
+            });
+            
+            console.log(`👨‍⚕️ Loaded ${result.doctors.length} unique doctors:`, result.doctors);
+          }
+        } else {
+          console.warn('👨‍⚕️ No doctors found or failed to load');
+        }
+      } catch (error) {
+        console.error('❌ Failed to load unique doctors:', error);
+      }
+    }
+
     function setupStatisticsRefresh() {
       // Set up event listeners for statistics refresh
       window.statisticsManager.setupStatisticsUpdater(loadStatistics);
@@ -1099,7 +1133,7 @@
 
     // Simple authentication check (no authentication required for local use)
     window.addEventListener('load', async () => {
-      console.log('🎯 Ultrasound Annotation Platform loaded successfully');
+      console.log('🎯 Neurotate Platform loaded successfully');
       
       // Initialize charts first
       initializeCharts();
@@ -1110,12 +1144,15 @@
       // Load chart data
       await loadChartData();
       
+      // Load unique doctors for dropdown
+      await loadUniqueDoctors();
+      
       // Set up automatic statistics refresh
       setupStatisticsRefresh();
       
       // Show welcome message
       setTimeout(() => {
-        showToast('Welcome to Ultrasound Annotation Platform!', 'info');
+        showToast('Welcome to Neurotate Platform!', 'info');
       }, 500);
     });
 

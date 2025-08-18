@@ -176,11 +176,11 @@ class StatisticsManager {
         imagesEl.textContent = this.formatNumber(stats.totalImages);
       }
 
-      // Update Annotations Created
+      // Update Sessions
       const annotationsEl = document.querySelector('[data-stat="annotations"] .stat-value') || 
                            document.querySelector(finalSelectors.totalAnnotations);
       if (annotationsEl) {
-        annotationsEl.textContent = this.formatNumber(stats.totalAnnotations);
+        annotationsEl.textContent = this.formatNumber(stats.totalSessions);
       }
 
       // Update Session Time

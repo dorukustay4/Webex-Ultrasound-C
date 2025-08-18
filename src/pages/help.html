@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Help - Ultrasound Annotation</title>
+  <title>Help - Neurotate</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <style>
     * {
@@ -17,33 +17,35 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #e2e8f0;
+      background: #fefefe;
+      color: #1e293b;
       min-height: 100vh;
-      overflow-x: hidden;
     }
 
     .app-container {
       display: flex;
       min-height: 100vh;
+      width: 100vw;
+      overflow-x: hidden;
     }
 
     /* Sidebar */
     .sidebar {
       width: 280px;
-      background: rgba(30, 41, 59, 0.95);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
-      border-right: 1px solid rgba(59, 130, 246, 0.2);
+      border-right: 1px solid #e2e8f0;
       display: flex;
       flex-direction: column;
       position: fixed;
       height: 100vh;
       z-index: 1000;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
     }
 
     .sidebar-header {
       padding: 1.5rem;
-      border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+      border-bottom: 1px solid #e2e8f0;
     }
 
     .logo {
@@ -59,6 +61,9 @@
       background-clip: text;
       font-size: 1.25rem;
       font-weight: 700;
+      font-family: 'Orbitron', 'Inter', sans-serif;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
 
     .sidebar-menu {
@@ -71,19 +76,19 @@
       align-items: center;
       gap: 0.75rem;
       padding: 0.875rem 1.5rem;
-      color: #94a3b8;
+      color: #64748b;
       text-decoration: none;
       transition: all 0.2s;
       border-left: 3px solid transparent;
     }
 
     .nav-item:hover {
-      background: rgba(59, 130, 246, 0.1);
-      color: #e2e8f0;
+      background: rgba(59, 130, 246, 0.05);
+      color: #1e293b;
     }
 
     .nav-item.active {
-      background: rgba(59, 130, 246, 0.15);
+      background: rgba(59, 130, 246, 0.1);
       color: #3b82f6;
       border-left-color: #3b82f6;
     }
@@ -93,6 +98,9 @@
       flex: 1;
       margin-left: 280px;
       padding: 2rem;
+      width: calc(100vw - 280px);
+      max-width: calc(100vw - 280px);
+      box-sizing: border-box;
     }
 
     .page-header {
@@ -110,26 +118,37 @@
     }
 
     .page-subtitle {
-      color: #94a3b8;
+      color: #475569;
       font-size: 1.1rem;
     }
 
     /* Help Content */
     .help-container {
-      max-width: 900px;
+      width: 100%;
+    }
+
+    .help-container * {
+      max-width: 100%;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      box-sizing: border-box;
     }
 
     .help-section {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.8);
       border-radius: 12px;
       margin-bottom: 2rem;
-      border: 1px solid rgba(59, 130, 246, 0.2);
+      border: 1px solid #e2e8f0;
       overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
     .help-section h2 {
       padding: 1.5rem;
-      border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+      border-bottom: 1px solid #e2e8f0;
       color: #3b82f6;
       font-size: 1.5rem;
       font-weight: 600;
@@ -140,39 +159,52 @@
 
     .help-content {
       padding: 1.5rem;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      overflow-x: hidden;
     }
 
     .help-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
       gap: 1.5rem;
       margin-top: 1rem;
     }
 
     .help-card {
-      background: rgba(30, 41, 59, 0.6);
+      background: rgba(248, 250, 252, 0.9);
       border-radius: 8px;
       padding: 1.5rem;
-      border: 1px solid rgba(59, 130, 246, 0.3);
+      border: 1px solid #e2e8f0;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
     .help-card h3 {
-      color: #10b981;
+      color: #059669;
       font-size: 1.1rem;
       font-weight: 600;
       margin-bottom: 1rem;
     }
 
     .help-card p {
-      color: #94a3b8;
+      color: #475569;
       line-height: 1.6;
       margin-bottom: 1rem;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
 
     .help-card ul, .help-card ol {
-      color: #94a3b8;
+      color: #475569;
       line-height: 1.6;
       padding-left: 1.5rem;
+      width: 100%;
+      max-width: 100%;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
 
     .help-card li {
@@ -182,6 +214,8 @@
     .step-list {
       list-style: none;
       padding: 0;
+      width: 100%;
+      max-width: 100%;
     }
 
     .step-list li {
@@ -190,8 +224,11 @@
       gap: 1rem;
       margin-bottom: 1rem;
       padding: 1rem;
-      background: rgba(59, 130, 246, 0.1);
+      background: rgba(59, 130, 246, 0.05);
       border-radius: 8px;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
     .step-number {
@@ -210,7 +247,7 @@
 
     .shortcut-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
       gap: 1rem;
       margin-top: 1rem;
     }
@@ -220,18 +257,21 @@
       justify-content: space-between;
       align-items: center;
       padding: 0.75rem 1rem;
-      background: rgba(30, 41, 59, 0.6);
+      background: rgba(248, 250, 252, 0.9);
       border-radius: 6px;
-      border: 1px solid rgba(59, 130, 246, 0.3);
+      border: 1px solid #e2e8f0;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
     .shortcut-action {
-      color: #e2e8f0;
+      color: #1e293b;
       font-weight: 500;
     }
 
     .shortcut-keys {
-      background: rgba(59, 130, 246, 0.2);
+      background: rgba(59, 130, 246, 0.1);
       color: #3b82f6;
       padding: 0.25rem 0.5rem;
       border-radius: 4px;
@@ -241,24 +281,27 @@
 
     .contact-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
       gap: 1.5rem;
       margin-top: 1rem;
     }
 
     .contact-card {
-      background: rgba(30, 41, 59, 0.6);
+      background: rgba(248, 250, 252, 0.9);
       border-radius: 8px;
       padding: 1.5rem;
-      border: 1px solid rgba(59, 130, 246, 0.3);
+      border: 1px solid #e2e8f0;
       text-align: center;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
     .contact-icon {
       width: 48px;
       height: 48px;
       margin: 0 auto 1rem;
-      background: rgba(59, 130, 246, 0.2);
+      background: rgba(59, 130, 246, 0.1);
       border-radius: 12px;
       display: flex;
       align-items: center;
@@ -266,14 +309,14 @@
     }
 
     .contact-title {
-      color: #10b981;
+      color: #059669;
       font-size: 1.1rem;
       font-weight: 600;
       margin-bottom: 0.5rem;
     }
 
     .contact-info {
-      color: #94a3b8;
+      color: #475569;
       margin-bottom: 1rem;
     }
 
@@ -295,7 +338,7 @@
     }
 
     .highlight {
-      background: rgba(59, 130, 246, 0.2);
+      background: rgba(59, 130, 246, 0.1);
       padding: 0.2rem 0.4rem;
       border-radius: 4px;
       color: #3b82f6;
@@ -319,6 +362,45 @@
       margin: 1rem 0;
       color: #6ee7b7;
     }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .main-content {
+        margin-left: 0;
+        padding: 1rem;
+        width: 100vw;
+        max-width: 100vw;
+      }
+      
+      .sidebar {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 1rem 0.5rem;
+        width: 100vw;
+        max-width: 100vw;
+      }
+      
+      .help-container {
+        padding: 0;
+        width: 100%;
+      }
+      
+      .help-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .shortcut-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -337,7 +419,7 @@
               </linearGradient>
             </defs>
           </svg>
-          <h2>Ultrasound Annotation</h2>
+          <h2>Neurotate</h2>
         </div>
       </div>
       
@@ -349,13 +431,7 @@
           <span>Home</span>
         </a>
         
-        <a href="test.html" class="nav-item">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M2 5C2 3.89543 2.89543 3 4 3H16C17.1046 3 18 3.89543 18 5V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M6 8L10 12L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span>Test</span>
-        </a>
+
         
         <a href="library.html" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -398,12 +474,88 @@
     <!-- Main Content -->
     <main class="main-content">
       <header class="page-header">
-        <h1 class="page-title">Help & Documentation</h1>
-        <p class="page-subtitle">Complete guide to using the Ultrasound Annotation System</p>
+        <h1 class="page-title">User Manual & Getting Started Guide</h1>
+        <p class="page-subtitle">Complete step-by-step guide for first-time users of the Neurotate System</p>
       </header>
 
       <div class="help-container">
-        <!-- Quick Start Guide -->
+        <!-- Welcome Section -->
+        <div class="help-section">
+          <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Welcome to Neurotate System
+          </h2>
+          <div class="help-content">
+            <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 2rem;">
+              This manual will guide you through every step of using the Neurotate System. Whether you're a medical professional new to digital annotation or familiar with other systems, this guide will help you become proficient quickly.
+            </p>
+            
+            <div class="help-grid">
+              <div class="help-card">
+                <h3>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                    <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+                    <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  What You'll Learn
+                </h3>
+                <ul>
+                  <li>How to set up and start your first annotation session</li>
+                  <li>Step-by-step annotation techniques for medical images</li>
+                  <li>Best practices for creating high-quality datasets</li>
+                  <li>Data management and export procedures</li>
+                </ul>
+              </div>
+
+              <div class="help-card">
+                <h3>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                    <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 6V10L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Time to Get Started
+                </h3>
+                <ul>
+                  <li><strong>Quick Start:</strong> 5 minutes to first annotation</li>
+                  <li><strong>Basic Proficiency:</strong> 30 minutes with this guide</li>
+                  <li><strong>Advanced Features:</strong> 1 hour of practice</li>
+                  <li><strong>Expert Level:</strong> Ongoing use and experience</li>
+                </ul>
+              </div>
+
+              <div class="help-card">
+                <h3>📋 Prerequisites</h3>
+                <ul>
+                  <li>Basic computer navigation skills</li>
+                  <li>Medical knowledge of ultrasound anatomy</li>
+                  <li>Understanding of nerve structures (for UGRA)</li>
+                  <li>Mouse or trackpad for precise annotation</li>
+                </ul>
+              </div>
+
+              <div class="help-card">
+                <h3>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                    <path d="M14.7 6.3C14.3 6 13.7 6 13.4 6.3L10 9.7L6.6 6.3C6.3 6 5.7 6 5.4 6.3C5.1 6.6 5.1 7.2 5.4 7.5L8.8 10.9L5.4 14.3C5.1 14.6 5.1 15.2 5.4 15.5C5.7 15.8 6.3 15.8 6.6 15.5L10 12.1L13.4 15.5C13.7 15.8 14.3 15.8 14.6 15.5C14.9 15.2 14.9 14.6 14.6 14.3L11.2 10.9L14.6 7.5C15 7.2 15 6.6 14.7 6.3Z" fill="currentColor"/>
+                    <rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+                  </svg>
+                  System Check
+                </h3>
+                <ul>
+                  <li>Ensure adequate screen resolution (1920x1080+)</li>
+                  <li>Verify sufficient RAM (8GB minimum)</li>
+                  <li>Check available storage space (2GB+)</li>
+                  <li>Test mouse scroll wheel functionality</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chapter 1: First Steps -->
         <div class="help-section">
           <h2>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -412,91 +564,600 @@
               <path d="M9 9H9.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
               <path d="M15 9H15.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
-            Quick Start Guide
+            Chapter 1: Your First Annotation Session
           </h2>
           <div class="help-content">
-            <p>Follow these steps to get started with annotating ultrasound images:</p>
+            <p>Let's create your first annotation session from start to finish. Follow these detailed steps:</p>
             
             <ol class="step-list">
               <li>
                 <div class="step-number">1</div>
                 <div>
-                  <strong>Start a New Session</strong><br>
-                  Navigate to the Home page and click <span class="highlight">"Start Session"</span>. This will initialize a new annotation session and take you to the annotation interface.
+                  <strong>Launch the Application</strong><br>
+                  Double-click the application icon or run the executable file. The system will initialize and show the main dashboard. Wait for the "Ready" indicator in the bottom status bar.
                 </div>
               </li>
               <li>
                 <div class="step-number">2</div>
                 <div>
-                  <strong>Upload Images</strong><br>
-                  Click the <span class="highlight">"Upload Images"</span> button to select your ultrasound images. You can upload multiple images at once.
+                  <strong>Navigate to Home Dashboard</strong><br>
+                  If not already there, click <span class="highlight">"Home"</span> in the left sidebar. You'll see the main dashboard with session statistics and the prominent "Start Session" button.
                 </div>
               </li>
               <li>
                 <div class="step-number">3</div>
                 <div>
-                  <strong>Configure Session Details</strong><br>
-                  Fill in the doctor name and select the appropriate category for your annotation session.
+                  <strong>Prepare Your Images</strong><br>
+                  Before starting, organize your ultrasound images in a folder. Supported formats include DICOM (.dcm), JPEG (.jpg), PNG (.png), and TIFF (.tiff). Ensure images are of good quality and properly labeled.
                 </div>
               </li>
               <li>
                 <div class="step-number">4</div>
                 <div>
-                  <strong>Start Annotating</strong><br>
-                  Use the annotation tools to mark nerve structures and other anatomical features in your images.
+                  <strong>Click "Start Session"</strong><br>
+                  The large blue button will take you to the session setup page. This is where you'll configure your annotation session parameters.
                 </div>
               </li>
               <li>
                 <div class="step-number">5</div>
                 <div>
-                  <strong>Save and Export</strong><br>
-                  Save your annotations and export the session data when complete.
+                  <strong>Upload Your Images</strong><br>
+                  Click "Upload Images" or drag files directly to the upload area. You can select multiple files at once. The system will show upload progress and validate each image format.
+                </div>
+              </li>
+              <li>
+                <div class="step-number">6</div>
+                <div>
+                  <strong>Configure Session Details</strong><br>
+                  Fill in the required information:
+                  <ul style="margin: 0.5rem 0; padding-left: 1rem;">
+                    <li><strong>Doctor Name:</strong> Your name or the annotating physician</li>
+                    <li><strong>Session Category:</strong> Choose from nerve blocks, vascular access, or custom</li>
+                    <li><strong>Patient Demographics:</strong> Age group and relevant clinical context</li>
+                    <li><strong>Notes:</strong> Any additional context about the image set</li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <div class="step-number">7</div>
+                <div>
+                  <strong>Enter Annotation Workspace</strong><br>
+                  Click "Begin Annotation" to enter the main annotation interface. The first image will load automatically, and annotation tools will be available on the left toolbar.
                 </div>
               </li>
             </ol>
+
+            <div class="tip">
+              <strong>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 5px; vertical-align: text-top;">
+                  <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="2"/>
+                  <path d="M8 12V8M8 4H8.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                First-Timer Tip:
+              </strong> Start with just 2-3 high-quality images for your first session. This helps you learn the tools without feeling overwhelmed.
+            </div>
           </div>
         </div>
 
-        <!-- Annotation Tools -->
+        <!-- Chapter 2: Understanding the Interface -->
+        <div class="help-section">
+          <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" stroke="currentColor" stroke-width="2"/>
+              <line x1="7" y1="2" x2="7" y2="22" stroke="currentColor" stroke-width="2"/>
+              <line x1="17" y1="2" x2="17" y2="22" stroke="currentColor" stroke-width="2"/>
+              <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Chapter 2: Understanding the Annotation Interface
+          </h2>
+          <div class="help-content">
+            <p>Once in the annotation workspace, you'll see several key areas. Let's explore each one:</p>
+            
+            <div class="help-grid">
+              <div class="help-card">
+                <h3>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                    <rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M3 8H17" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                  Main Image Area
+                </h3>
+                <p>The central workspace where your ultrasound image appears.</p>
+                <ul>
+                  <li>Images are automatically scaled to fit the viewport</li>
+                  <li>Use mouse wheel to zoom in/out for detail work</li>
+                  <li>Click and drag to pan around large images</li>
+                  <li>Double-click to reset to original view</li>
+                </ul>
+              </div>
+
+              <div class="help-card">
+                <h3>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                    <rect x="2" y="3" width="4" height="14" rx="1" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="4" cy="6" r="1" fill="currentColor"/>
+                    <circle cx="4" cy="10" r="1" fill="currentColor"/>
+                    <circle cx="4" cy="14" r="1" fill="currentColor"/>
+                    <path d="M8 6H18M8 10H18M8 14H18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                  Tool Palette (Left Side)
+                </h3>
+                <p>Contains all annotation tools and controls.</p>
+                <ul>
+                  <li><strong>Selection Tool:</strong> Default tool for selecting existing annotations</li>
+                  <li><strong>Polygon Tool:</strong> Primary tool for tracing nerve boundaries</li>
+                  <li><strong>Pan Tool:</strong> For moving around the image</li>
+                  <li><strong>Zoom Tools:</strong> Magnifying glass icons for zoom control</li>
+                </ul>
+              </div>
+
+              <div class="help-card">
+                <h3>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                    <path d="M14 2H6C4.89543 2 4 2.89543 4 4V16C4 17.1046 4.89543 18 6 18H14C15.1046 18 16 17.1046 16 16V4C16 2.89543 15.1046 2 14 2Z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M8 6H12M8 10H12M8 14H10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                  Properties Panel (Right Side)
+                </h3>
+                <p>Shows details and allows editing of selected annotations.</p>
+                <ul>
+                  <li>Medical attributes for each annotation</li>
+                  <li>Coordinate information and area measurements</li>
+                  <li>Color and visibility settings</li>
+                  <li>Clinical notes and observations</li>
+                </ul>
+              </div>
+
+              <div class="help-card">
+                <h3>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                    <rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <rect x="4" y="6" width="3" height="2" rx="1" fill="currentColor"/>
+                    <rect x="8" y="6" width="3" height="2" rx="1" fill="currentColor"/>
+                    <rect x="12" y="6" width="3" height="2" rx="1" fill="currentColor"/>
+                    <rect x="4" y="10" width="12" height="4" rx="1" stroke="currentColor" stroke-width="1"/>
+                  </svg>
+                  Image Navigator (Bottom)
+                </h3>
+                <p>Thumbnail strip for multi-image sessions.</p>
+                <ul>
+                  <li>Click thumbnails to switch between images</li>
+                  <li>Progress indicator shows annotation status</li>
+                  <li>Keyboard arrows also navigate between images</li>
+                  <li>Context menu for image-specific operations</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="warning">
+              <strong>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 5px; vertical-align: text-top;">
+                  <path d="M8 1L15 15H1L8 1Z" stroke="currentColor" stroke-width="2"/>
+                  <path d="M8 6V10M8 12H8.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Interface Tip:
+              </strong> If the interface looks crowded, you can hide/show panels using the View menu or keyboard shortcuts (Tab key toggles tool visibility).
+            </div>
+          </div>
+        </div>
+
+        <!-- Chapter 3: Creating Your First Annotation -->
         <div class="help-section">
           <h2>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M11 4H4a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Annotation Tools
+            Chapter 3: Creating Your First Annotation (Step-by-Step)
           </h2>
           <div class="help-content">
+            <p>Now for the main event - creating precise medical annotations. We'll annotate a nerve structure step by step:</p>
+
+            <ol class="step-list">
+              <li>
+                <div class="step-number">1</div>
+                <div>
+                  <strong>Locate the Anatomical Structure</strong><br>
+                  Examine your ultrasound image and identify the nerve or structure you want to annotate. Use the zoom tool if needed to see fine details clearly. Look for the characteristic hyperechoic or hypoechoic patterns typical of nerve tissue.
+                </div>
+              </li>
+              <li>
+                <div class="step-number">2</div>
+                <div>
+                  <strong>Select the Polygon Tool</strong><br>
+                  Click the polygon tool icon in the left toolbar (it looks like a connected shape outline) or press the 'P' key. Your cursor will change to a crosshair, indicating you're ready to start drawing.
+                </div>
+              </li>
+              <li>
+                <div class="step-number">3</div>
+                <div>
+                  <strong>Start Tracing the Boundary</strong><br>
+                  Position your cursor at the edge of the nerve structure and click once to place your first point. A small dot will appear, marking the beginning of your annotation polygon.
+                </div>
+              </li>
+              <li>
+                <div class="step-number">4</div>
+                <div>
+                  <strong>Continue Around the Perimeter</strong><br>
+                  Move your cursor around the edge of the structure and click to place additional points. Each click adds a vertex to your polygon. Aim for:
+                  <ul style="margin: 0.5rem 0; padding-left: 1rem;">
+                    <li>10-20 points for typical nerve structures</li>
+                    <li>More points for irregular shapes</li>
+                    <li>Fewer points for simple, round structures</li>
+                    <li>Focus on capturing key anatomical boundaries</li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <div class="step-number">5</div>
+                <div>
+                  <strong>Complete the Shape</strong><br>
+                  When you've traced around the entire structure, return close to your starting point. Either double-click your final point or press the Enter key to complete the polygon. The shape will automatically close and fill with a semi-transparent color.
+                </div>
+              </li>
+              <li>
+                <div class="step-number">6</div>
+                <div>
+                  <strong>Review and Adjust</strong><br>
+                  The annotation should now outline your structure. If adjustments are needed:
+                  <ul style="margin: 0.5rem 0; padding-left: 1rem;">
+                    <li>Click the selection tool and select your annotation</li>
+                    <li>Drag the corner handles to reshape</li>
+                    <li>Press Delete to remove and start over if needed</li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <div class="step-number">7</div>
+                <div>
+                  <strong>Add Medical Attributes</strong><br>
+                  A properties panel will appear (or right-click the annotation). Fill in the medical details:
+                  <ul style="margin: 0.5rem 0; padding-left: 1rem;">
+                    <li><strong>Structure Type:</strong> Select from dropdown (median nerve, ulnar nerve, etc.)</li>
+                    <li><strong>Body Side:</strong> Choose Left or Right</li>
+                    <li><strong>Visibility Quality:</strong> Rate as Poor, Fair, Good, or Excellent</li>
+                    <li><strong>Patient Position:</strong> Supine, lateral, etc.</li>
+                    <li><strong>Depth:</strong> Approximate depth from skin surface</li>
+                    <li><strong>Clinical Notes:</strong> Any relevant observations</li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <div class="step-number">8</div>
+                <div>
+                  <strong>Save the Annotation</strong><br>
+                  Click "Save Current Annotation" button or use Ctrl+S. The annotation is now permanently stored in your session. You'll see a confirmation message and the annotation counter will update.
+                </div>
+              </li>
+            </ol>
+
+            <div class="tip">
+              <strong>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 5px; vertical-align: text-top;">
+                  <path d="M8 1L13 15H3L8 1Z" stroke="currentColor" stroke-width="2"/>
+                  <circle cx="8" cy="10" r="1" fill="currentColor"/>
+                </svg>
+                Expert Technique:
+              </strong> For nerve structures with unclear boundaries, focus on the most visible portions and use clinical notes to indicate areas of uncertainty. This provides valuable context for AI training.
+            </div>
+
+            <div class="warning">
+              <strong>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 5px; vertical-align: text-top;">
+                  <path d="M8 1L15 15H1L8 1Z" stroke="currentColor" stroke-width="2"/>
+                  <path d="M8 6V10M8 12H8.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Important:
+              </strong> Always save your work frequently! While the system auto-saves progress, manual saves ensure your annotations are securely stored.
+            </div>
+          </div>
+        </div>
+
+        <!-- Chapter 4: Working with Multiple Images -->
+        <div class="help-section">
+          <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="2"/>
+              <path d="M21 15L16 10L5 21" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Chapter 4: Managing Multi-Image Sessions
+          </h2>
+          <div class="help-content">
+            <p>Most annotation sessions involve multiple images. Here's how to work efficiently across your image set:</p>
+            
             <div class="help-grid">
               <div class="help-card">
-                <h3>Polygon Tool</h3>
-                <p>The primary tool for outlining nerve structures and anatomical features.</p>
+                <h3>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                    <path d="M7 13L10 10L13 13M10 16V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <rect x="4" y="4" width="12" height="8" rx="2" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                  Navigation Between Images
+                </h3>
                 <ul>
-                  <li>Click to place points around the structure</li>
-                  <li>Double-click or press Enter to complete</li>
-                  <li>Right-click to cancel current polygon</li>
+                  <li><strong>Thumbnail Strip:</strong> Click any thumbnail at the bottom to switch images</li>
+                  <li><strong>Keyboard:</strong> Use Left/Right arrow keys to move between images</li>
+                  <li><strong>Quick Jump:</strong> Type an image number to jump directly</li>
+                  <li><strong>Progress Tracking:</strong> Green dots show completed annotations</li>
                 </ul>
               </div>
 
               <div class="help-card">
-                <h3>Pan & Zoom</h3>
-                <p>Navigate around the image for detailed annotation work.</p>
+                <h3>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                    <rect x="3" y="4" width="14" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M7 8L9 10L13 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M3 10H17" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                  Session Progress Tracking
+                </h3>
                 <ul>
-                  <li>Mouse wheel to zoom in/out</li>
-                  <li>Click and drag to pan</li>
-                  <li>Double-click to reset view</li>
+                  <li>Session header shows "Image X of Y" status</li>
+                  <li>Progress bar indicates completion percentage</li>
+                  <li>Annotation counter shows total annotations created</li>
+                  <li>Time tracker records session duration</li>
                 </ul>
               </div>
 
               <div class="help-card">
-                <h3>Selection Tool</h3>
-                <p>Select and modify existing annotations.</p>
+                <h3>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                    <path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                  Workflow Optimization
+                </h3>
                 <ul>
-                  <li>Click on annotations to select</li>
-                  <li>Drag corner handles to resize</li>
-                  <li>Press Delete to remove selected</li>
+                  <li><strong>Batch Processing:</strong> Complete all images of one type first</li>
+                  <li><strong>Quality Check:</strong> Review previous images before finishing</li>
+                  <li><strong>Consistent Labeling:</strong> Use the same naming conventions</li>
+                  <li><strong>Break Planning:</strong> Save and take breaks every 20-30 minutes</li>
                 </ul>
               </div>
+
+              <div class="help-card">
+                <h3>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                    <path d="M14 2H6C4.89543 2 4 2.89543 4 4V16C4 17.1046 4.89543 18 6 18H14C15.1046 18 16 17.1046 16 16V4C16 2.89543 15.1046 2 14 2Z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M8 6H12M8 10H12M8 14H10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                  Session Notes
+                </h3>
+                <ul>
+                  <li>Add overall session notes for context</li>
+                  <li>Record any technical issues encountered</li>
+                  <li>Note image quality variations</li>
+                  <li>Document any anatomical variants observed</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chapter 5: Keyboard Shortcuts & Efficiency -->
+        <div class="help-section">
+          <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+              <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="2"/>
+              <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Chapter 5: Keyboard Shortcuts for Speed & Efficiency
+          </h2>
+          <div class="help-content">
+            <p>Master these keyboard shortcuts to dramatically improve your annotation speed:</p>
+            
+            <div class="shortcut-grid">
+              <div class="shortcut-item">
+          <span class="shortcut-key">Enter</span>
+          <span class="shortcut-description">Complete current polygon</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-key">Esc</span>
+          <span class="shortcut-description">Cancel current polygon / Close modals</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-key">Space</span>
+          <span class="shortcut-description">End current session</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-key">Delete</span>
+          <span class="shortcut-description">Delete selected annotation</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-key">Ctrl + Z</span>
+          <span class="shortcut-description">Undo last action</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-key">Ctrl + Y</span>
+          <span class="shortcut-description">Redo last action</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-key">Ctrl + S</span>
+          <span class="shortcut-description">Save current annotation</span>
+        </div>
+        <div class="shortcut-item">
+          <span class="shortcut-key">Ctrl + U</span>
+          <span class="shortcut-description">Upload new image</span>
+        </div>
+      </div>
+            </div>
+
+            <div class="tip">
+              <strong>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 5px; vertical-align: text-top;">
+                  <path d="M8 1L11 7H13L10 9L11 15L8 12L5 15L6 9L3 7H5L8 1Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                </svg>
+                Speed Tip:
+              </strong> Practice the P → Click → Click → Enter → Ctrl+S sequence until it becomes muscle memory. This basic annotation flow will become lightning fast with practice.
+            </div>
+          </div>
+        </div>
+
+        <!-- Chapter 6: Data Management & Export -->
+        <div class="help-section">
+          <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2"/>
+              <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2"/>
+              <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2"/>
+              <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Chapter 6: Saving, Managing, and Exporting Your Work
+          </h2>
+          <div class="help-content">
+            <p>Proper data management ensures your annotations are safe and accessible. Follow these procedures:</p>
+            
+            <ol class="step-list">
+              <li>
+                <div class="step-number">1</div>
+                <div>
+                  <strong>During Your Session - Save Frequently</strong><br>
+                  Use Ctrl+S or the "Save Current Annotation" button after each annotation. The system shows a brief confirmation message. Your work is automatically backed up every 5 minutes, but manual saves are more reliable.
+                </div>
+              </li>
+              <li>
+                <div class="step-number">2</div>
+                <div>
+                  <strong>Finishing Your Session</strong><br>
+                  Before ending your session:
+                  <ul style="margin: 0.5rem 0; padding-left: 1rem;">
+                    <li>Review all images to ensure nothing was missed</li>
+                    <li>Click "Export Session Data" to create a backup</li>
+                    <li>Add any final session notes</li>
+                    <li>Click "End Session" to finalize and store in library</li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <div class="step-number">3</div>
+                <div>
+                  <strong>Accessing Your Library</strong><br>
+                  Click "Library" in the sidebar to view all your completed sessions. Each session shows:
+                  <ul style="margin: 0.5rem 0; padding-left: 1rem;">
+                    <li>Session date and duration</li>
+                    <li>Number of images and annotations</li>
+                    <li>Doctor name and category</li>
+                    <li>Action buttons (View, Export, Delete)</li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <div class="step-number">4</div>
+                <div>
+                  <strong>Exporting Data</strong><br>
+                  From the Library page, click "Export" next to any session:
+                  <ul style="margin: 0.5rem 0; padding-left: 1rem;">
+                    <li><strong>JSON Format:</strong> Complete data including images (recommended)</li>
+                    <li><strong>CSV Format:</strong> Annotation coordinates and attributes only</li>
+                    <li><strong>COCO Format:</strong> Industry standard for machine learning</li>
+                    <li><strong>Custom Format:</strong> Specify your own export parameters</li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <div class="step-number">5</div>
+                <div>
+                  <strong>Backup Strategy</strong><br>
+                  Implement a backup routine:
+                  <ul style="margin: 0.5rem 0; padding-left: 1rem;">
+                    <li>Export important sessions immediately after completion</li>
+                    <li>Store exports in multiple locations (local drive, cloud, external drive)</li>
+                    <li>Weekly backup of the entire application database</li>
+                    <li>Monthly archive of exported sessions by date</li>
+                  </ul>
+                </div>
+              </li>
+            </ol>
+
+            <div class="warning">
+              <strong>🔒 Data Security:</strong> All data is stored locally on your computer. While this ensures privacy, it also means YOU are responsible for backups. Deleted sessions cannot be recovered.
+            </div>
+          </div>
+        </div>
+
+        <!-- Chapter 7: Best Practices & Quality Guidelines -->
+        <div class="help-section">
+          <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Chapter 7: Best Practices for High-Quality Annotations
+          </h2>
+          <div class="help-content">
+            <p>Follow these professional guidelines to create annotations suitable for medical AI training:</p>
+            
+            <div class="help-grid">
+              <div class="help-card">
+                <h3>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                    <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+                    <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Annotation Accuracy
+                </h3>
+                <ul>
+                  <li><strong>Boundary Precision:</strong> Trace nerve boundaries precisely, don't approximate</li>
+                  <li><strong>Consistent Criteria:</strong> Use the same visibility standards throughout</li>
+                  <li><strong>Complete Coverage:</strong> Annotate all visible relevant structures</li>
+                  <li><strong>Avoid Over-annotation:</strong> Don't mark uncertain or barely visible structures</li>
+                </ul>
+              </div>
+
+              <div class="help-card">
+                <h3>📋 Clinical Documentation</h3>
+                <ul>
+                  <li><strong>Detailed Attributes:</strong> Fill in all relevant medical fields</li>
+                  <li><strong>Consistent Naming:</strong> Use standardized anatomical terminology</li>
+                  <li><strong>Quality Assessment:</strong> Honestly rate image visibility</li>
+                  <li><strong>Clinical Context:</strong> Include relevant patient positioning and probe details</li>
+                </ul>
+              </div>
+
+              <div class="help-card">
+                <h3>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                    <circle cx="10" cy="10" r="6" stroke="currentColor" stroke-width="2"/>
+                    <path d="M13 7L9 11L7 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Quality Control
+                </h3>
+                <ul>
+                  <li><strong>Self-Review:</strong> Check your work before saving sessions</li>
+                  <li><strong>Peer Review:</strong> Have colleagues review complex cases</li>
+                  <li><strong>Consistency Checks:</strong> Compare similar structures across images</li>
+                  <li><strong>Error Correction:</strong> Fix mistakes promptly when identified</li>
+                </ul>
+              </div>
+
+              <div class="help-card">
+                <h3>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                    <path d="M13 2L3 14H10L7 18L17 6H10L13 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Efficiency Tips
+                </h3>
+                <ul>
+                  <li><strong>Batch Similar Images:</strong> Group images by anatomy or procedure</li>
+                  <li><strong>Template Attributes:</strong> Set default values for repeated attributes</li>
+                  <li><strong>Keyboard Mastery:</strong> Learn shortcuts for common operations</li>
+                  <li><strong>Break Schedule:</strong> Take regular breaks to maintain accuracy</li>
+                </ul>
+              </div>
+            </div>
+            
+            <div class="tip">
+              <strong>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 5px; vertical-align: text-top;">
+                  <path d="M8 1L10 5H14L11 8L12 12L8 10L4 12L5 8L2 5H6L8 1Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                </svg>
+                Professional Standard:
+              </strong> Aim for annotations that would meet publication quality standards. Future AI models will learn from your work, so invest in accuracy and completeness.
+            </div>
+          </div>
+        </div>
 
               <div class="help-card">
                 <h3>Medical Attributes</h3>
@@ -507,13 +1168,10 @@
                   <li>Patient positioning</li>
                   <li>Clinical observations</li>
                 </ul>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- Keyboard Shortcuts -->
-        <div class="help-section">
+                <!-- Keyboard Shortcuts -->
+                 
+              <div class="help-section">
           <h2>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
@@ -561,7 +1219,7 @@
         </div>
 
         <!-- Best Practices -->
-        <div class="help-section">
+              <div class="help-section">
           <h2>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -613,126 +1271,33 @@
             </div>
 
             <div class="tip">
-              <strong>💡 Tip:</strong> Use the Library page to review and manage your completed annotation sessions. You can view detailed information about each session and export data as needed.
+              <strong>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 5px; vertical-align: text-top;">
+                  <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="2"/>
+                  <path d="M8 12V8M8 4H8.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Tip:
+              </strong> Use the Library page to review and manage your completed annotation sessions. You can view detailed information about each session and export data as needed.
             </div>
 
             <div class="warning">
-              <strong>⚠️ Important:</strong> Always export your session data before deleting sessions from the library. Deleted sessions cannot be recovered.
+              <strong>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 5px; vertical-align: text-top;">
+                  <path d="M8 1L15 15H1L8 1Z" stroke="currentColor" stroke-width="2"/>
+                  <path d="M8 6V10M8 12H8.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Important:
+              </strong> Always export your session data before deleting sessions from the library. Deleted sessions cannot be recovered.
             </div>
           </div>
         </div>
-
-        <!-- System Requirements -->
-        <div class="help-section">
-          <h2>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" stroke="currentColor" stroke-width="2"/>
-              <line x1="7" y1="2" x2="7" y2="22" stroke="currentColor" stroke-width="2"/>
-              <line x1="17" y1="2" x2="17" y2="22" stroke="currentColor" stroke-width="2"/>
-              <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2"/>
-              <line x1="2" y1="7" x2="7" y2="7" stroke="currentColor" stroke-width="2"/>
-              <line x1="2" y1="17" x2="7" y2="17" stroke="currentColor" stroke-width="2"/>
-              <line x1="17" y1="17" x2="22" y2="17" stroke="currentColor" stroke-width="2"/>
-              <line x1="17" y1="7" x2="22" y2="7" stroke="currentColor" stroke-width="2"/>
-            </svg>
-            System Requirements
-          </h2>
-          <div class="help-content">
-            <div class="help-grid">
-              <div class="help-card">
-                <h3>Minimum Requirements</h3>
-                <ul>
-                  <li>4GB RAM</li>
-                  <li>2GB free disk space</li>
-                  <li>Modern web browser</li>
-                  <li>Screen resolution 1024x768</li>
-                </ul>
-              </div>
-
-              <div class="help-card">
-                <h3>Recommended</h3>
-                <ul>
-                  <li>8GB+ RAM</li>
-                  <li>10GB+ free disk space</li>
-                  <li>Chrome/Firefox latest version</li>
-                  <li>Screen resolution 1920x1080+</li>
-                </ul>
-              </div>
-
-              <div class="help-card">
-                <h3>Supported Browsers</h3>
-                <ul>
-                  <li>Google Chrome 90+</li>
-                  <li>Mozilla Firefox 88+</li>
-                  <li>Microsoft Edge 90+</li>
-                  <li>Safari 14+ (macOS)</li>
-                </ul>
-              </div>
-
-              <div class="help-card">
-                <h3>Operating Systems</h3>
-                <ul>
-                  <li>Windows 10/11</li>
-                  <li>macOS 10.15+</li>
-                  <li>Ubuntu 20.04+</li>
-                  <li>Other Linux distributions</li>
-                </ul>
+        </div>
+              
               </div>
             </div>
           </div>
+
         </div>
+        
 
-        <!-- Support & Contact -->
-        <div class="help-section">
-          <h2>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Support & Contact
-          </h2>
-          <div class="help-content">
-            <p>Need additional help? Get in touch with our support team:</p>
-            
-            <div class="contact-grid">
-              <div class="contact-card">
-                <div class="contact-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2"/>
-                    <polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2"/>
-                  </svg>
-                </div>
-                <div class="contact-title">Email Support</div>
-                <div class="contact-info">Get help via email<br>Response within 24 hours</div>
-                <a href="mailto:support@ultrasound-annotation.com" class="contact-button">Send Email</a>
-              </div>
 
-              <div class="contact-card">
-                <div class="contact-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" stroke="currentColor" stroke-width="2"/>
-                    <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z" stroke="currentColor" stroke-width="2"/>
-                  </svg>
-                </div>
-                <div class="contact-title">Documentation</div>
-                <div class="contact-info">Access detailed guides<br>and API documentation</div>
-                <a href="#" class="contact-button">View Docs</a>
-              </div>
-
-              <div class="contact-card">
-                <div class="contact-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" stroke="currentColor" stroke-width="2"/>
-                  </svg>
-                </div>
-                <div class="contact-title">GitHub Issues</div>
-                <div class="contact-info">Report bugs and<br>request features</div>
-                <a href="https://github.com/ultrasound-annotation/issues" class="contact-button">Open Issue</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
-  </div>
-</body>
-</html>
