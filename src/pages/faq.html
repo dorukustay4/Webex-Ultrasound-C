@@ -6,7 +6,7 @@
   <title>FAQ - Neurotate</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https:/              The Neurotate System is a comprehensive desktop application designed specifically for medical professionals to annotate ultrasound images used in ultrasound-guided regional anesthesia (UGRA) procedures. It enables doctors to precisely mark anatomical structures like nerves, blood vessels, and tissue boundaries to create expert-validated training datasets for AI model development. The system combines advanced annotation tools with medical metadata capture to ensure high-quality, clinically relevant annotation...fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <style>
     * {
@@ -324,7 +324,7 @@
               </svg>
             </button>
             <div class="faq-answer">
-              The Ultrasound Annotation System is a comprehensive desktop application designed specifically for medical professionals to annotate ultrasound images used in ultrasound-guided regional anesthesia (UGRA) procedures. It enables doctors to precisely mark anatomical structures like nerves, blood vessels, and tissue boundaries to create expert-validated training datasets for AI model development. The system combines advanced annotation tools with medical metadata capture to ensure high-quality, clinically relevant annotations.
+              The Ultrasound Annotation System is a comprehensive desktop application designed specifically for medical professionals to annotate ultrasound images used in ultrasound-guided regional anesthesia (UGRA) procedures. It enables doctors to precisely mark nerves boundaries to create expert-validated training datasets for AI model development. The system combines advanced annotation tools with structured medical metadata capture to ensure high-quality, clinically relevant annotations.
             </div>
           </div>
 
@@ -348,7 +348,7 @@
               </svg>
             </button>
             <div class="faq-answer">
-              Yes, your data is completely secure. All ultrasound images and annotations are stored locally on your computer using an encrypted SQLite database. No data is transmitted to external servers or cloud services. You have full control over your data, including the ability to export, backup, or permanently delete sessions as needed. This ensures complete HIPAA compliance and patient privacy protection.
+              Yes, your data is completely secure. All ultrasound images and annotations are stored locally on your computer using an encrypted SQLite database. No data is transmitted to external servers or cloud services. You have full control over your data, including the ability to export, backup, or permanently delete sessions as needed. This ensures complete patient privacy protection.
             </div>
           </div>
 
@@ -363,9 +363,8 @@
               Starting an annotation session is simple:
               <ol style="margin: 1rem 0; padding-left: 1.5rem;">
                 <li>From the main dashboard, click the <span class="highlight">"Start Session"</span> button</li>
-                <li>Upload your ultrasound images by clicking "Upload Images" or dragging files to the upload area</li>
-                <li>Enter session details including doctor name, procedure type, and patient information (anonymized)</li>
-                <li>Select the category of annotation (e.g., Nerve Blocks, Vascular Access, etc.)</li>
+                <li>Upload your ultrasound images by clicking "Upload Image".</li>
+                <li>Enter session details including session title, doctor name, and session type.</li>
                 <li>Click "Begin Annotation" to enter the annotation workspace</li>
               </ol>
               The system will automatically create a new session and save your progress as you work.
@@ -385,30 +384,23 @@
                 <li><strong>DICOM files (.dcm)</strong> - Industry standard for medical imaging</li>
                 <li><strong>JPEG (.jpg, .jpeg)</strong> - Common compressed format</li>
                 <li><strong>PNG (.png)</strong> - Lossless compression, excellent for detailed images</li>
-                <li><strong>TIFF (.tiff, .tif)</strong> - High-quality uncompressed format</li>
-                <li><strong>BMP (.bmp)</strong> - Windows bitmap format</li>
               </ul>
-              <strong>File size limits:</strong> Individual images up to 50MB. Batch upload supports up to 100 images per session.
             </div>
           </div>
 
           <div class="faq-item">
             <button class="faq-question" onclick="toggleFAQ(this)">
-              Can I upload multiple images at once?
+              Can I upload multiple images in one session?
               <svg class="faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
             <div class="faq-answer">
-              Yes! The system supports batch upload for efficiency:
+              Yes! The system supports multiple uploads for efficiency:
               <ul style="margin: 1rem 0; padding-left: 1.5rem;">
-                <li>Select multiple files using Ctrl+click (Windows) or Cmd+click (Mac)</li>
-                <li>Drag and drop entire folders containing images</li>
-                <li>Upload up to 100 images per session</li>
-                <li>Images are automatically organized and numbered in the session</li>
-                <li>Navigate between images using the thumbnail panel or arrow keys</li>
+                <li>Add new image files using the "Add Image" button to move on to next annotation after saving first annotation.</li>
               </ul>
-              All images in a session share the same metadata (doctor, procedure type, etc.) but can have individual annotations.
+              All images in a session share the same metadata (doctor, session type, etc.) but can have individual annotations and attributes.
             </div>
           </div>
         </div>
@@ -427,21 +419,21 @@
             <div class="faq-answer">
               Follow these detailed steps to annotate nerve structures:
               <ol style="margin: 1rem 0; padding-left: 1.5rem;">
-                <li><strong>Select the Polygon Tool:</strong> Click the polygon icon in the toolbar or press 'P'</li>
                 <li><strong>Trace the Nerve Boundary:</strong> Click around the perimeter of the nerve structure. Each click places a point</li>
                 <li><strong>Complete the Shape:</strong> Double-click the final point or press Enter to close the polygon</li>
-                <li><strong>Fill Medical Attributes:</strong> A form will appear asking for:
+                <li><strong>Fill Medical Attributes:</strong> Use the form section on the right to specify:
                   <ul style="margin: 0.5rem 0; padding-left: 1rem;">
                     <li>Nerve type (Median, Ulnar, Radial, Sciatic, etc.)</li>
                     <li>Side of body (Left/Right)</li>
                     <li>Visibility quality (Poor/Fair/Good/Excellent)</li>
                     <li>Patient position</li>
-                    <li>Clinical notes</li>
+                    <li>Patient age group</li>
+                    <li>Needle approach</li>
+                    <li>Clinical notes (if applicable)</li>
                   </ul>
                 </li>
-                <li><strong>Save the Annotation:</strong> Click "Save Current Annotation" to store the data</li>
+                <li><strong>Save the Annotation:</strong> Click "Save Current Annotation" or Ctrl + S to store the data</li>
               </ol>
-              <strong>Pro Tip:</strong> Use the zoom tool to work on fine details and ensure precise boundary tracing.
             </div>
           <div class="faq-item">
             <button class="faq-question" onclick="toggleFAQ(this)">
@@ -455,12 +447,10 @@
               <ul style="margin: 1rem 0; padding-left: 1.5rem;">
                 <li><strong>Anatomical Structure:</strong> Specify the exact nerve (e.g., Median Nerve, Brachial Plexus)</li>
                 <li><strong>Body Side:</strong> Left or Right laterality</li>
-                <li><strong>Patient Demographics:</strong> Age group (Pediatric, Adult, Geriatric)</li>
+                <li><strong>Patient Demographics:</strong> Age group (Pediatric, Adult, Elderly)</li>
                 <li><strong>Image Quality:</strong> Visibility rating (Poor, Fair, Good, Excellent)</li>
                 <li><strong>Patient Position:</strong> Supine, Prone, Lateral, Sitting</li>
-                <li><strong>Probe Orientation:</strong> Transverse, Longitudinal, Oblique</li>
                 <li><strong>Needle Approach:</strong> In-plane, Out-of-plane (if applicable)</li>
-                <li><strong>Depth:</strong> Approximate depth from skin surface in cm</li>
                 <li><strong>Clinical Notes:</strong> Any relevant observations, pathology, or anatomical variants</li>
               </ul>
               These attributes are crucial for creating clinically relevant training datasets.
@@ -480,34 +470,14 @@
             <div class="faq-answer">
               Yes, you have full control over your annotations:
               <ul style="margin: 1rem 0; padding-left: 1.5rem;">
-                <li><strong>Edit Shape:</strong> Click on any annotation to select it, then drag the corner handles to resize or reshape</li>
                 <li><strong>Modify Attributes:</strong> Right-click on an annotation to edit its medical attributes</li>
                 <li><strong>Delete Individual:</strong> Select an annotation and press Delete key or right-click → Delete</li>
                 <li><strong>Clear All:</strong> Use "Clear All" button to remove all annotations from the current image</li>
                 <li><strong>Undo/Redo:</strong> Use Ctrl+Z (undo) and Ctrl+Y (redo) for recent changes</li>
               </ul>
-              Changes are automatically saved within the current session. Once you end a session, annotations become permanent in the database.
+              Changes are automatically saved within the current session. Once you end a session, annotations become permanent in the database. Sessions can be viewed, deleted or exported as a whole.
             </div>
           </div>
-
-          <div class="faq-item">
-            <button class="faq-question" onclick="toggleFAQ(this)">
-              How do I handle overlapping or adjacent structures?
-              <svg class="faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-            <div class="faq-answer">
-              For complex anatomical regions with multiple structures:
-              <ul style="margin: 1rem 0; padding-left: 1.5rem;">
-                <li><strong>Layer Management:</strong> Create separate annotations for each distinct structure</li>
-                <li><strong>Transparency:</strong> Adjust annotation opacity to see underlying structures</li>
-                <li><strong>Different Colors:</strong> The system automatically assigns different colors to distinguish overlapping annotations</li>
-                <li><strong>Naming Convention:</strong> Use clear, descriptive names for each structure</li>
-                <li><strong>Priority Ordering:</strong> Annotate the most clinically relevant structures first</li>
-                <li><strong>Detailed Notes:</strong> Use clinical notes to describe spatial relationships between structures</li>
-              </ul>
-              This approach ensures comprehensive coverage while maintaining clarity for AI training purposes.
           
             </div>
           <div class="faq-item">
@@ -531,22 +501,6 @@
             </div>
           </div>
 
-          <div class="faq-item">
-            <button class="faq-question" onclick="toggleFAQ(this)">
-              Can I edit annotations after saving?
-              <svg class="faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-            <div class="faq-answer">
-              Yes, you can edit annotations within the current session. Use the <span class="highlight">"Clear All"</span> button to remove all annotations on the current image and start over. Once a session is ended, annotations are saved permanently to the database.
-            </div>
-          </div>
-        </div>
-          
-
-          
-
         <!-- Data Management Section -->
         <div class="faq-section">
           <h2>Data Management</h2>
@@ -563,14 +517,10 @@
               <ul style="margin: 1rem 0; padding-left: 1.5rem;">
                 <li><strong>During Session:</strong> Click "Export Session Data" before ending the session</li>
                 <li><strong>From Library:</strong> Navigate to Library page and click "Export" for any completed session</li>
-                <li><strong>Batch Export:</strong> Select multiple sessions and export them together</li>
               </ul>
-              <strong>Export Formats:</strong>
+              <strong>Export Format:</strong>
               <ul style="margin: 1rem 0; padding-left: 1.5rem;">
-                <li><strong>JSON:</strong> Complete annotation data with coordinates and medical attributes</li>
-                <li><strong>COCO Format:</strong> Industry standard for computer vision datasets</li>
-                <li><strong>CSV:</strong> Spreadsheet-compatible format for statistical analysis</li>
-                <li><strong>DICOM SR:</strong> Structured report format for medical systems integration</li>
+                <li><strong>JSON:</strong> Complete annotation data with coordinates and medical attributes.</li>
               </ul>
               All exports include both annotation geometry and associated image data (base64 encoded).
             </div>
@@ -586,7 +536,7 @@
             <div class="faq-answer">
               Your data is stored securely on your local computer:
               <ul style="margin: 1rem 0; padding-left: 1.5rem;">
-                <li><strong>Database Location:</strong> [Application Folder]/data/annotations.db</li>
+                <li><strong>Database Location:</strong> [Application Folder]/data/sessions.db</li>
                 <li><strong>Image Storage:</strong> Original images stored as base64 in database for integrity</li>
                 <li><strong>Metadata:</strong> All medical attributes and session information included</li>
               </ul>
@@ -595,47 +545,20 @@
                 <li><strong>Automatic:</strong> Copy the entire application folder to external drive</li>
                 <li><strong>Manual:</strong> Export individual sessions as JSON files</li>
                 <li><strong>Professional:</strong> Database backup tools can backup the SQLite file</li>
-                <li><strong>Cloud Sync:</strong> Store application folder in cloud storage (Dropbox, OneDrive, etc.)</li>
               </ul>
             </div>
           </div>
 
           <div class="faq-item">
             <button class="faq-question" onclick="toggleFAQ(this)">
-              Can I import annotations from other systems or previous exports?
+              How do I manage session deletion?
               <svg class="faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
             <div class="faq-answer">
-              Yes, the system supports importing data from various sources:
-              <ul style="margin: 1rem 0; padding-left: 1.5rem;">
-                <li><strong>Previous Exports:</strong> Re-import JSON files previously exported from this system</li>
-                <li><strong>COCO Format:</strong> Import datasets from other annotation tools</li>
-                <li><strong>Custom JSON:</strong> Import from compatible annotation systems with proper formatting</li>
-                <li><strong>Migration Tool:</strong> Built-in converter for common medical annotation formats</li>
-              </ul>
-              <strong>Import Process:</strong> Go to Library → Import Data → Select file format → Map fields → Validate → Import
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <button class="faq-question" onclick="toggleFAQ(this)">
-              How do I manage session deletion and data retention?
-              <svg class="faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-            <div class="faq-answer">
-              Comprehensive data management options:
-              <ul style="margin: 1rem 0; padding-left: 1.5rem;">
-                <li><strong>Individual Deletion:</strong> Delete specific sessions from Library page</li>
-                <li><strong>Bulk Operations:</strong> Select multiple sessions for batch deletion</li>
-                <li><strong>Archive Mode:</strong> Hide sessions without deleting (soft delete)</li>
-                <li><strong>Permanent Removal:</strong> Complete deletion removes all traces from database</li>
-              </ul>
-              <strong>⚠️ Important:</strong> Deletion is permanent and cannot be undone. Always export valuable data before deletion.
-              <strong>Best Practice:</strong> Set up automated exports weekly and maintain backup copies.
+              <strong>Individual Deletion:</strong> Delete specific sessions from Library page
+              <strong>Important:</strong> Deletion is permanent and cannot be undone. Always export valuable data before deletion.
             </div>
           </div>
 
@@ -649,109 +572,22 @@
             <div class="faq-answer">
               Advanced search and filtering capabilities:
               <ul style="margin: 1rem 0; padding-left: 1.5rem;">
-                <li><strong>Date Range:</strong> Filter sessions by creation date or modification date</li>
                 <li><strong>Doctor Name:</strong> Find all sessions by specific practitioners</li>
-                <li><strong>Procedure Type:</strong> Filter by annotation category or procedure</li>
-                <li><strong>Anatomical Structure:</strong> Search by specific nerves or body regions</li>
-                <li><strong>Image Quality:</strong> Filter by visibility ratings</li>
-                <li><strong>Patient Demographics:</strong> Sort by age groups or other criteria</li>
-                <li><strong>Annotation Count:</strong> Find sessions with specific numbers of annotations</li>
-                <li><strong>Free Text Search:</strong> Search within clinical notes and descriptions</li>
+                <li><strong>Session Title:</strong> Find all sessions by specific titles</li>
+                <li><strong>Procedure Type:</strong> Filter by session category</li>
+                <li><strong>Date of Session:</strong> Filters by specific date ranges</li>
+
               </ul>
-              Use the filter panel in the Library page to combine multiple criteria for precise searches.
+              Use the filter panel and search bar in the Library page to combine multiple criteria for precise searches.
             </div>
           </div>
         </div>
 
-        <!-- Troubleshooting & Performance Section -->
-        <div class="faq-section">
-          <h2>Troubleshooting & Performance</h2>
-          
-          <div class="faq-item">
-            <button class="faq-question" onclick="toggleFAQ(this)">
-              What should I do if the application runs slowly or freezes?
-              <svg class="faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-            <div class="faq-answer">
-              Performance optimization steps:
-              <ol style="margin: 1rem 0; padding-left: 1.5rem;">
-                <li><strong>Close Unnecessary Applications:</strong> Free up system memory and processing power</li>
-                <li><strong>Reduce Image Size:</strong> Work with smaller images or compress large DICOM files</li>
-                <li><strong>Clear Cache:</strong> Restart the application to clear temporary files</li>
-                <li><strong>Check Available Disk Space:</strong> Ensure adequate storage for database operations</li>
-                <li><strong>Update System:</strong> Ensure OS and drivers are current</li>
-                <li><strong>Antivirus Exception:</strong> Add application folder to antivirus exclusions</li>
-              </ol>
-              <strong>System Requirements:</strong> 8GB RAM minimum, 16GB recommended for large image sets.
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <button class="faq-question" onclick="toggleFAQ(this)">
-              How do I resolve annotation tool responsiveness issues?
-              <svg class="faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-            <div class="faq-answer">
-              Common annotation tool fixes:
-              <ul style="margin: 1rem 0; padding-left: 1.5rem;">
-                <li><strong>Zoom Level:</strong> Reset zoom to 100% if tools become unresponsive</li>
-                <li><strong>Tool Selection:</strong> Switch to Selection tool, then back to desired tool</li>
-                <li><strong>Browser Reset:</strong> Refresh the annotation page (Ctrl+F5)</li>
-                <li><strong>Clear Annotations:</strong> Use "Clear All" if too many annotations cause lag</li>
-                <li><strong>Save Progress:</strong> Save current work and restart session</li>
-                <li><strong>Hardware Acceleration:</strong> Ensure graphics acceleration is enabled</li>
-              </ul>
-              <strong>Prevention:</strong> Save work frequently and avoid creating excessive annotations on single images.
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <button class="faq-question" onclick="toggleFAQ(this)">
-              What if I encounter database errors or corruption?
-              <svg class="faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-            <div class="faq-answer">
-              Database recovery procedures:
-              <ol style="margin: 1rem 0; padding-left: 1.5rem;">
-                <li><strong>Automatic Recovery:</strong> Application attempts auto-repair on startup</li>
-                <li><strong>Backup Restoration:</strong> Restore from previous backup copy</li>
-                <li><strong>Export Rescue:</strong> Try to export existing sessions before corruption spreads</li>
-                <li><strong>Database Rebuild:</strong> Use built-in database repair tools from Settings</li>
-                <li><strong>Fresh Start:</strong> Create new database and import previous exports</li>
-              </ol>
-              <strong>Prevention:</strong> Regular backups and proper application shutdown prevent most corruption issues.
-            </div>
-          </div>
-        </div>
 
         <!-- Technical Support Section -->
         <div class="faq-section">
           <h2>Technical Support</h2>
           
-          <div class="faq-item">
-            <button class="faq-question" onclick="toggleFAQ(this)">
-              What should I do if the application won't start?
-              <svg class="faq-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-            <div class="faq-answer">
-              If the application won't start:
-              <ol style="margin: 1rem 0; padding-left: 1.5rem;">
-                <li>Check that you have sufficient system permissions</li>
-                <li>Ensure no antivirus software is blocking the application</li>
-                <li>Try running as administrator (Windows) or with sudo (Mac/Linux)</li>
-                <li>Check the application logs for error messages</li>
-                <li>Contact technical support if the issue persists</li>
-              </ol>
-            </div>
-          </div>
 
           <div class="faq-item">
             <button class="faq-question" onclick="toggleFAQ(this)">

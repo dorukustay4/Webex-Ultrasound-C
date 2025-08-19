@@ -154,7 +154,32 @@
       font-weight: 600;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 0.75rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      transition: all 0.2s;
+    }
+
+    .help-section h2:hover {
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    .help-section h2 .title-content {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .help-icon {
+      transition: transform 0.2s;
+    }
+
+    .help-section h2.active .help-icon {
+      transform: rotate(180deg);
     }
 
     .help-content {
@@ -163,6 +188,11 @@
       max-width: 100%;
       box-sizing: border-box;
       overflow-x: hidden;
+      display: none;
+    }
+
+    .help-content.active {
+      display: block;
     }
 
     .help-grid {
@@ -481,14 +511,19 @@
       <div class="help-container">
         <!-- Welcome Section -->
         <div class="help-section">
-          <h2>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2"/>
+          <h2 onclick="toggleHelp(this)" class="active">
+            <div class="title-content">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              Welcome to Neurotate System
+            </div>
+            <svg class="help-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Welcome to Neurotate System
           </h2>
-          <div class="help-content">
+          <div class="help-content active">
             <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 2rem;">
               This manual will guide you through every step of using the Neurotate System. Whether you're a medical professional new to digital annotation or familiar with other systems, this guide will help you become proficient quickly.
             </p>
@@ -546,9 +581,8 @@
                 </h3>
                 <ul>
                   <li>Ensure adequate screen resolution (1920x1080+)</li>
-                  <li>Verify sufficient RAM (8GB minimum)</li>
                   <li>Check available storage space (2GB+)</li>
-                  <li>Test mouse scroll wheel functionality</li>
+
                 </ul>
               </div>
             </div>
@@ -557,14 +591,19 @@
 
         <!-- Chapter 1: First Steps -->
         <div class="help-section">
-          <h2>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-              <path d="M8 14S9.5 16 12 16 16 14 16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M9 9H9.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M15 9H15.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <h2 onclick="toggleHelp(this)">
+            <div class="title-content">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M8 14S9.5 16 12 16 16 14 16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M9 9H9.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M15 9H15.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Chapter 1: Your First Annotation Session
+            </div>
+            <svg class="help-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Chapter 1: Your First Annotation Session
           </h2>
           <div class="help-content">
             <p>Let's create your first annotation session from start to finish. Follow these detailed steps:</p>
@@ -574,81 +613,61 @@
                 <div class="step-number">1</div>
                 <div>
                   <strong>Launch the Application</strong><br>
-                  Double-click the application icon or run the executable file. The system will initialize and show the main dashboard. Wait for the "Ready" indicator in the bottom status bar.
+                  Double-click the application icon or run the executable file. The system will initialize and show the main dashboard.
                 </div>
               </li>
               <li>
                 <div class="step-number">2</div>
                 <div>
-                  <strong>Navigate to Home Dashboard</strong><br>
-                  If not already there, click <span class="highlight">"Home"</span> in the left sidebar. You'll see the main dashboard with session statistics and the prominent "Start Session" button.
+                  <strong>Home Dashboard</strong><br>
+                  You'll see the main dashboard with session statistics, annotation distributions, and the prominent "Start Session" button.
                 </div>
               </li>
               <li>
                 <div class="step-number">3</div>
                 <div>
                   <strong>Prepare Your Images</strong><br>
-                  Before starting, organize your ultrasound images in a folder. Supported formats include DICOM (.dcm), JPEG (.jpg), PNG (.png), and TIFF (.tiff). Ensure images are of good quality and properly labeled.
+                  Before starting, organize your ultrasound images in a folder. Supported formats include DICOM (.dcm), JPEG (.jpg), and PNG (.png). Ensure images are of good quality and properly labeled.
                 </div>
               </li>
               <li>
                 <div class="step-number">4</div>
                 <div>
-                  <strong>Click "Start Session"</strong><br>
-                  The large blue button will take you to the session setup page. This is where you'll configure your annotation session parameters.
+                  <strong>Click "Start Session" and Configure Session Details</strong><br>
+                  The large blue button will take you to the session setup page. Fill in the required information:
+                  <ul style="margin: 0.5rem 0; padding-left: 1rem;">
+                    <li><strong>Session Title:</strong> Title of the session</li>
+                    <li><strong>Doctor Name:</strong> Name of attending clinician</li>
+                    <li><strong>Session Category:</strong> Choose from nerve blocks, vascular access, or custom</li>
+                  </ul>
                 </div>
               </li>
               <li>
                 <div class="step-number">5</div>
                 <div>
                   <strong>Upload Your Images</strong><br>
-                  Click "Upload Images" or drag files directly to the upload area. You can select multiple files at once. The system will show upload progress and validate each image format.
-                </div>
-              </li>
-              <li>
-                <div class="step-number">6</div>
-                <div>
-                  <strong>Configure Session Details</strong><br>
-                  Fill in the required information:
-                  <ul style="margin: 0.5rem 0; padding-left: 1rem;">
-                    <li><strong>Doctor Name:</strong> Your name or the annotating physician</li>
-                    <li><strong>Session Category:</strong> Choose from nerve blocks, vascular access, or custom</li>
-                    <li><strong>Patient Demographics:</strong> Age group and relevant clinical context</li>
-                    <li><strong>Notes:</strong> Any additional context about the image set</li>
-                  </ul>
-                </div>
-              </li>
-              <li>
-                <div class="step-number">7</div>
-                <div>
-                  <strong>Enter Annotation Workspace</strong><br>
-                  Click "Begin Annotation" to enter the main annotation interface. The first image will load automatically, and annotation tools will be available on the left toolbar.
+                  Click "Upload Image" and the system will show upload progress and automatically display the image on the annotation whiteboard.
                 </div>
               </li>
             </ol>
-
-            <div class="tip">
-              <strong>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 5px; vertical-align: text-top;">
-                  <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="2"/>
-                  <path d="M8 12V8M8 4H8.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                First-Timer Tip:
-              </strong> Start with just 2-3 high-quality images for your first session. This helps you learn the tools without feeling overwhelmed.
-            </div>
           </div>
         </div>
 
         <!-- Chapter 2: Understanding the Interface -->
         <div class="help-section">
-          <h2>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" stroke="currentColor" stroke-width="2"/>
-              <line x1="7" y1="2" x2="7" y2="22" stroke="currentColor" stroke-width="2"/>
-              <line x1="17" y1="2" x2="17" y2="22" stroke="currentColor" stroke-width="2"/>
-              <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2"/>
+          <h2 onclick="toggleHelp(this)">
+            <div class="title-content">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" stroke="currentColor" stroke-width="2"/>
+                <line x1="7" y1="2" x2="7" y2="22" stroke="currentColor" stroke-width="2"/>
+                <line x1="17" y1="2" x2="17" y2="22" stroke="currentColor" stroke-width="2"/>
+                <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              Chapter 2: Understanding the Annotation Interface
+            </div>
+            <svg class="help-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Chapter 2: Understanding the Annotation Interface
           </h2>
           <div class="help-content">
             <p>Once in the annotation workspace, you'll see several key areas. Let's explore each one:</p>
@@ -665,9 +684,7 @@
                 <p>The central workspace where your ultrasound image appears.</p>
                 <ul>
                   <li>Images are automatically scaled to fit the viewport</li>
-                  <li>Use mouse wheel to zoom in/out for detail work</li>
-                  <li>Click and drag to pan around large images</li>
-                  <li>Double-click to reset to original view</li>
+                  <li>This is where you will be annotating the images, think of it as an annotation whiteboard</li>
                 </ul>
               </div>
 
@@ -686,8 +703,9 @@
                 <ul>
                   <li><strong>Selection Tool:</strong> Default tool for selecting existing annotations</li>
                   <li><strong>Polygon Tool:</strong> Primary tool for tracing nerve boundaries</li>
-                  <li><strong>Pan Tool:</strong> For moving around the image</li>
-                  <li><strong>Zoom Tools:</strong> Magnifying glass icons for zoom control</li>
+                  <li><strong>Brightness/Contrast Tool:</strong> For adjusting image brightness and contrast for better view of the nerve</li>
+                  <li><strong>Undo/Redo Tool:</strong> For undoing and redoing changes made during annotation</li>
+                  <li><strong>Clear All/Delete Tool:</strong> For removing all or selected annotations from the image</li>
                 </ul>
               </div>
 
@@ -728,27 +746,22 @@
                 </ul>
               </div>
             </div>
-
-            <div class="warning">
-              <strong>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 5px; vertical-align: text-top;">
-                  <path d="M8 1L15 15H1L8 1Z" stroke="currentColor" stroke-width="2"/>
-                  <path d="M8 6V10M8 12H8.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-                Interface Tip:
-              </strong> If the interface looks crowded, you can hide/show panels using the View menu or keyboard shortcuts (Tab key toggles tool visibility).
-            </div>
           </div>
         </div>
 
         <!-- Chapter 3: Creating Your First Annotation -->
         <div class="help-section">
-          <h2>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <h2 onclick="toggleHelp(this)">
+            <div class="title-content">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Chapter 3: Creating Your First Annotation (Step-by-Step)
+            </div>
+            <svg class="help-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Chapter 3: Creating Your First Annotation (Step-by-Step)
           </h2>
           <div class="help-content">
             <p>Now for the main event - creating precise medical annotations. We'll annotate a nerve structure step by step:</p>
@@ -855,13 +868,18 @@
 
         <!-- Chapter 4: Working with Multiple Images -->
         <div class="help-section">
-          <h2>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
-              <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="2"/>
-              <path d="M21 15L16 10L5 21" stroke="currentColor" stroke-width="2"/>
+          <h2 onclick="toggleHelp(this)">
+            <div class="title-content">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="2"/>
+                <path d="M21 15L16 10L5 21" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              Chapter 4: Managing Multi-Image Sessions
+            </div>
+            <svg class="help-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Chapter 4: Managing Multi-Image Sessions
           </h2>
           <div class="help-content">
             <p>Most annotation sessions involve multiple images. Here's how to work efficiently across your image set:</p>
@@ -937,13 +955,18 @@
 
         <!-- Chapter 5: Keyboard Shortcuts & Efficiency -->
         <div class="help-section">
-          <h2>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
-              <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="2"/>
-              <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="2"/>
+          <h2 onclick="toggleHelp(this)">
+            <div class="title-content">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="2"/>
+                <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              Chapter 5: Keyboard Shortcuts for Speed & Efficiency
+            </div>
+            <svg class="help-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Chapter 5: Keyboard Shortcuts for Speed & Efficiency
           </h2>
           <div class="help-content">
             <p>Master these keyboard shortcuts to dramatically improve your annotation speed:</p>
@@ -982,29 +1005,24 @@
           <span class="shortcut-description">Upload new image</span>
         </div>
       </div>
-            </div>
-
-            <div class="tip">
-              <strong>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 5px; vertical-align: text-top;">
-                  <path d="M8 1L11 7H13L10 9L11 15L8 12L5 15L6 9L3 7H5L8 1Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                </svg>
-                Speed Tip:
-              </strong> Practice the P → Click → Click → Enter → Ctrl+S sequence until it becomes muscle memory. This basic annotation flow will become lightning fast with practice.
-            </div>
           </div>
         </div>
 
         <!-- Chapter 6: Data Management & Export -->
         <div class="help-section">
-          <h2>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2"/>
-              <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2"/>
-              <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2"/>
-              <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2"/>
+          <h2 onclick="toggleHelp(this)">
+            <div class="title-content">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2"/>
+                <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2"/>
+                <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2"/>
+                <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              Chapter 6: Saving, Managing, and Exporting Your Work
+            </div>
+            <svg class="help-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Chapter 6: Saving, Managing, and Exporting Your Work
           </h2>
           <div class="help-content">
             <p>Proper data management ensures your annotations are safe and accessible. Follow these procedures:</p>
@@ -1070,21 +1088,20 @@
                 </div>
               </li>
             </ol>
-
-            <div class="warning">
-              <strong>🔒 Data Security:</strong> All data is stored locally on your computer. While this ensures privacy, it also means YOU are responsible for backups. Deleted sessions cannot be recovered.
-            </div>
           </div>
         </div>
-
-        <!-- Chapter 7: Best Practices & Quality Guidelines -->
         <div class="help-section">
-          <h2>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2"/>
+          <h2 onclick="toggleHelp(this)">
+            <div class="title-content">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              Chapter 7: Best Practices for High-Quality Annotations
+            </div>
+            <svg class="help-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Chapter 7: Best Practices for High-Quality Annotations
           </h2>
           <div class="help-content">
             <p>Follow these professional guidelines to create annotations suitable for medical AI training:</p>
@@ -1147,157 +1164,32 @@
                 </ul>
               </div>
             </div>
-            
-            <div class="tip">
-              <strong>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 5px; vertical-align: text-top;">
-                  <path d="M8 1L10 5H14L11 8L12 12L8 10L4 12L5 8L2 5H6L8 1Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                </svg>
-                Professional Standard:
-              </strong> Aim for annotations that would meet publication quality standards. Future AI models will learn from your work, so invest in accuracy and completeness.
-            </div>
           </div>
         </div>
 
-              <div class="help-card">
-                <h3>Medical Attributes</h3>
-                <p>Specify clinical details for each annotation.</p>
-                <ul>
-                  <li>Nerve type and location</li>
-                  <li>Visibility assessment</li>
-                  <li>Patient positioning</li>
-                  <li>Clinical observations</li>
-                </ul>
+      </div>
+    </main>
+  </div>
 
-                <!-- Keyboard Shortcuts -->
-                 
-              <div class="help-section">
-          <h2>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
-              <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="2"/>
-              <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="2"/>
-            </svg>
-            Keyboard Shortcuts
-          </h2>
-          <div class="help-content">
-            <div class="shortcut-grid">
-              <div class="shortcut-item">
-                <span class="shortcut-action">Start new polygon</span>
-                <span class="shortcut-keys">P</span>
-              </div>
-              <div class="shortcut-item">
-                <span class="shortcut-action">Complete polygon</span>
-                <span class="shortcut-keys">Enter</span>
-              </div>
-              <div class="shortcut-item">
-                <span class="shortcut-action">Cancel polygon</span>
-                <span class="shortcut-keys">Esc</span>
-              </div>
-              <div class="shortcut-item">
-                <span class="shortcut-action">Delete selected</span>
-                <span class="shortcut-keys">Delete</span>
-              </div>
-              <div class="shortcut-item">
-                <span class="shortcut-action">Zoom in</span>
-                <span class="shortcut-keys">+</span>
-              </div>
-              <div class="shortcut-item">
-                <span class="shortcut-action">Zoom out</span>
-                <span class="shortcut-keys">-</span>
-              </div>
-              <div class="shortcut-item">
-                <span class="shortcut-action">Reset view</span>
-                <span class="shortcut-keys">R</span>
-              </div>
-              <div class="shortcut-item">
-                <span class="shortcut-action">Select all</span>
-                <span class="shortcut-keys">Ctrl+A</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Best Practices -->
-              <div class="help-section">
-          <h2>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2"/>
-            </svg>
-            Best Practices
-          </h2>
-          <div class="help-content">
-            <div class="help-grid">
-              <div class="help-card">
-                <h3>Annotation Quality</h3>
-                <ul>
-                  <li>Follow nerve boundaries precisely</li>
-                  <li>Use adequate zoom for detail work</li>
-                  <li>Double-check polygon closure</li>
-                  <li>Verify medical attributes</li>
-                </ul>
-              </div>
-
-              <div class="help-card">
-                <h3>Session Management</h3>
-                <ul>
-                  <li>Save frequently during long sessions</li>
-                  <li>Use descriptive session names</li>
-                  <li>Export data before ending sessions</li>
-                  <li>Review annotations before saving</li>
-                </ul>
-              </div>
-
-              <div class="help-card">
-                <h3>Data Organization</h3>
-                <ul>
-                  <li>Group related images in sessions</li>
-                  <li>Use consistent naming conventions</li>
-                  <li>Include relevant clinical notes</li>
-                  <li>Backup exported data regularly</li>
-                </ul>
-              </div>
-
-              <div class="help-card">
-                <h3>Quality Assurance</h3>
-                <ul>
-                  <li>Review all annotations before saving</li>
-                  <li>Verify medical attribute accuracy</li>
-                  <li>Check for incomplete polygons</li>
-                  <li>Validate export data format</li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="tip">
-              <strong>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 5px; vertical-align: text-top;">
-                  <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="2"/>
-                  <path d="M8 12V8M8 4H8.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                Tip:
-              </strong> Use the Library page to review and manage your completed annotation sessions. You can view detailed information about each session and export data as needed.
-            </div>
-
-            <div class="warning">
-              <strong>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; margin-right: 5px; vertical-align: text-top;">
-                  <path d="M8 1L15 15H1L8 1Z" stroke="currentColor" stroke-width="2"/>
-                  <path d="M8 6V10M8 12H8.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-                Important:
-              </strong> Always export your session data before deleting sessions from the library. Deleted sessions cannot be recovered.
-            </div>
-          </div>
-        </div>
-        </div>
-              
-              </div>
-            </div>
-          </div>
-
-        </div>
-        
-
-
+  <script>
+    function toggleHelp(button) {
+      const content = button.nextElementSibling;
+      const isActive = content.classList.contains('active');
+      
+      // Close all other help sections
+      document.querySelectorAll('.help-content.active').forEach(item => {
+        item.classList.remove('active');
+      });
+      document.querySelectorAll('.help-section h2.active').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // Toggle current section
+      if (!isActive) {
+        content.classList.add('active');
+        button.classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>
