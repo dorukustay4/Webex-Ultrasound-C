@@ -25,7 +25,7 @@ class StatisticsManager {
     const stats = {
       // Total counts
       totalSessions: completedSessions.length,
-      totalImages: completedSessions.reduce((sum, s) => sum + (s.images || s.total_images || 0), 0),
+      totalImages: completedSessions.reduce((sum, s) => sum + (s.annotated_images || 0), 0),
       totalAnnotations: completedSessions.reduce((sum, s) => sum + (s.annotations || s.total_annotations || 0), 0),
       
       // Time statistics
@@ -45,6 +45,15 @@ class StatisticsManager {
       // Last updated
       lastUpdated: new Date().toISOString()
     };
+
+    console.log('StatisticsManager: Calculating total annotated images...');
+    const imageBreakdown = completedSessions.map(s => ({
+      id: s.id,
+      title: s.title,
+      annotated_images: s.annotated_images || 0
+    }));
+    console.log('StatisticsManager: Annotated images per session:', imageBreakdown);
+    console.log('StatisticsManager: Total annotated images calculated:', stats.totalImages);
 
     // Calculate averages
     if (stats.totalSessions > 0) {

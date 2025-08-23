@@ -27,6 +27,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   dbGetSessions: () => ipcRenderer.invoke('db-get-sessions'),
   dbGetSessionDetails: (sessionId) => ipcRenderer.invoke('db-get-session-details', sessionId),
   dbDeleteSession: (sessionId) => ipcRenderer.invoke('db-delete-session', sessionId),
+  dbDeleteAnnotation: (annotationId) => ipcRenderer.invoke('db-delete-annotation', annotationId),
   dbGetAnnotation: (annotationId) => ipcRenderer.invoke('db-get-annotation', annotationId),
   dbGetAnnotationStats: () => ipcRenderer.invoke('db-get-annotation-stats'),
   dbClearDatabase: () => ipcRenderer.invoke('db-clear-database'),

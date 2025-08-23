@@ -85,6 +85,7 @@ class DatabaseManager {
             nerve_type TEXT,
             side_of_body TEXT,
             patient_position TEXT,
+            scan_region TEXT,
             visibility TEXT,
             patient_age_group TEXT,
             needle_approach TEXT,
@@ -104,6 +105,10 @@ class DatabaseManager {
             
             // Add image_data column to images table if it doesn't exist
             this.addImageDataColumn()
+              .then(() => {
+                // Add scan_region column to annotations table if it doesn't exist
+                return this.addScanRegionColumn();
+              })
               .then(() => {
                 // Update existing sessions to have default category if they don't have one
                 return this.updateExistingSessions();
@@ -164,6 +169,41 @@ class DatabaseManager {
           });
         } else {
           console.log('✅ image_data column already exists in images table');
+          resolve();
+        }
+      });
+    });
+  }
+
+  // Add scan_region column to annotations table if it doesn't exist
+  async addScanRegionColumn() {
+    return new Promise((resolve, reject) => {
+      // Check if column already exists
+      this.db.all("PRAGMA table_info(annotations)", (err, columns) => {
+        if (err) {
+          console.error('Error checking annotations table structure:', err.message);
+          reject(err);
+          return;
+        }
+
+        const hasScanRegionColumn = columns.some(col => col.name === 'scan_region');
+        
+        if (!hasScanRegionColumn) {
+          console.log('🔧 Adding scan_region column to annotations table...');
+          this.db.run(`
+            ALTER TABLE annotations 
+            ADD COLUMN scan_region TEXT
+          `, (err) => {
+            if (err) {
+              console.error('Error adding scan_region column:', err.message);
+              reject(err);
+            } else {
+              console.log('✅ Successfully added scan_region column to annotations table');
+              resolve();
+            }
+          });
+        } else {
+          console.log('✅ scan_region column already exists in annotations table');
           resolve();
         }
       });
@@ -268,7 +308,7 @@ class DatabaseManager {
       
       const {
         id, sessionId, imageId, annotationType, points, nerveType,
-        sideOfBody, patientPosition, visibility, patientAgeGroup,
+        sideOfBody, patientPosition, scanRegion, visibility, patientAgeGroup,
         needleApproach, clinicalNotes, timestamp
       } = annotationData;
 
@@ -276,7 +316,7 @@ class DatabaseManager {
         id, sessionId, imageId, annotationType, 
         pointsType: typeof points,
         pointsValue: points,
-        nerveType, sideOfBody, patientPosition, visibility, 
+        nerveType, sideOfBody, patientPosition, scanRegion, visibility, 
         patientAgeGroup, needleApproach, clinicalNotes, timestamp
       });
 
@@ -286,20 +326,20 @@ class DatabaseManager {
       const sql = `
         INSERT OR REPLACE INTO annotations 
         (id, session_id, image_id, annotation_type, points, nerve_type,
-         side_of_body, patient_position, visibility, patient_age_group,
+         side_of_body, patient_position, scan_region, visibility, patient_age_group,
          needle_approach, clinical_notes, timestamp)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
       this.db.run(sql, [
         id, sessionId, imageId, annotationType, serializedPoints, nerveType,
-        sideOfBody, patientPosition, visibility, patientAgeGroup,
+        sideOfBody, patientPosition, scanRegion, visibility, patientAgeGroup,
         needleApproach, clinicalNotes, timestamp
       ], function(err) {
         if (err) {
           console.error('❌ Error saving annotation to database:', err.message);
           console.error('❌ SQL:', sql);
-          console.error('❌ Parameters:', [id, sessionId, imageId, annotationType, serializedPoints, nerveType, sideOfBody, patientPosition, visibility, patientAgeGroup, needleApproach, clinicalNotes, timestamp]);
+          console.error('❌ Parameters:', [id, sessionId, imageId, annotationType, serializedPoints, nerveType, sideOfBody, patientPosition, scanRegion, visibility, patientAgeGroup, needleApproach, clinicalNotes, timestamp]);
           reject(err);
         } else {
           console.log('✅ Annotation saved to database with ID:', id);
@@ -316,7 +356,8 @@ class DatabaseManager {
       const sql = `
         SELECT *, 
         (SELECT COUNT(*) FROM annotations WHERE session_id = sessions.id) as actual_annotations,
-        (SELECT COUNT(*) FROM images WHERE session_id = sessions.id) as actual_images
+        (SELECT COUNT(*) FROM images WHERE session_id = sessions.id) as actual_images,
+        (SELECT COUNT(DISTINCT image_id) FROM annotations WHERE session_id = sessions.id) as annotated_images
         FROM sessions 
         ORDER BY created_at DESC
       `;
@@ -338,7 +379,8 @@ class DatabaseManager {
       const sql = `
         SELECT *, 
         (SELECT COUNT(*) FROM annotations WHERE session_id = sessions.id) as actual_annotations,
-        (SELECT COUNT(*) FROM images WHERE session_id = sessions.id) as actual_images
+        (SELECT COUNT(*) FROM images WHERE session_id = sessions.id) as actual_images,
+        (SELECT COUNT(DISTINCT image_id) FROM annotations WHERE session_id = sessions.id) as annotated_images
         FROM sessions 
         WHERE id = ?
       `;
@@ -365,33 +407,39 @@ class DatabaseManager {
             return;
           }
 
-          // Get images for this session
-          const imagesSQL = `SELECT * FROM images WHERE session_id = ? ORDER BY uploaded_at`;
-          this.db.all(imagesSQL, [sessionId], (err, images) => {
+          // Get annotations for this session
+          const annotationsSQL = `
+            SELECT a.*, i.filename as image_name 
+            FROM annotations a
+            LEFT JOIN images i ON a.image_id = i.id
+            WHERE a.session_id = ? 
+            ORDER BY a.timestamp
+          `;
+          this.db.all(annotationsSQL, [sessionId], (err, annotations) => {
             if (err) {
               reject(err);
               return;
             }
 
-            // Get annotations for this session
-            const annotationsSQL = `
-              SELECT a.*, i.filename as image_name 
-              FROM annotations a
-              LEFT JOIN images i ON a.image_id = i.id
-              WHERE a.session_id = ? 
-              ORDER BY a.timestamp
+            // Parse points from JSON strings
+            annotations = annotations.map(annotation => ({
+              ...annotation,
+              points: annotation.points ? JSON.parse(annotation.points) : []
+            }));
+
+            // Get images that have annotations (unique images with at least one annotation)
+            const imagesWithAnnotationsSQL = `
+              SELECT DISTINCT i.* 
+              FROM images i
+              INNER JOIN annotations a ON i.id = a.image_id
+              WHERE i.session_id = ?
+              ORDER BY i.uploaded_at
             `;
-            this.db.all(annotationsSQL, [sessionId], (err, annotations) => {
+            this.db.all(imagesWithAnnotationsSQL, [sessionId], (err, images) => {
               if (err) {
                 reject(err);
                 return;
               }
-
-              // Parse points from JSON strings
-              annotations = annotations.map(annotation => ({
-                ...annotation,
-                points: annotation.points ? JSON.parse(annotation.points) : []
-              }));
 
               resolve({
                 session,
@@ -524,12 +572,126 @@ class DatabaseManager {
     });
   }
 
+  // Delete a single annotation from the database
+  async deleteAnnotation(annotationId) {
+    return new Promise((resolve, reject) => {
+      console.log('🗑️ Starting delete operation for annotation:', annotationId);
+      
+      // Add a timeout to prevent hanging
+      const timeoutId = setTimeout(() => {
+        console.error('❌ Annotation delete operation timed out after 3 seconds');
+        reject(new Error('Database operation timed out'));
+      }, 3000);
+      
+      const cleanupAndResolve = (result) => {
+        clearTimeout(timeoutId);
+        resolve(result);
+      };
+      
+      const cleanupAndReject = (error) => {
+        clearTimeout(timeoutId);
+        reject(error);
+      };
+      
+      // First, check if the annotation exists and get session info
+      this.db.get('SELECT id, session_id FROM annotations WHERE id = ?', [annotationId], (err, row) => {
+        if (err) {
+          console.error('❌ Error checking if annotation exists:', err);
+          cleanupAndReject(err);
+          return;
+        }
+        
+        if (!row) {
+          console.log('⚠️ Annotation not found in database:', annotationId);
+          cleanupAndResolve({ 
+            success: false, 
+            error: 'Annotation not found',
+            annotationId: annotationId 
+          });
+          return;
+        }
+        
+        const sessionId = row.session_id;
+        console.log('✅ Annotation found:', annotationId, 'in session:', sessionId);
+        
+        // Capture database reference to avoid 'this' context issues
+        const db = this.db;
+        
+        // Delete the annotation
+        db.run('DELETE FROM annotations WHERE id = ?', [annotationId], function(deleteErr) {
+          if (deleteErr) {
+            console.error('❌ Failed to delete annotation:', deleteErr);
+            cleanupAndReject(deleteErr);
+            return;
+          }
+          
+          const deletedRows = this.changes;
+          console.log('✅ Annotation deleted successfully. Rows affected:', deletedRows);
+          
+          if (deletedRows > 0) {
+            // Update session statistics - get new count of annotations for this session
+            db.get('SELECT COUNT(*) as count FROM annotations WHERE session_id = ?', [sessionId], (countErr, countRow) => {
+              if (countErr) {
+                console.error('❌ Error updating session statistics:', countErr);
+                // Still return success for annotation deletion even if count update fails
+                cleanupAndResolve({ 
+                  success: true, 
+                  annotationId: annotationId,
+                  sessionId: sessionId,
+                  deletedRows: deletedRows,
+                  warning: 'Annotation deleted but session statistics update failed'
+                });
+                return;
+              }
+              
+              const newAnnotationCount = countRow.count;
+              
+              // Update the session's total_annotations count
+              db.run('UPDATE sessions SET total_annotations = ? WHERE id = ?', [newAnnotationCount, sessionId], function(updateErr) {
+                if (updateErr) {
+                  console.error('❌ Error updating session total_annotations:', updateErr);
+                  // Still return success for annotation deletion
+                  cleanupAndResolve({ 
+                    success: true, 
+                    annotationId: annotationId,
+                    sessionId: sessionId,
+                    deletedRows: deletedRows,
+                    newAnnotationCount: newAnnotationCount,
+                    warning: 'Annotation deleted but session total_annotations update failed'
+                  });
+                  return;
+                }
+                
+                console.log('✅ Session statistics updated. New annotation count:', newAnnotationCount);
+                cleanupAndResolve({ 
+                  success: true, 
+                  annotationId: annotationId,
+                  sessionId: sessionId,
+                  deletedRows: deletedRows,
+                  newAnnotationCount: newAnnotationCount
+                });
+              });
+            });
+          } else {
+            console.log('⚠️ No annotation was deleted (already deleted?)');
+            cleanupAndResolve({ 
+              success: false, 
+              error: 'Annotation was not found or already deleted',
+              deletedRows: 0
+            });
+          }
+        });
+      });
+    });
+  }
+
   // Get annotation statistics for charts
   async getAnnotationStats() {
     return new Promise((resolve, reject) => {
       this.db.serialize(() => {
         const nerveTypeStats = {};
         const ageGroupStats = {};
+        const scanRegionStats = {};
         
         // Get nerve type distribution
         this.db.all(`
@@ -565,14 +727,34 @@ class DatabaseManager {
               ageGroupStats[row.patient_age_group] = row.count;
             });
             
-            console.log('📊 Chart stats retrieved:', {
-              nerveTypes: nerveTypeStats,
-              ageGroups: ageGroupStats
-            });
-            
-            resolve({
-              nerveTypes: nerveTypeStats,
-              ageGroups: ageGroupStats
+            // Get scan region distribution
+            this.db.all(`
+              SELECT scan_region, COUNT(*) as count 
+              FROM annotations 
+              WHERE scan_region IS NOT NULL AND scan_region != '' 
+              GROUP BY scan_region
+            `, (err, scanRows) => {
+              if (err) {
+                console.error('Error getting scan region stats:', err.message);
+                reject(err);
+                return;
+              }
+              
+              scanRows.forEach(row => {
+                scanRegionStats[row.scan_region] = row.count;
+              });
+              
+              console.log('📊 Chart stats retrieved:', {
+                nerveTypes: nerveTypeStats,
+                ageGroups: ageGroupStats,
+                scanRegions: scanRegionStats
+              });
+              
+              resolve({
+                nerveTypes: nerveTypeStats,
+                ageGroups: ageGroupStats,
+                scanRegions: scanRegionStats
+              });
             });
           });
         });

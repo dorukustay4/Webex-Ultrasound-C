@@ -756,6 +756,25 @@
           </div>
 
           <div class="attribute-group">
+            <label class="attribute-label">Scan Region</label>
+            <select class="attribute-select" id="scanRegion">
+              <option value="Neck">Neck</option>
+              <option value="Shoulder">Shoulder</option>
+              <option value="Arm">Arm</option>
+              <option value="Forearm">Forearm</option>
+              <option value="Hand">Hand</option>
+              <option value="Chest">Chest</option>
+              <option value="Abdomen">Abdomen</option>
+              <option value="Hip">Hip</option>
+              <option value="Thigh">Thigh</option>
+              <option value="Knee">Knee</option>
+              <option value="Leg">Leg</option>
+              <option value="Ankle">Ankle</option>
+              <option value="Foot">Foot</option>
+            </select>
+          </div>
+
+          <div class="attribute-group">
             <label class="attribute-label">Visibility</label>
             <select class="attribute-select" id="visibility">
               <option value="Excellent">Excellent</option>
@@ -1183,6 +1202,7 @@
       const nerveType = document.getElementById('nerveType').value;
       const sideOfBody = document.getElementById('sideOfBody').value;
       const patientPosition = document.getElementById('patientPosition').value;
+      const scanRegion = document.getElementById('scanRegion').value;
       const visibility = document.getElementById('visibility').value;
       const patientAgeGroup = document.getElementById('patientAgeGroup').value;
       const needleApproach = document.getElementById('needleApproach').value;
@@ -1192,6 +1212,7 @@
         nerveType,
         sideOfBody,
         patientPosition,
+        scanRegion,
         visibility,
         patientAgeGroup,
         needleApproach,
@@ -1210,6 +1231,7 @@
         nerveType: nerveType,
         sideOfBody: sideOfBody,
         patientPosition: patientPosition,
+        scanRegion: scanRegion,
         visibility: visibility,
         patientAgeGroup: patientAgeGroup,
         needleApproach: needleApproach,
@@ -1272,6 +1294,7 @@
         nerveType: annotation.nerveType,
         sideOfBody: annotation.sideOfBody,
         patientPosition: annotation.patientPosition,
+        scanRegion: annotation.scanRegion,
         visibility: annotation.visibility,
         patientAgeGroup: annotation.patientAgeGroup,
         needleApproach: annotation.needleApproach,
@@ -1306,6 +1329,7 @@
               console.log('- Sent nerveType:', dbAnnotation.nerveType, '| Saved nerveType:', verifyResult.annotation.nerve_type);
               console.log('- Sent sideOfBody:', dbAnnotation.sideOfBody, '| Saved sideOfBody:', verifyResult.annotation.side_of_body);
               console.log('- Sent patientPosition:', dbAnnotation.patientPosition, '| Saved patientPosition:', verifyResult.annotation.patient_position);
+              console.log('- Sent scanRegion:', dbAnnotation.scanRegion, '| Saved scanRegion:', verifyResult.annotation.scan_region);
               console.log('- Sent visibility:', dbAnnotation.visibility, '| Saved visibility:', verifyResult.annotation.visibility);
               console.log('- Sent patientAgeGroup:', dbAnnotation.patientAgeGroup, '| Saved patientAgeGroup:', verifyResult.annotation.patient_age_group);
               console.log('- Sent needleApproach:', dbAnnotation.needleApproach, '| Saved needleApproach:', verifyResult.annotation.needle_approach);
@@ -1542,6 +1566,7 @@
           nerveType: annotation.nerveType || annotation.nerve_type,
           sideOfBody: annotation.sideOfBody || annotation.side_of_body,
           patientPosition: annotation.patientPosition || annotation.patient_position,
+          scanRegion: annotation.scanRegion || annotation.scan_region,
           visibility: annotation.visibility,
           patientAgeGroup: annotation.patientAgeGroup || annotation.patient_age_group,
           needleApproach: annotation.needleApproach || annotation.needle_approach,
@@ -1687,6 +1712,7 @@
               nerveType: annotation.nerveType || '',
               sideOfBody: annotation.sideOfBody || '',
               patientPosition: annotation.patientPosition || '',
+              scanRegion: annotation.scanRegion || '',
               visibility: annotation.visibility || '',
               patientAgeGroup: annotation.patientAgeGroup || '',
               needleApproach: annotation.needleApproach || '',
@@ -2228,6 +2254,7 @@
           nerveType: medicalAnnotation.nerveType,
           sideOfBody: medicalAnnotation.sideOfBody,
           patientPosition: medicalAnnotation.patientPosition,
+          scanRegion: medicalAnnotation.scanRegion,
           visibility: medicalAnnotation.visibility,
           patientAgeGroup: medicalAnnotation.patientAgeGroup,
           needleApproach: medicalAnnotation.needleApproach,
@@ -2382,6 +2409,7 @@
           nerveType: annotation.nerveType,
           sideOfBody: annotation.sideOfBody,
           patientPosition: annotation.patientPosition,
+          scanRegion: annotation.scanRegion,
           visibility: annotation.visibility,
           patientAgeGroup: annotation.patientAgeGroup,
           needleApproach: annotation.needleApproach,

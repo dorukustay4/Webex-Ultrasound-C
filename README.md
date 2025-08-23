@@ -72,10 +72,11 @@ Generates research-ready JSON with flattened annotation-image pairs:
 
 ## ⌨️ Keyboard Shortcuts
 
-- **Ctrl+S** - Save and next image
+- **Ctrl+S** - Save annotation and move onto next image
 - **Enter** - Complete polygon
-- **Ctrl+Z/Shift+Z** - Undo/Redo
+- **Ctrl+Z/Ctrl+Y** - Undo/Redo
 - **F1** - Help
+- **Space** End Session
 
 ## 🙏 Acknowledgments
 

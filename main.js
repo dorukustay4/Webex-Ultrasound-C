@@ -437,6 +437,8 @@ function setupIPCHandlers() {
           category: session.category,
           total_annotations: session.total_annotations,
           actual_annotations: session.actual_annotations,
+          actual_images: session.actual_images,
+          annotated_images: session.annotated_images,
           status: session.status
         });
       });
@@ -488,6 +490,29 @@ function setupIPCHandlers() {
       return result;
     } catch (error) {
       console.error('❌ IPC: Failed to delete session:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Delete annotation
+  ipcMain.handle('db-delete-annotation', async (event, annotationId) => {
+    console.log('📨 IPC: Received delete annotation request for:', annotationId);
+    console.log('📨 IPC: Annotation ID type:', typeof annotationId);
+    console.log('📨 IPC: dbManager available:', !!dbManager);
+    
+    try {
+      if (!dbManager) {
+        console.error('❌ IPC: Database not initialized');
+        throw new Error('Database not initialized');
+      }
+      
+      console.log('📨 IPC: Calling dbManager.deleteAnnotation...');
+      const result = await dbManager.deleteAnnotation(annotationId);
+      console.log('📨 IPC: dbManager.deleteAnnotation result:', result);
+      
+      return result;
+    } catch (error) {
+      console.error('❌ IPC: Failed to delete annotation:', error);
       return { success: false, error: error.message };
     }
   });

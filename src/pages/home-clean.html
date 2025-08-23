@@ -478,7 +478,7 @@
       <div class="charts-section">
         <div class="charts-header">
           <h3>Annotation Analytics</h3>
-          <p>Distribution of nerve types and patient age groups</p>
+          <p>Distribution of nerve types, patient age groups, and scan regions</p>
         </div>
         
         <div class="charts-grid">
@@ -502,6 +502,18 @@
               <canvas id="ageGroupChart" width="300" height="300"></canvas>
               <div class="chart-no-data" id="ageGroupNoData" style="display: none;">
                 <p>No age group data available</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <div class="chart-header">
+              <h4>Scan Region Distribution</h4>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="scanRegionChart" width="300" height="300"></canvas>
+              <div class="chart-no-data" id="scanRegionNoData" style="display: none;">
+                <p>No scan region data available</p>
               </div>
             </div>
           </div>
@@ -943,11 +955,13 @@
     // Chart management
     let nerveTypeChart = null;
     let ageGroupChart = null;
+    let scanRegionChart = null;
 
     // Initialize charts
     function initializeCharts() {
       const nerveTypeCtx = document.getElementById('nerveTypeChart').getContext('2d');
       const ageGroupCtx = document.getElementById('ageGroupChart').getContext('2d');
+      const scanRegionCtx = document.getElementById('scanRegionChart').getContext('2d');
 
       // Nerve Type Chart
       nerveTypeChart = new Chart(nerveTypeCtx, {
@@ -1036,6 +1050,50 @@
           }
         }
       });
+
+      // Scan Region Chart
+      scanRegionChart = new Chart(scanRegionCtx, {
+        type: 'pie',
+        data: {
+          labels: [],
+          datasets: [{
+            data: [],
+            backgroundColor: [
+              '#7c9cc7', '#6ba88a', '#c9a876', '#c97878', '#a087c7',
+              '#6fb3c7', '#a5b573', '#c79670', '#c795a8', '#8a9199'
+            ],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 20,
+                usePointStyle: true,
+                font: {
+                  size: 12
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = ((value / total) * 100).toFixed(1);
+                  return `${label}: ${value} (${percentage}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
     }
 
     // Load and update charts
@@ -1068,6 +1126,10 @@
 
     // Update charts with new data
     function updateCharts(stats) {
+      console.log('📊 updateCharts called with stats:', stats);
+      console.log('📊 stats keys:', Object.keys(stats));
+      console.log('📊 stats.scanRegions specifically:', stats.scanRegions);
+      
       // Update nerve type chart
       const nerveTypes = stats.nerveTypes || {};
       const nerveTypeLabels = Object.keys(nerveTypes);
@@ -1099,6 +1161,37 @@
         document.getElementById('ageGroupChart').style.display = 'none';
         document.getElementById('ageGroupNoData').style.display = 'flex';
       }
+
+      // Update scan region chart
+      const scanRegions = stats.scanRegions || {};
+      const scanRegionLabels = Object.keys(scanRegions);
+      const scanRegionData = Object.values(scanRegions);
+
+      console.log('🔍 Scan Region Chart Debug:');
+      console.log('- stats.scanRegions:', stats.scanRegions);
+      console.log('- scanRegions object:', scanRegions);
+      console.log('- scanRegionLabels:', scanRegionLabels);
+      console.log('- scanRegionData:', scanRegionData);
+      console.log('- labels length:', scanRegionLabels.length);
+      console.log('- scanRegionChart object:', scanRegionChart);
+
+      if (scanRegionLabels.length > 0) {
+        console.log('✅ Updating scan region chart with data');
+        if (scanRegionChart) {
+          scanRegionChart.data.labels = scanRegionLabels;
+          scanRegionChart.data.datasets[0].data = scanRegionData;
+          scanRegionChart.update();
+          document.getElementById('scanRegionChart').style.display = 'block';
+          document.getElementById('scanRegionNoData').style.display = 'none';
+          console.log('✅ Scan region chart updated successfully');
+        } else {
+          console.error('❌ scanRegionChart is null or undefined!');
+        }
+      } else {
+        console.log('❌ No scan region data found, showing empty state');
+        document.getElementById('scanRegionChart').style.display = 'none';
+        document.getElementById('scanRegionNoData').style.display = 'flex';
+      }
     }
 
     // Show empty state for charts
@@ -1107,6 +1200,8 @@
       document.getElementById('nerveTypeNoData').style.display = 'flex';
       document.getElementById('ageGroupChart').style.display = 'none';
       document.getElementById('ageGroupNoData').style.display = 'flex';
+      document.getElementById('scanRegionChart').style.display = 'none';
+      document.getElementById('scanRegionNoData').style.display = 'flex';
     }
 
     // Refresh charts data

@@ -579,6 +579,7 @@
     .session-info h3 {
       color: #1e293b;
       margin-bottom: 15px;
+      margin-top: 20px;
       font-size: 1.2rem;
       font-weight: 600;
     }
@@ -587,6 +588,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 15px;
+      margin-bottom: 30px;
     }
 
     .session-info-item {
@@ -612,7 +614,8 @@
 
     .annotations-list h3 {
       color: #1e293b;
-      margin-bottom: 20px;
+      margin-top: 70px;
+      margin-bottom: 25px;
       font-size: 1.2rem;
       font-weight: 600;
       border-bottom: 2px solid #e2e8f0;
@@ -623,6 +626,7 @@
       background: #f8fafc;
       border-radius: 8px;
       padding: 20px;
+      margin-top: 20px;
       margin-bottom: 15px;
       border: 1px solid #e2e8f0;
       transition: all 0.2s ease;
@@ -699,6 +703,44 @@
       color: #64748b;
       font-style: italic;
       padding: 40px 20px;
+    }
+
+    .annotation-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .delete-annotation-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .delete-annotation-btn:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    }
+
+    .delete-annotation-btn:active {
+      transform: translateY(0);
+    }
+
+    .delete-annotation-btn svg {
+      width: 14px;
+      height: 14px;
     }
   </style>
 </head>
@@ -1716,7 +1758,7 @@
                 </div>
                 <div class="session-info-item">
                   <span class="session-info-label">Status</span>
-                  <span class="session-info-value">${session.status || 'completed'}</span>
+                  <span class="session-info-value">${(session.status || 'completed').charAt(0).toUpperCase() + (session.status || 'completed').slice(1)}</span>
                 </div>
                 <div class="session-info-item">
                   <span class="session-info-label">Total Annotations</span>
@@ -1740,6 +1782,7 @@
                   nerveType: annotation.nerveType || annotation.nerve_type || 'Not specified',
                   sideOfBody: annotation.sideOfBody || annotation.side_of_body || 'Not specified',
                   patientPosition: annotation.patientPosition || annotation.patient_position || 'Not specified',
+                  scanRegion: annotation.scanRegion || annotation.scan_region || 'Not specified',
                   visibility: annotation.visibility || 'Not specified',
                   patientAgeGroup: annotation.patientAgeGroup || annotation.patient_age_group || 'Not specified',
                   needleApproach: annotation.needleApproach || annotation.needle_approach || 'Not specified',
@@ -1766,6 +1809,10 @@
                         <span class="annotation-detail-value">${annotationData.patientPosition}</span>
                       </div>
                       <div class="annotation-detail">
+                        <span class="annotation-detail-label">Scan Region</span>
+                        <span class="annotation-detail-value">${annotationData.scanRegion}</span>
+                      </div>
+                      <div class="annotation-detail">
                         <span class="annotation-detail-label">Visibility</span>
                         <span class="annotation-detail-value">${annotationData.visibility}</span>
                       </div>
@@ -1782,17 +1829,45 @@
                         <div class="clinical-notes-content">${annotationData.clinicalNotes}</div>
                       </div>
                     </div>
+                    <div class="annotation-actions">
+                      <button class="delete-annotation-btn" onclick="deleteAnnotation('${annotation.id}', '${sessionId}', ${index + 1})">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M8 6V4C8 3.44772 8.44772 3 9 3H15C15.5523 3 16 3.44772 16 4V6M19 6V20C19 21.1046 18.1046 22 17 22H7C5.89543 22 5 21.1046 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M10 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M14 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Delete Annotation
+                      </button>
+                    </div>
                   </div>
                 `;
               });
             }
             
-            // Update modal content
-            document.getElementById('sessionInfo').innerHTML = sessionInfoHtml;
-            document.getElementById('annotationsList').innerHTML = annotationsHtml;
+            // Combine session info and annotations into one HTML string
+            const fullDetailsHtml = sessionInfoHtml + annotationsHtml;
             
-            // Show modal
-            document.getElementById('annotationModal').style.display = 'block';
+            // Update modal content - check if element exists before setting innerHTML
+            const annotationDetailsElement = document.getElementById('annotation-details');
+            const annotationModalElement = document.getElementById('annotation-modal');
+            
+            if (annotationDetailsElement) {
+              annotationDetailsElement.innerHTML = fullDetailsHtml;
+            } else {
+              console.error('❌ Element with ID "annotation-details" not found');
+              showToast('Error: Modal structure not found', 'error');
+              return;
+            }
+            
+            // Show modal - use correct ID
+            if (annotationModalElement) {
+              annotationModalElement.style.display = 'block';
+            } else {
+              console.error('❌ Element with ID "annotation-modal" not found');
+              showToast('Error: Modal not found', 'error');
+              return;
+            }
             
           } else {
             console.error('❌ Failed to load session details:', result.error);
@@ -1805,6 +1880,14 @@
       } catch (error) {
         console.error('❌ Error viewing session details:', error);
         showToast('Error loading session details', 'error');
+      }
+    }
+
+    // Close annotation modal
+    function closeAnnotationModal() {
+      const annotationModalElement = document.getElementById('annotation-modal');
+      if (annotationModalElement) {
+        annotationModalElement.style.display = 'none';
       }
     }
 
@@ -1988,434 +2071,50 @@
       }
     }
 
-    // Toast notification function
-    function showToast(message, type = 'success') {
-      const toast = document.createElement('div');
-      toast.className = `toast toast-${type}`;
-      toast.textContent = message;
-      toast.style.cssText = `
-        position: fixed;
-        top: 80px;
-        right: 20px;
-        background: ${type === 'error' ? '#ef4444' : type === 'info' ? '#3b82f6' : '#10b981'};
-        color: white;
-        padding: 12px 20px;
-        border-radius: 8px;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        font-size: 14px;
-        font-weight: 500;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        z-index: 10000;
-        opacity: 0;
-        transform: translateX(100%);
-        transition: all 0.3s ease;
-      `;
-
-      document.body.appendChild(toast);
-
-      requestAnimationFrame(() => {
-        toast.style.opacity = '1';
-        toast.style.transform = 'translateX(0)';
-      });
-
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        setTimeout(() => {
-          if (toast.parentNode) {
-            toast.parentNode.removeChild(toast);
-          }
-        }, 300);
-      }, 3000);
-    }
-
-    // Initialize the library when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('📚 Library page loaded, initializing...');
-      loadSessionsFromDatabase();
-    });
-  </script>
-
-  <!-- Annotation Details Modal -->
-        const result = await window.electronAPI.dbGetSessionDetails(sessionId);
-        
-        if (!result.success || !result.session) {
-          showToast('Session not found', 'error');
-          return;
-        }
-        
-        const session = result.session;
-        const annotations = result.annotations || [];
-        
-        const exportData = {
-          sessionInfo: {
-            id: session.id,
-            title: session.title,
-            attendees: session.attendees || session.doctor_name,
-            category: session.category,
-            startTime: session.start_time || session.startTime,
-            endTime: session.end_time || session.endTime,
-            totalAnnotations: annotations.length,
-            status: session.status
-          },
-          format: 'flattened_annotation_image_pairs',
-          description: 'Session export from database',
-          annotations: annotations.map(annotation => ({
-            annotationId: annotation.id,
-            annotationTimestamp: annotation.timestamp || annotation.created_at,
-            annotationType: annotation.annotationType || annotation.type || 'polygon',
-            annotationPoints: annotation.points,
-            nerveType: annotation.nerveType || annotation.nerve_type,
-            sideOfBody: annotation.sideOfBody || annotation.side_of_body,
-            patientPosition: annotation.patientPosition || annotation.patient_position,
-            visibility: annotation.visibility,
-            patientAgeGroup: annotation.patientAgeGroup || annotation.patient_age_group,
-            needleApproach: annotation.needleApproach || annotation.needle_approach,
-            clinicalNotes: annotation.clinicalNotes || annotation.clinical_notes,
-            imageId: annotation.imageId || annotation.image_id
-          }))
-        };
-
-        const dataStr = JSON.stringify(exportData, null, 2);
-        const dataBlob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(dataBlob);
-        
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `session_${session.id}_${session.category || 'annotations'}_${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        showToast(`Exported ${annotations.length} annotations`, 'success');
-        
-      } catch (error) {
-        console.error('❌ Export error:', error);
-        showToast('Export failed', 'error');
-      }
-    }
-
-    // Toast notification function
-    function showToast(message, type = 'success') {
-      const toast = document.createElement('div');
-      toast.className = `toast toast-${type}`;
-      toast.textContent = message;
-      toast.style.cssText = `
-        position: fixed;
-        top: 80px;
-        right: 20px;
-        background: ${type === 'error' ? '#ef4444' : type === 'info' ? '#3b82f6' : '#10b981'};
-        color: white;
-        padding: 12px 20px;
-        border-radius: 8px;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        font-size: 14px;
-        font-weight: 500;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        z-index: 10000;
-        opacity: 0;
-        transform: translateX(100%);
-        transition: all 0.3s ease;
-      `;
-
-      document.body.appendChild(toast);
-
-      // Trigger animation
-      requestAnimationFrame(() => {
-        toast.style.opacity = '1';
-        toast.style.transform = 'translateX(0)';
-      });
-
-      // Auto dismiss
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        setTimeout(() => {
-          if (toast.parentNode) {
-            toast.parentNode.removeChild(toast);
-          }
-        }, 300);
-      }, 3000);
-    }
-
-    // Initialize the library when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('📚 Library page loaded, initializing...');
+    // Delete annotation function
+    async function deleteAnnotation(annotationId, sessionId, annotationNumber) {
+      console.log(`🗑️ Deleting annotation ${annotationId} from session ${sessionId}`);
       
-      // Add some basic styling for toasts
-      if (!document.getElementById('toast-styles')) {
-        const toastStyles = document.createElement('style');
-        toastStyles.id = 'toast-styles';
-        toastStyles.textContent = `
-        .duration { font-family: monospace; }
-        .annotation-label { font-size: 0.75rem; color: #94a3b8; display: block; }
-        .image-count { font-size: 0.75rem; color: #94a3b8; }
-      `;
-      document.head.appendChild(toastStyles);
+      // Show confirmation dialog
+      const confirmed = confirm(`Are you sure you want to delete Annotation ${annotationNumber}? This action cannot be undone.`);
+      if (!confirmed) {
+        console.log('🚫 Annotation deletion cancelled by user');
+        return;
       }
       
-      // Load sessions from database
-      loadSessionsFromDatabase();
-    });
-
-    // Style for toast notifications 
-    const toastStyles = document.createElement('style');
-    toastStyles.textContent = `
-      .duration { font-family: monospace; }
-      .annotation-label { font-size: 0.75rem; color: #94a3b8; display: block; }
-      .image-count { font-size: 0.75rem; color: #94a3b8; }
-    `;
-    document.head.appendChild(toastStyles);
+      if (!window.electronAPI || !window.electronAPI.dbDeleteAnnotation) {
+        showToast('Database not available', 'error');
+        console.error('❌ electronAPI or dbDeleteAnnotation not available');
+        return;
+      }
       
       try {
-        const result = await window.electronAPI.dbGetSessionDetails(sessionId);
+        showToast('Deleting annotation...', 'info');
+        console.log('🗑️ Calling dbDeleteAnnotation...');
         
-        if (!result.success || !result.session) {
-          showToast('Session not found', 'error');
-          return;
-        }
+        const result = await window.electronAPI.dbDeleteAnnotation(annotationId);
+        console.log('🗑️ Delete annotation result:', result);
         
-        const session = result.session;
-        const annotations = result.annotations || [];
-        
-        const exportData = {
-          sessionInfo: {
-            id: session.id,
-            title: session.title,
-            attendees: session.attendees || session.doctor_name,
-            category: session.category,
-            startTime: session.start_time || session.startTime,
-            endTime: session.end_time || session.endTime,
-            totalAnnotations: annotations.length,
-            status: session.status
-          },
-          format: 'flattened_annotation_image_pairs',
-          description: 'Session export from database',
-          annotations: annotations.map(annotation => ({
-            annotationId: annotation.id,
-            annotationTimestamp: annotation.timestamp || annotation.created_at,
-            annotationType: annotation.annotationType || annotation.type || 'polygon',
-            annotationPoints: annotation.points,
-            nerveType: annotation.nerveType || annotation.nerve_type,
-            sideOfBody: annotation.sideOfBody || annotation.side_of_body,
-            patientPosition: annotation.patientPosition || annotation.patient_position,
-            visibility: annotation.visibility,
-            patientAgeGroup: annotation.patientAgeGroup || annotation.patient_age_group,
-            needleApproach: annotation.needleApproach || annotation.needle_approach,
-            clinicalNotes: annotation.clinicalNotes || annotation.clinical_notes,
-            imageId: annotation.imageId || annotation.image_id
-          }))
-        };
-
-        const dataStr = JSON.stringify(exportData, null, 2);
-        const dataBlob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(dataBlob);
-        
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `session_${session.id}_${session.category || 'annotations'}_${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        showToast(`Exported ${annotations.length} annotations`, 'success');
-        
-      } catch (error) {
-        console.error('❌ Export error:', error);
-        showToast('Export failed', 'error');
-      }
-    }
-
-    // Toast notification function
-    function showToast(message, type = 'success') {
-      const toast = document.createElement('div');
-      toast.className = `toast toast-${type}`;
-      toast.textContent = message;
-      toast.style.cssText = `
-        position: fixed;
-        top: 80px;
-        right: 20px;
-        background: ${type === 'error' ? '#ef4444' : type === 'info' ? '#3b82f6' : '#10b981'};
-        color: white;
-      });
-
-      // Create flattened annotation-image pairs
-      const flattenedAnnotations = annotationsData.map(annotation => {
-        // Find associated image (handle both in-memory and database field names)
-        const associatedImage = imagesData.find(img => 
-          img.id === (annotation.imageId || annotation.image_id)
-        );
-
-        // Handle image data
-        let imageData = null;
-        if (associatedImage) {
-          imageData = associatedImage.image_data || 
-                     associatedImage.data || 
-                     associatedImage.imageData || 
-                     associatedImage.base64 || 
-                     associatedImage.content || 
-                     associatedImage.file_data ||
-                     null;
-        }
-
-        // Safely parse annotation points (for database data)
-        let annotationPoints = [];
-        try {
-          const points = annotation.points;
-          if (points) {
-            if (typeof points === 'string') {
-              annotationPoints = JSON.parse(points);
-            } else if (Array.isArray(points) || typeof points === 'object') {
-              annotationPoints = points;
-            }
-          }
-        } catch (error) {
-          console.warn('Failed to parse annotation points for annotation', annotation.id, ':', error);
-          annotationPoints = [];
-        }
-
-        return {
-          // Annotation data (handle both field name formats)
-          annotationId: annotation.id,
-          annotationTimestamp: annotation.timestamp || annotation.created_at,
-          annotationType: annotation.annotationType || annotation.type || 'polygon',
-          annotationPoints: annotationPoints,
+        if (result && result.success) {
+          console.log('✅ Annotation deleted successfully');
+          showToast(`Annotation ${annotationNumber} deleted successfully`, 'success');
           
-          // Medical attributes (handle both field name formats)
-          nerveType: annotation.nerveType || annotation.nerve_type,
-          sideOfBody: annotation.sideOfBody || annotation.side_of_body,
-          patientPosition: annotation.patientPosition || annotation.patient_position,
-          visibility: annotation.visibility,
-          patientAgeGroup: annotation.patientAgeGroup || annotation.patient_age_group,
-          needleApproach: annotation.needleApproach || annotation.needle_approach,
-          clinicalNotes: annotation.clinicalNotes || annotation.clinical_notes,
+          // Refresh the session details to show updated annotation list
+          console.log('🔄 Refreshing session details view...');
+          await viewSessionDetails(sessionId);
           
-          // Image data (handle both field name formats)
-          imageId: annotation.imageId || annotation.image_id,
-          imageName: associatedImage?.filename || associatedImage?.name || associatedImage?.file_name || associatedImage?.imageName || 'Unknown',
-          imageData: imageData,
-          imageSize: associatedImage?.fileSize || associatedImage?.file_size || associatedImage?.size,
-          imageType: associatedImage?.fileType || associatedImage?.file_type || associatedImage?.type || associatedImage?.mimeType,
-          imageUploadedAt: associatedImage?.uploadedAt || associatedImage?.uploaded_at || associatedImage?.created_at
-        };
-      });
-
-      // Create export data structure
-      const exportData = {
-        sessionInfo: {
-          id: sessionData.id,
-          title: sessionData.title,
-          attendees: sessionData.attendees || sessionData.doctor_name,
-          category: sessionData.category,
-          startTime: sessionData.startTime || sessionData.start_time,
-          endTime: sessionData.endTime || sessionData.end_time,
-          totalAnnotations: annotationsData.length,
-          totalImages: imagesData.length,
-          status: sessionData.status
-        },
-        format: 'flattened_annotation_image_pairs',
-        description: `Session export with annotation-image pairs in flattened format (${dataSource})`,
-        annotations: flattenedAnnotations
-      };
-
-      return exportData;
-    }
-
-    // Export session annotations (simplified backup version)
-    async function exportSession(sessionId) {
-      try {
-        console.log(`📤 Exporting session ${sessionId}`);
-        
-        if (window.electronAPI && window.electronAPI.dbGetSessionDetails) {
-          const result = await window.electronAPI.dbGetSessionDetails(sessionId);
+          // Also refresh the main sessions list to update statistics
+          console.log('🔄 Refreshing sessions list to update statistics...');
+          await loadSessionsFromDatabase();
           
-          if (result.success && result.session) {
-            const session = result.session;
-            const annotations = result.annotations || [];
-            const images = result.images || [];
-            
-            // Simple export data structure
-            const exportData = {
-              sessionInfo: {
-                id: session.id,
-                title: session.title,
-                attendees: session.attendees || session.doctor_name,
-                category: session.category,
-                startTime: session.start_time || session.startTime,
-                endTime: session.end_time || session.endTime,
-                totalAnnotations: annotations.length,
-                totalImages: images.length,
-                status: session.status
-              },
-              format: 'flattened_annotation_image_pairs',
-              description: 'Session export with annotation-image pairs in flattened format from SQLite database',
-              annotations: annotations.map(annotation => ({
-                annotationId: annotation.id,
-                annotationTimestamp: annotation.timestamp || annotation.created_at,
-                annotationType: annotation.annotationType || annotation.type || 'polygon',
-                annotationPoints: annotation.points,
-                nerveType: annotation.nerveType || annotation.nerve_type,
-                sideOfBody: annotation.sideOfBody || annotation.side_of_body,
-                patientPosition: annotation.patientPosition || annotation.patient_position,
-                visibility: annotation.visibility,
-                patientAgeGroup: annotation.patientAgeGroup || annotation.patient_age_group,
-                needleApproach: annotation.needleApproach || annotation.needle_approach,
-                clinicalNotes: annotation.clinicalNotes || annotation.clinical_notes,
-                imageId: annotation.imageId || annotation.image_id,
-                imageName: 'Export Image',
-                imageData: null
-              }))
-            };
-
-            // Download export
-            const dataStr = JSON.stringify(exportData, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `session_${session.id}_${session.category || 'annotations'}_${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showToast(`Exported ${annotations.length} annotations`, 'success');
-            
-          } else {
-            showToast('Session not found', 'error');
-          }
         } else {
-          showToast('Database not available', 'error');
+          console.error('❌ Failed to delete annotation:', result?.error || result);
+          showToast(`Failed to delete annotation: ${result?.error || 'Unknown error'}`, 'error');
         }
         
       } catch (error) {
-        console.error('❌ Export error:', error);
-        showToast(`Export failed: ${error.message}`, 'error');
-      }
-    } {
-              console.log('📝 Converting export data to JSON...');
-              const dataStr = JSON.stringify(exportData, null, 2);
-              console.log('✅ JSON conversion successful');
-              
-              const dataBlob = new Blob([dataStr], { type: 'application/json' });
-              const url = URL.createObjectURL(dataBlob);
-              
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = `session_${session.id}_${session.category || 'annotations'}_${new Date().toISOString().split('T')[0]}.json`;
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-              URL.revokeObjectURL(url);
-              
-              showToast(`Exported ${annotations.length} annotations`, 'success');
-        
-      } catch (error) {
-        console.error('❌ Export error:', error);
-        showToast('Export failed', 'error');
+        console.error('❌ Error deleting annotation:', error);
+        showToast('Error deleting annotation', 'error');
       }
     }
 
@@ -2432,111 +2131,66 @@
         color: white;
         padding: 12px 20px;
         border-radius: 8px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
         font-weight: 500;
-        z-index: 2000;
-        animation: slideInRight 0.3s ease-out;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        max-width: 300px;
-        font-size: 0.9rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        z-index: 10000;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
       `;
-      
+
       document.body.appendChild(toast);
-      
+
+      requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(0)';
+      });
+
       setTimeout(() => {
-        toast.style.animation = 'slideOutRight 0.3s ease-out';
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
         setTimeout(() => {
-          if (document.body.contains(toast)) {
-            document.body.removeChild(toast);
+          if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
           }
         }, 300);
-      }, 4000);
+      }, 3000);
     }
 
-    // Logout function
-    function logout() {
-      try {
-        if (typeof window.logout === 'function') {
-          window.logout();
-        }
-      } catch (error) {
-        console.log('Logout function not available');
+    // Initialize the library when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('📚 Library page loaded, initializing...');
+      loadSessionsFromDatabase();
+      
+      // Add click event listener to close modal when clicking outside
+      const annotationModal = document.getElementById('annotation-modal');
+      if (annotationModal) {
+        annotationModal.addEventListener('click', function(event) {
+          if (event.target === annotationModal) {
+            closeAnnotationModal();
+          }
+        });
       }
-      window.location.href = 'home-clean.html';
-    }
-
-    // Add CSS for toast animations
-    const toastStyles = document.createElement('style');
-    toastStyles.textContent = `
-      @keyframes slideInRight {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-      }
-      @keyframes slideOutRight {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-      }
-      .session-date .date { font-weight: 500; }
-      .session-date .time { font-size: 0.85rem; color: #94a3b8; }
-      .session-title strong { color: #1e293b; }
-      .session-category { font-size: 0.75rem; color: #94a3b8; margin-top: 2px; }
-      .attendee-name { color: #1e293b; }
-      .duration { font-family: monospace; }
-      .status { padding: 0.25rem 0.5rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 500; }
-      .status-completed { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-      .status-archived { background: rgba(107, 114, 128, 0.1); color: #9ca3af; }
-      .annotation-stats { text-align: center; }
-      .annotation-count { font-weight: 600; font-size: 1.1rem; color: #3b82f6; }
-      .annotation-label { font-size: 0.75rem; color: #94a3b8; display: block; }
-      .image-count { font-size: 0.75rem; color: #94a3b8; }
-    `;
-    document.head.appendChild(toastStyles);
+    });
   </script>
-  
+
   <!-- Annotation Details Modal -->
-  <div id="annotationModal" class="modal">
+  <div id="annotation-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Session Annotation Details</h2>
-        <span class="close">&times;</span>
+        <h3>Annotation Details</h3>
+        <span class="close-modal" onclick="closeAnnotationModal()">&times;</span>
       </div>
       <div class="modal-body">
-        <div id="sessionInfo" class="session-info"></div>
-        <div id="annotationsList" class="annotations-list"></div>
+        <div id="annotation-details"></div>
       </div>
     </div>
   </div>
 
   <script>
-    // Modal event handlers
-    document.addEventListener('DOMContentLoaded', function() {
-      const modal = document.getElementById('annotationModal');
-      const closeBtn = document.querySelector('.close');
-      
-      // Close modal when clicking the X button
-      if (closeBtn) {
-        closeBtn.onclick = function() {
-          modal.style.display = 'none';
-        };
-      }
-      
-      // Close modal when clicking outside of it
-      window.onclick = function(event) {
-        if (event.target === modal) {
-          modal.style.display = 'none';
-        }
-      };
-      
-      // Close modal with Escape key
-      document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape' && modal.style.display === 'block') {
-          modal.style.display = 'none';
-        }
-      });
-    });
-
-    // Test script to verify JavaScript execution
-    console.log('🔧 JavaScript is executing - testing library page');
-    console.log('🔧 Page title:', document.title);
+    console.log('📚 Library page script initialized');
     console.log('🔧 calls-tbody element exists:', !!document.getElementById('calls-tbody'));
   </script>
 </body>
