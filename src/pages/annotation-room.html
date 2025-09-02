@@ -852,7 +852,6 @@
     <div class="via-container" id="viaContainer">
       <iframe 
         id="via_image_annotator" 
-        src="/via/via-simple.html" 
         style="width: 100%; height: 100%; border: none;"
         title="VGG Image Annotator">
       </iframe>
@@ -1000,7 +999,7 @@
     // Session Management Functions
     function showStartSessionModal() {
       // Double-check current session state
-      console.log('🔍 Checking session state before opening modal:', currentSession);
+      console.log(' Checking session state before opening modal:', currentSession);
       
       // If there's an active session, warn user
       if (currentSession && currentSession.status === 'active') {
@@ -1010,7 +1009,7 @@
       
       // Clear any residual session data to ensure clean state
       if (currentSession) {
-        console.log('⚠️ Found inactive session data, clearing...');
+        console.log(' Found inactive session data, clearing...');
         currentSession = null;
         sessionAnnotations = [];
         sessionImages = [];
@@ -1028,7 +1027,7 @@
       document.getElementById('doctorName').value = '';
       document.getElementById('sessionCategory').value = 'annotation_session';
       
-      console.log('✅ Opening session modal for new session #' + nextSessionId);
+      console.log(' Opening session modal for new session #' + nextSessionId);
       document.getElementById('startSessionModal').classList.add('active');
     }
 
@@ -1039,7 +1038,7 @@
 
     // Debug helper function
     function checkSessionState() {
-      console.log('📊 Current Session State Debug:');
+      console.log(' Current Session State Debug:');
       console.log('- currentSession:', currentSession);
       console.log('- sessionAnnotations length:', sessionAnnotations?.length || 0);
       console.log('- sessionImages length:', sessionImages?.length || 0);
@@ -1053,7 +1052,7 @@
       const doctorInput = document.getElementById('doctorName');
       const categorySelect = document.getElementById('sessionCategory');
       
-      console.log('📝 Form Element States:');
+      console.log(' Form Element States:');
       console.log('- Title input disabled:', titleInput?.disabled);
       console.log('- Doctor input disabled:', doctorInput?.disabled);
       console.log('- Category select disabled:', categorySelect?.disabled);
@@ -1077,18 +1076,18 @@
       const category = document.getElementById('sessionCategory').value;
       const sessionId = document.getElementById('sessionId').value;
       
-      console.log('🚀 Starting new session with data:', { title, doctorName, category, sessionId });
-      console.log('🔍 Debug - Category element:', document.getElementById('sessionCategory'));
-      console.log('🔍 Debug - Category value:', category);
+      console.log(' Starting new session with data:', { title, doctorName, category, sessionId });
+      console.log(' Debug - Category element:', document.getElementById('sessionCategory'));
+      console.log(' Debug - Category value:', category);
       
       if (!title || !doctorName || !category) {
-        console.error('❌ Form validation failed:', { title: !!title, doctorName: !!doctorName, category: !!category });
+        console.error('Form validation failed:', { title: !!title, doctorName: !!doctorName, category: !!category });
         showToast('Please fill in all required fields', 'error');
         return;
       }
       
       // Clear any old session data to prevent mixing
-      console.log('🧹 Clearing ALL old annotation data from localStorage');
+      console.log(' Clearing ALL old annotation data from localStorage');
       localStorage.removeItem('medical_annotations');
       localStorage.removeItem('session_images');
       
@@ -1138,8 +1137,8 @@
       closeStartSessionModal();
       showToast(`Session #${sessionId} started successfully! You can now upload images.`, 'success');
       
-      console.log('🚀 Session started:', currentSession);
-      console.log('💾 Session data saved to localStorage');
+      console.log(' Session started:', currentSession);
+      console.log(' Session data saved to localStorage');
     }
 
     function saveCurrentAnnotation() {
@@ -1154,7 +1153,7 @@
       }
       
       // Debug: Log current form values before saving
-      console.log('🔍 Form values at save time:', debugCurrentFormValues());
+      console.log(' Form values at save time:', debugCurrentFormValues());
       
       // Reset VIA save completion flag
       window.viaSaveCompleted = false;
@@ -1172,7 +1171,7 @@
           // Set a timeout to save form data even if VIA doesn't respond
           setTimeout(() => {
             if (!window.viaSaveCompleted) {
-              console.log('⚠️ VIA did not respond within 500ms, saving form data only');
+              console.log(' VIA did not respond within 500ms, saving form data only');
               saveAnnotationToSession();
               window.viaSaveCompleted = true;
             }
@@ -1189,10 +1188,10 @@
     }
 
     function saveAnnotationToSession() {
-      console.log('🚀 saveAnnotationToSession() called - Starting annotation save process');
+      console.log(' saveAnnotationToSession() called - Starting annotation save process');
       
       if (!currentSession || !currentImage) {
-        console.log('⚠️ Missing session or image for annotation save');
+        console.log(' Missing session or image for annotation save');
         console.log('- currentSession:', !!currentSession);
         console.log('- currentImage:', !!currentImage);
         return;
@@ -1208,7 +1207,7 @@
       const needleApproach = document.getElementById('needleApproach').value;
       const clinicalNotes = document.getElementById('clinicalNotes').value;
       
-      console.log('📋 Reading form values for annotation:', {
+      console.log(' Reading form values for annotation:', {
         nerveType,
         sideOfBody,
         patientPosition,
@@ -1271,17 +1270,17 @@
           window.electronAPI.dbSaveImage(imageData)
             .then(result => {
               if (result.success) {
-                console.log('✅ Image saved to database:', result);
+                console.log(' Image saved to database:', result);
               } else {
-                console.error('❌ Failed to save image to database:', result.error);
+                console.error(' Failed to save image to database:', result.error);
               }
             })
             .catch(error => {
-              console.error('❌ Database image save error:', error);
+              console.error(' Database image save error:', error);
             });
         }
       } else {
-        console.log('ℹ️ Image already exists in session images');
+        console.log(' Image already exists in session images');
       }
       
       // Save annotation to database
@@ -1302,30 +1301,30 @@
         timestamp: annotation.timestamp
       };
       
-      console.log('💾 About to save annotation to database:', dbAnnotation);
-      console.log('💾 electronAPI available:', !!window.electronAPI);
-      console.log('💾 dbSaveAnnotation available:', !!(window.electronAPI && window.electronAPI.dbSaveAnnotation));
+      console.log(' About to save annotation to database:', dbAnnotation);
+      console.log(' electronAPI available:', !!window.electronAPI);
+      console.log(' dbSaveAnnotation available:', !!(window.electronAPI && window.electronAPI.dbSaveAnnotation));
       
       if (window.electronAPI && window.electronAPI.dbSaveAnnotation) {
         window.electronAPI.dbSaveAnnotation(dbAnnotation)
           .then(result => {
             if (result.success) {
-              console.log('✅ Annotation saved to database:', result);
+              console.log(' Annotation saved to database:', result);
               
               // Immediately verify what was saved by reading it back
               if (window.electronAPI.dbGetAnnotation) {
                 return window.electronAPI.dbGetAnnotation(dbAnnotation.id);
               }
             } else {
-              console.error('❌ Failed to save annotation to database:', result.error);
+              console.error(' Failed to save annotation to database:', result.error);
             }
           })
           .then(verifyResult => {
             if (verifyResult && verifyResult.success) {
-              console.log('🔍 Verification - What was actually saved to database:', verifyResult.annotation);
+              console.log(' Verification - What was actually saved to database:', verifyResult.annotation);
               
               // Compare what we sent vs what was saved
-              console.log('📊 Comparison of sent vs saved data:');
+              console.log(' Comparison of sent vs saved data:');
               console.log('- Sent nerveType:', dbAnnotation.nerveType, '| Saved nerveType:', verifyResult.annotation.nerve_type);
               console.log('- Sent sideOfBody:', dbAnnotation.sideOfBody, '| Saved sideOfBody:', verifyResult.annotation.side_of_body);
               console.log('- Sent patientPosition:', dbAnnotation.patientPosition, '| Saved patientPosition:', verifyResult.annotation.patient_position);
@@ -1336,26 +1335,26 @@
             }
           })
           .catch(error => {
-            console.error('❌ Database annotation save/verify error:', error);
+            console.error(' Database annotation save/verify error:', error);
           });
       } else {
-        console.error('❌ electronAPI or dbSaveAnnotation not available - annotation will not be saved to database!');
-        console.error('❌ This means the annotation will only exist in the session but not be persisted');
-        showToast('⚠️ Database not available - annotation saved to session only', 'warning');
+        console.error(' electronAPI or dbSaveAnnotation not available - annotation will not be saved to database!');
+        console.error(' This means the annotation will only exist in the session but not be persisted');
+        showToast(' Database not available - annotation saved to session only', 'warning');
       }
       
-      showToast(`✅ Annotation saved! (${sessionAnnotations.length} total in session)`, 'success');
+      showToast(` Annotation saved! (${sessionAnnotations.length} total in session)`, 'success');
       
       // Automatically proceed to next annotation after successful save
       showToast('📷 Loading next annotation interface...', 'info');
       nextAnnotation();
       
-      console.log('💾 Annotation saved to session:', annotation);
-      console.log(`📊 Session now has ${sessionAnnotations.length} annotations and ${sessionImages.length} images`);
+      console.log(' Annotation saved to session:', annotation);
+      console.log(` Session now has ${sessionAnnotations.length} annotations and ${sessionImages.length} images`);
       
       // Clear the stored VIA annotation since we've used it
       if (currentVIAAnnotation) {
-        console.log('🧹 Clearing stored VIA annotation after save');
+        console.log(' Clearing stored VIA annotation after save');
         currentVIAAnnotation = null;
       }
     }
@@ -1372,7 +1371,7 @@
         clinicalNotes: document.getElementById('clinicalNotes').value
       };
       
-      console.log('🔍 Current form values:', formValues);
+      console.log(' Current form values:', formValues);
       showToast('Form values logged to console', 'info');
       return formValues;
     }
@@ -1408,7 +1407,7 @@
         if (viaFrame && viaFrame.contentWindow) {
           // Send clear command
           viaFrame.contentWindow.postMessage({ type: 'clear_annotations' }, '*');
-          console.log('🧹 Sent clear command to VIA iframe');
+          console.log(' Sent clear command to VIA iframe');
         }
       } catch (error) {
         console.log('Could not clear VIA annotations:', error);
@@ -1423,7 +1422,7 @@
             viaFrame.src = 'about:blank';
             setTimeout(() => {
               viaFrame.src = currentSrc;
-              console.log('🔄 VIA iframe completely reloaded for clean state');
+              console.log(' VIA iframe completely reloaded for clean state');
             }, 200);
           }
         } catch (error) {
@@ -1431,7 +1430,7 @@
         }
       }, 300);
       
-      showToast(`📷 Ready for next image! (Session has ${sessionAnnotations.length} annotations so far)`, 'info');
+      showToast(` Ready for next image! (Session has ${sessionAnnotations.length} annotations so far)`, 'info');
     }
 
     function showEndSessionModal() {
@@ -1440,8 +1439,8 @@
         return;
       }
       
-      console.log('🔍 Debug - Current session data:', currentSession);
-      console.log('🔍 Debug - Session category:', currentSession.category);
+      console.log(' Debug - Current session data:', currentSession);
+      console.log(' Debug - Session category:', currentSession.category);
       
       // Calculate session duration
       const duration = Date.now() - sessionStartTime;
@@ -1464,7 +1463,7 @@
           .map(word => word.charAt(0).toUpperCase() + word.slice(1))
           .join(' ');
       }
-      console.log('🔍 Debug - Category display:', categoryDisplay);
+      console.log(' Debug - Category display:', categoryDisplay);
       document.getElementById('displaySessionCategory').textContent = categoryDisplay;
       
       document.getElementById('endSessionModal').classList.add('active');
@@ -1476,12 +1475,12 @@
 
     // Keyboard Shortcuts Modal Functions
     function toggleKeyboardShortcuts() {
-      console.log('🔴 toggleKeyboardShortcuts called');
+      console.log(' toggleKeyboardShortcuts called');
       document.getElementById('keyboardShortcutsModal').classList.add('active');
     }
 
     function closeKeyboardShortcutsModal() {
-      console.log('🔴 closeKeyboardShortcutsModal called');
+      console.log(' closeKeyboardShortcutsModal called');
       document.getElementById('keyboardShortcutsModal').classList.remove('active');
     }
 
@@ -1495,7 +1494,7 @@
         maxWidth = 800
       } = options;
 
-      console.log('📤 Creating unified export:', {
+      console.log(' Creating unified export:', {
         annotations: annotationsData.length,
         images: imagesData.length,
         compression: useCompression
@@ -1616,7 +1615,7 @@
         return;
       }
       
-      console.log('📤 Exporting current session data');
+      console.log(' Exporting current session data');
       
       const currentSessionAnnotations = sessionAnnotations || [];
       
@@ -1638,21 +1637,21 @@
         downloadJSON(exportData, filename);
         
         showToast(`Session data exported with ${currentSessionAnnotations.length} annotations from current session!`, 'success');
-        console.log('📤 Current session data exported:', exportData);
+        console.log(' Current session data exported:', exportData);
         
       } catch (error) {
-        console.error('❌ Export failed:', error);
+        console.error(' Export failed:', error);
         showToast('Export failed - please try again', 'error');
       }
     }
 
-    function endSession() {
-      console.log('🏁 endSession() called');
-      console.log('🔍 Debug - currentSession at start:', currentSession);
-      console.log('🔍 Debug - sessionAnnotations at start:', sessionAnnotations);
+    async function endSession() {
+      console.log(' endSession() called');
+      console.log(' Debug - currentSession at start:', currentSession);
+      console.log(' Debug - sessionAnnotations at start:', sessionAnnotations);
       
       if (!currentSession) {
-        console.error('❌ No current session found when trying to end session');
+        console.error(' No current session found when trying to end session');
         return;
       }
       
@@ -1673,8 +1672,8 @@
         status: 'completed'
       };
       
-      console.log('💾 Saving session data to database:', sessionData);
-      console.log('📊 Session contains:', {
+      console.log(' Saving session data to database:', sessionData);
+      console.log(' Session contains:', {
         annotations: sessionAnnotations.length,
         images: sessionImages.length,
         duration: sessionData.duration
@@ -1683,23 +1682,23 @@
       // Ensure all annotations are saved to database before ending session
       const saveAllAnnotations = async () => {
         if (!currentSession || !currentSession.id) {
-          console.error('❌ No valid current session found for saving annotations');
+          console.error(' No valid current session found for saving annotations');
           return;
         }
         
         if (sessionAnnotations && sessionAnnotations.length > 0) {
-          console.log(`🔄 Ensuring ${sessionAnnotations.length} annotations are saved to database...`);
-          console.log('🔍 Debug - sessionAnnotations array:', sessionAnnotations);
+          console.log(` Ensuring ${sessionAnnotations.length} annotations are saved to database...`);
+          console.log(' Debug - sessionAnnotations array:', sessionAnnotations);
           
           for (const annotation of sessionAnnotations) {
             // Add null checks to prevent errors
             if (!annotation || !annotation.id) {
-              console.warn('⚠️ Skipping annotation with missing id:', annotation);
+              console.warn(' Skipping annotation with missing id:', annotation);
               continue;
             }
             
             if (!annotation.imageId) {
-              console.warn('⚠️ Skipping annotation with missing imageId:', annotation);
+              console.warn(' Skipping annotation with missing imageId:', annotation);
               continue;
             }
             
@@ -1722,9 +1721,9 @@
             
             try {
               await window.electronAPI.dbSaveAnnotation(dbAnnotation);
-              console.log(`✅ Annotation ${annotation.id} ensured in database`);
+              console.log(` Annotation ${annotation.id} ensured in database`);
             } catch (error) {
-              console.error(`❌ Failed to ensure annotation ${annotation.id}:`, error);
+              console.error(` Failed to ensure annotation ${annotation.id}:`, error);
             }
           }
         }
@@ -1732,14 +1731,14 @@
       
       // Save annotations first, then save session
       if (window.electronAPI && window.electronAPI.dbSaveSession) {
-        console.log('🔍 Debug - About to call saveAllAnnotations, currentSession:', currentSession);
+        console.log(' Debug - About to call saveAllAnnotations, currentSession:', currentSession);
         // First ensure all annotations are in database
         saveAllAnnotations().then(() => {
           // Then save the session with the correct count
           return window.electronAPI.dbSaveSession(sessionData);
         }).then(result => {
           if (result.success) {
-            console.log('✅ Session saved to database successfully:', result);
+            console.log(' Session saved to database successfully:', result);
             showToast('Session data saved to library!', 'success');
             
             // Notify home page about session completion for statistics update
@@ -1749,7 +1748,7 @@
                   type: 'sessionCompleted',
                   sessionData: sessionData
                 }, '*');
-                console.log('📊 Notified home page about session completion');
+                console.log(' Notified home page about session completion');
               }
               
               // Also dispatch event for local listeners
@@ -1761,7 +1760,7 @@
             }
             
           } else {
-            console.error('❌ Failed to save session to database:', result.error);
+            console.error(' Failed to save session to database:', result.error);
             showToast('Session completed but save failed', 'error');
           }
           
@@ -1769,14 +1768,14 @@
           performSessionCleanup();
           
         }).catch(error => {
-          console.error('❌ Database save error:', error);
+          console.error(' Database save error:', error);
           showToast('Session completed but save failed', 'error');
           
           // Clean up session even on error
           performSessionCleanup();
         });
       } else {
-        console.error('❌ electronAPI or dbSaveSession not available');
+        console.error(' electronAPI or dbSaveSession not available');
         showToast('Database not available - session not saved', 'error');
         
         // Clean up session even when database not available
@@ -1786,7 +1785,7 @@
 
     // Separate function to handle all session cleanup
     function performSessionCleanup() {
-      console.log('🏁 Starting session cleanup, currentSession:', currentSession);
+      console.log(' Starting session cleanup, currentSession:', currentSession);
       const endedSessionId = currentSession ? currentSession.id : 'unknown';
       
       // Clean up localStorage
@@ -1814,6 +1813,18 @@
       sessionStartTime = null;
       currentImage = null;
       
+      // Clear session data from both IPC and localStorage
+      if (typeof window.electronAPI !== 'undefined' && window.electronAPI.sessionClearData) {
+        window.electronAPI.sessionClearData().then(() => {
+          console.log(' Session data cleared via Electron IPC');
+        }).catch(error => {
+          console.error('❌ Failed to clear session data via IPC:', error);
+        });
+      }
+      localStorage.removeItem('currentSession');
+      localStorage.removeItem('sessionStartTime');
+      localStorage.removeItem('lastSessionId');
+      
       // Clear form inputs to ensure fresh start
       document.getElementById('sessionTitle').value = '';
       document.getElementById('doctorName').value = '';
@@ -1821,12 +1832,23 @@
       
       showToast(`Session #${endedSessionId} ended successfully! You can start a new session.`, 'success');
       
-      console.log('✅ Session data cleared, ready for new session');
+      console.log(' Session data cleared, ready for new session');
       
       // Redirect to home page immediately after session cleanup
-      console.log('🏠 Redirecting to home page...');
+      console.log(' Redirecting to home page...');
       showToast('Redirecting to home page...', 'info');
-      window.location.href = 'home-clean.html';
+      
+      // Use Electron API if available, otherwise fallback to window.location
+      if (typeof window.electronAPI !== 'undefined' && window.electronAPI.navigate) {
+        window.electronAPI.navigate('home-clean.html').then(() => {
+          console.log(' Navigation to home page successful');
+        }).catch(error => {
+          console.error(' Navigation failed, using fallback:', error);
+          window.location.href = 'home-clean.html';
+        });
+      } else {
+        window.location.href = 'home-clean.html';
+      }
     }
 
     // Predefined Medical Attributes for Ultrasound-Guided Regional Anesthesia
@@ -1928,12 +1950,12 @@
 
     // Upload Images Function
     function uploadImages() {
-      console.log('🖼️ Upload images function called');
+      console.log(' Upload images function called');
       console.log('- Current session:', currentSession);
       
       if (!currentSession) {
         showToast('Please start a session first by clicking "Start a Session" button above', 'error');
-        console.log('❌ No active session - cannot upload');
+        console.log(' No active session - cannot upload');
         // Highlight the start session button
         const startBtn = document.getElementById('startSessionBtn');
         if (startBtn) {
@@ -1942,37 +1964,37 @@
         return;
       }
       
-      console.log('✅ Session active, triggering file input click');
+      console.log(' Session active, triggering file input click');
       const fileInput = document.getElementById('fileInput');
       if (fileInput) {
         // Reset the file input to ensure change event fires even for same file
         fileInput.value = '';
         fileInput.click();
-        console.log('📁 File input clicked');
+        console.log(' File input clicked');
       } else {
-        console.error('❌ File input element not found');
+        console.error(' File input element not found');
         showToast('Upload interface error - please refresh the page', 'error');
       }
     }
 
     // Handle File Upload
     function handleFileUpload(event) {
-      console.log('📥 File upload handler called');
+      console.log(' File upload handler called');
       console.log('- Event:', event);
       console.log('- Files:', event.target.files);
       
       const file = event.target.files[0];
       if (!file) {
-        console.log('❌ No file selected');
+        console.log(' No file selected');
         return;
       }
 
-      console.log('✅ File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
-      console.log('🔄 Processing medical image:', file.name);
+      console.log(' File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
+      console.log(' Processing medical image:', file.name);
       
       const reader = new FileReader();
       reader.onload = function(e) {
-        console.log('📖 File read completed, creating image object');
+        console.log(' File read completed, creating image object');
         currentImage = {
           id: 'img_' + Date.now(),
           filename: file.name,
@@ -1982,7 +2004,7 @@
           uploadedAt: new Date().toISOString()
         };
 
-        console.log('🖼️ Image object created:', {
+        console.log(' Image object created:', {
           id: currentImage.id,
           filename: currentImage.filename,
           size: currentImage.size,
@@ -1993,7 +2015,7 @@
       };
       
       reader.onerror = function(error) {
-        console.error('❌ File reading error:', error);
+        console.error(' File reading error:', error);
         showToast('Error reading file. Please try again.', 'error');
       };
       
@@ -2002,14 +2024,14 @@
 
     // Display Image in Canvas Area
     function displayImage(imageSrc) {
-      console.log('🎨 Display image function called');
+      console.log(' Display image function called');
       
       // Clear any existing VIA annotations before loading new image
       try {
         const viaFrame = document.getElementById('via_image_annotator');
         if (viaFrame && viaFrame.contentWindow) {
           viaFrame.contentWindow.postMessage({ type: 'clear_annotations' }, '*');
-          console.log('🧹 Cleared VIA annotations before loading new image');
+          console.log(' Cleared VIA annotations before loading new image');
         }
       } catch (error) {
         console.log('Could not clear VIA annotations:', error);
@@ -2020,7 +2042,7 @@
       const mainImage = document.getElementById('mainImage');
 
       if (!uploadOverlay || !imageContainer || !mainImage) {
-        console.error('❌ Required DOM elements not found:', {
+        console.error(' Required DOM elements not found:', {
           uploadOverlay: !!uploadOverlay,
           imageContainer: !!imageContainer,
           mainImage: !!mainImage
@@ -2029,14 +2051,14 @@
         return;
       }
 
-      console.log('✅ DOM elements found, updating display');
+      console.log(' DOM elements found, updating display');
       
       // Hide upload overlay and show image
       uploadOverlay.style.display = 'none';
       mainImage.src = imageSrc;
       imageContainer.classList.add('active');
 
-      console.log('✅ Image displayed - starting annotation automatically');
+      console.log(' Image displayed - starting annotation automatically');
       showToast('Image loaded successfully! Starting annotation tools...', 'success');
       
       // Automatically start annotation after a brief delay to ensure image is loaded
@@ -2049,7 +2071,7 @@
     function startAnnotation() {
       if (!currentImage) return;
 
-      console.log('🎯 Starting local VGG annotation mode...');
+      console.log(' Starting local VGG annotation mode...');
       
       // Show loading
       showLoading();
@@ -2066,21 +2088,48 @@
     }
 
     // Initialize Local VGG Image Annotator
-    function initializeLocalVIA() {
+    async function initializeLocalVIA() {
       const viaFrame = document.getElementById('via_image_annotator');
       
-      viaFrame.onload = function() {
-        console.log('Local VIA iframe loaded, sending image...');
-        setTimeout(() => {
-          sendImageToVIA();
-        }, 1000);
-      };
+      try {
+        // Get the correct VIA path from main process
+        let viaPath = '/via/via-simple.html'; // Default for development
+        
+        if (typeof window.electronAPI !== 'undefined' && window.electronAPI.getViaPath) {
+          console.log(' Getting VIA path from main process...');
+          const result = await window.electronAPI.getViaPath();
+          if (result.success) {
+            viaPath = result.viaPath;
+            console.log(' VIA path received:', viaPath);
+          } else {
+            console.warn(' Failed to get VIA path, using default');
+          }
+        }
+        
+        console.log(' Setting VIA iframe src to:', viaPath);
+        viaFrame.src = viaPath;
+        
+        viaFrame.onload = function() {
+          console.log(' Local VIA iframe loaded successfully!');
+          setTimeout(() => {
+            sendImageToVIA();
+          }, 1000);
+        };
+        
+        viaFrame.onerror = function(error) {
+          console.error(' Failed to load VIA iframe:', error);
+          showToast('Failed to load annotation tool. Please try refreshing.', 'error');
+        };
 
-      // If already loaded, send image immediately
-      if (viaFrame.contentDocument && viaFrame.contentDocument.readyState === 'complete') {
-        setTimeout(() => {
-          sendImageToVIA();
-        }, 500);
+        // If already loaded, send image immediately
+        if (viaFrame.contentDocument && viaFrame.contentDocument.readyState === 'complete') {
+          setTimeout(() => {
+            sendImageToVIA();
+          }, 500);
+        }
+      } catch (error) {
+        console.error(' Error initializing VIA:', error);
+        showToast('Error initializing annotation tool', 'error');
       }
     }
 
@@ -2093,7 +2142,7 @@
         if (viaWindow && currentImage) {
           // Clear any existing annotations before loading new image
           viaWindow.postMessage({ type: 'clear_annotations' }, '*');
-          console.log('🧹 Cleared VIA before sending new image');
+          console.log(' Cleared VIA before sending new image');
           
           // Small delay to ensure clearing is processed
           setTimeout(() => {
@@ -2106,13 +2155,13 @@
               }
             }, '*');
             
-            console.log('✅ Image sent to local VIA successfully');
+            console.log(' Image sent to local VIA successfully');
             showToast('Local VGG Image Annotator ready!', 'success');
           }, 100);
         }
         
       } catch (error) {
-        console.log('⚠️ Error communicating with local VIA:', error);
+        console.log(' Error communicating with local VIA:', error);
         showToast('VIA loaded - you can start annotating', 'info');
       }
     }
@@ -2126,24 +2175,24 @@
       
       switch (type) {
         case 'annotation_created':
-          console.log('💾 Annotation received from VIA:', data);
+          console.log(' Annotation received from VIA:', data);
           // Store the VIA annotation but don't save it yet - wait for user to click "Save Annotation"
           currentVIAAnnotation = data;
-          console.log('📝 VIA annotation stored, waiting for user to set attributes and save manually');
+          console.log(' VIA annotation stored, waiting for user to set attributes and save manually');
           showToast('Polygon created! Set your attributes and click "Save Annotation"', 'info');
           break;
         case 'save_current_annotation':
-          console.log('💾 Save current annotation requested from VIA');
+          console.log(' Save current annotation requested from VIA');
           // Save current annotation and move to next image
           saveCurrentAnnotation();
           break;
         case 'annotations_export':
-          console.log('📤 VIA requested export, but ignoring to prevent unwanted popups during save');
+          console.log(' VIA requested export, but ignoring to prevent unwanted popups during save');
           // No automatic export - only allow manual export from End Session modal
           break;
         case 'get_annotations':
           // Handle get annotations response
-          console.log('📥 Received annotations from VIA:', data);
+          console.log(' Received annotations from VIA:', data);
           window.viaSaveCompleted = true; // Mark that VIA responded
           
           if (data && data.length > 0) {
@@ -2152,11 +2201,11 @@
               console.log('Processing VIA annotation for current session:', annotation);
               saveMedicalAnnotationFromVIA(annotation);
             });
-            showToast(`✅ Saved ${data.length} annotation(s) with polygons! (${sessionAnnotations.length} total)`, 'success');
+            showToast(` Saved ${data.length} annotation(s) with polygons! (${sessionAnnotations.length} total)`, 'success');
           } else {
             // No VIA annotations, save form data only to current session
             saveAnnotationToSession();
-            showToast('✅ Annotation saved with medical attributes!', 'success');
+            showToast(' Annotation saved with medical attributes!', 'success');
           }
           break;
         case 'get_annotations_for_save':
@@ -2172,7 +2221,7 @@
     // Save Medical Annotation from VIA (only to current session, not localStorage)
     function saveMedicalAnnotationFromVIA(viaAnnotation) {
       if (!currentSession) {
-        console.log('⚠️ No active session - cannot save annotation');
+        console.log(' No active session - cannot save annotation');
         showToast('No active session. Please start a session first.', 'error');
         return;
       }
@@ -2186,7 +2235,7 @@
       const needleApproach = document.getElementById('needleApproach').value;
       const clinicalNotes = document.getElementById('clinicalNotes').value;
       
-      console.log('📋 Reading form values for VIA annotation:', {
+      console.log(' Reading form values for VIA annotation:', {
         nerveType,
         sideOfBody,
         patientPosition,
@@ -2236,7 +2285,7 @@
           currentSession.images.push(currentImage);
         }
         
-        console.log('✅ Added image to current session only:', {
+        console.log(' Added image to current session only:', {
           filename: imageData.filename,
           sessionId: currentSession?.id,
           hasData: !!imageData.data
@@ -2265,24 +2314,24 @@
         window.electronAPI.dbSaveAnnotation(dbAnnotation)
           .then(result => {
             if (result.success) {
-              console.log('✅ VIA annotation saved to database:', result);
+              console.log(' VIA annotation saved to database:', result);
             } else {
-              console.error('❌ Failed to save VIA annotation to database:', result.error);
+              console.error(' Failed to save VIA annotation to database:', result.error);
             }
           })
           .catch(error => {
-            console.error('❌ Database VIA annotation save error:', error);
+            console.error(' Database VIA annotation save error:', error);
           });
       }
       
-      console.log('🏥 VIA annotation saved to CURRENT SESSION ONLY with', medicalAnnotation.points?.length || 0, 'points');
-      console.log(`📊 Current session now has ${sessionAnnotations.length} annotations and ${sessionImages.length} images`);
+      console.log(' VIA annotation saved to CURRENT SESSION ONLY with', medicalAnnotation.points?.length || 0, 'points');
+      console.log(` Current session now has ${sessionAnnotations.length} annotations and ${sessionImages.length} images`);
       showToast(`Annotation saved to current session! (Total: ${sessionAnnotations.length})`, 'success');
     }
 
     // Activate Polygon Tool
     function activatePolygonTool() {
-      console.log('🎯 Polygon tool activated');
+      console.log(' Polygon tool activated');
       
       if (!document.getElementById('viaContainer').classList.contains('active')) {
         showToast('Please upload an image first to start annotation', 'info');
@@ -2301,10 +2350,10 @@
           }, '*');
           
           showToast('Polygon tool activated in VGG annotator', 'success');
-          console.log('📐 Polygon tool message sent to local VIA');
+          console.log(' Polygon tool message sent to local VIA');
         }
       } catch (error) {
-        console.log('⚠️ Could not communicate with local VIA:', error);
+        console.log(' Could not communicate with local VIA:', error);
         showToast('Use polygon tool in the left toolbar of VGG annotator', 'info');
       }
     }
@@ -2566,8 +2615,8 @@
             ctx.drawImage(img, 0, 0, newWidth, newHeight);
             const compressedData = canvas.toDataURL('image/jpeg', quality);
             
-            console.log(`🗜️ Image compressed: ${img.width}x${img.height} → ${newWidth}x${newHeight}`);
-            console.log(`📦 Size reduction: ${imageDataUrl.length} → ${compressedData.length} chars`);
+            console.log(` Image compressed: ${img.width}x${img.height} → ${newWidth}x${newHeight}`);
+            console.log(` Size reduction: ${imageDataUrl.length} → ${compressedData.length} chars`);
             
             resolve({
               data: compressedData,
@@ -2580,7 +2629,7 @@
           };
           
           img.onerror = function() {
-            console.log('⚠️ Could not compress image, using original');
+            console.log(' Could not compress image, using original');
             resolve({
               data: imageDataUrl,
               originalSize: imageDataUrl.length,
@@ -2592,7 +2641,7 @@
           
           img.src = imageDataUrl;
         } catch (error) {
-          console.log('⚠️ Compression error:', error);
+          console.log(' Compression error:', error);
           resolve({
             data: imageDataUrl,
             originalSize: imageDataUrl.length,
@@ -2633,7 +2682,7 @@
         }
         
         showToast('All annotations cleared', 'info');
-        console.log('�️ All annotations cleared');
+        console.log(' All annotations cleared');
         
         // Reset to upload state
         document.getElementById('viaContainer').classList.remove('active');
@@ -2717,16 +2766,16 @@
       });
       needleSelect.value = MEDICAL_ATTRIBUTES.Needle_Approach.default_option_id;
 
-      console.log('✅ Dropdown menus populated with medical attributes');
+      console.log(' Dropdown menus populated with medical attributes');
     }
 
     // Load unique doctors for dropdown
     async function loadUniqueDoctors() {
-      console.log('👨‍⚕️ Loading unique doctors for dropdown...');
+      console.log(' Loading unique doctors for dropdown...');
       
       try {
         if (!window.electronAPI || !window.electronAPI.dbGetUniqueDoctors) {
-          console.warn('👨‍⚕️ Database API not available for doctors');
+          console.warn(' Database API not available for doctors');
           return;
         }
 
@@ -2745,20 +2794,67 @@
               doctorsList.appendChild(option);
             });
             
-            console.log(`👨‍⚕️ Loaded ${result.doctors.length} unique doctors:`, result.doctors);
+            console.log(` Loaded ${result.doctors.length} unique doctors:`, result.doctors);
           }
         } else {
-          console.warn('👨‍⚕️ No doctors found or failed to load');
+          console.warn(' No doctors found or failed to load');
         }
       } catch (error) {
-        console.error('❌ Failed to load unique doctors:', error);
+        console.error(' Failed to load unique doctors:', error);
+      }
+    }
+
+    // Enable upload functionality when session is active
+    function enableUploadFunctionality() {
+      const uploadBtn = document.getElementById('uploadBtn');
+      const fileInput = document.getElementById('fileInput');
+      
+      if (uploadBtn) {
+        uploadBtn.disabled = false;
+        uploadBtn.style.opacity = '1';
+        uploadBtn.style.cursor = 'pointer';
+        console.log(' Upload button enabled');
+      }
+      
+      if (fileInput) {
+        fileInput.disabled = false;
+        console.log(' File input enabled');
+      }
+      
+      // Show upload area if hidden
+      const uploadArea = document.querySelector('.upload-area');
+      if (uploadArea) {
+        uploadArea.style.display = 'block';
+        console.log(' Upload area shown');
+      }
+    }
+
+    // Update session display in the UI
+    function updateSessionDisplay() {
+      if (currentSession) {
+        // Update UI to show active session
+        const startSessionBtn = document.getElementById('startSessionBtn');
+        const sessionControls = document.getElementById('sessionControls');
+        const sessionInfo = document.getElementById('sessionInfo');
+        const saveAnnotationBtn = document.getElementById('saveAnnotationBtn');
+        const endSessionBtn = document.getElementById('endSessionBtn');
+        
+        if (startSessionBtn) startSessionBtn.style.display = 'none';
+        if (sessionControls) sessionControls.style.display = 'inline-flex';
+        if (sessionInfo) sessionInfo.textContent = `Session: #${currentSession.id}`;
+        if (saveAnnotationBtn) saveAnnotationBtn.style.display = 'block';
+        if (endSessionBtn) endSessionBtn.style.display = 'block';
+        
+        console.log(' Session display updated for session:', currentSession.id);
       }
     }
 
     // Initialize Application
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('🏥 Annotation Whiteboard initialized');
-      console.log('🔧 Configuration: Local VGG Image Annotator');
+    document.addEventListener('DOMContentLoaded', async function() {
+      console.log(' Annotation Whiteboard initialized');
+      console.log(' Configuration: Local VGG Image Annotator');
+      console.log(' Current URL:', window.location.href);
+      console.log(' ElectronAPI available:', typeof window.electronAPI !== 'undefined');
       
       // Populate dropdown menus first
       populateDropdowns();
@@ -2767,22 +2863,57 @@
       loadUniqueDoctors();
       
       // Check for existing session data from home page
-      const storedSession = localStorage.getItem('currentSession');
-      const storedStartTime = localStorage.getItem('sessionStartTime');
+      console.log(' Checking for stored session data...');
       
-      console.log('🔍 Checking for stored session data...');
+      let storedSession = null;
+      let storedStartTime = null;
+      
+      // Try to get session data from Electron IPC first (production), then localStorage (development)
+      if (typeof window.electronAPI !== 'undefined' && window.electronAPI.sessionGetData) {
+        try {
+          const sessionResult = await window.electronAPI.sessionGetData();
+          if (sessionResult.success && sessionResult.sessionData) {
+            console.log(' Retrieved session data via Electron IPC:', sessionResult.sessionData);
+            storedSession = JSON.stringify(sessionResult.sessionData);
+            storedStartTime = sessionResult.sessionData.sessionStartTime || Date.now().toString();
+          }
+        } catch (error) {
+          console.error(' Failed to get session data via IPC:', error);
+        }
+      }
+      
+      // Fallback to localStorage for development
+      if (!storedSession) {
+        storedSession = localStorage.getItem('currentSession');
+        storedStartTime = localStorage.getItem('sessionStartTime');
+        console.log(' Retrieved session data via localStorage');
+      }
+      
       console.log('- storedSession:', storedSession);
       console.log('- storedStartTime:', storedStartTime);
       
       if (storedSession && storedStartTime) {
         try {
+          console.log(' Session data found! Initializing session...');
           // Load existing session
           currentSession = JSON.parse(storedSession);
           sessionStartTime = parseInt(storedStartTime);
           sessionAnnotations = [];
           sessionImages = [];
           
-          console.log('📂 Loaded existing session:', currentSession);
+          console.log(' Loaded session:', currentSession);
+          console.log(' Session start time:', sessionStartTime);
+          
+          // Update the UI to show active session
+          updateSessionDisplay();
+          
+          // Enable upload functionality
+          console.log(' Enabling upload functionality...');
+          enableUploadFunctionality();
+          
+          console.log(' Session initialization complete!');
+          
+          console.log(' Loaded existing session:', currentSession);
           
           // Update UI to show active session
           document.getElementById('startSessionBtn').style.display = 'none';
@@ -2793,17 +2924,17 @@
           document.getElementById('endSessionBtn').style.display = 'block';
           
           showToast(`Session #${currentSession.id} loaded successfully! You can now upload images.`, 'success');
-          console.log('✅ Session UI updated successfully');
+          console.log(' Session UI updated successfully');
         } catch (error) {
-          console.error('❌ Error loading session data:', error);
+          console.error(' Error loading session data:', error);
           showToast('Error loading session data. Please start a new session.', 'error');
           // Clear corrupted data
           localStorage.removeItem('currentSession');
           localStorage.removeItem('sessionStartTime');
         }
       } else {
-        console.log('⚠️ No existing session found - user may need to start a session from home page or locally');
-        console.log('🎯 Showing start session button for local session creation');
+        console.log(' No existing session found - user may need to start a session from home page or locally');
+        console.log(' Showing start session button for local session creation');
         showToast('No active session detected. Click "Start a Session" above to create a new annotation session.', 'info');
         
         // Make sure the start session button is visible
@@ -2836,9 +2967,9 @@
         uploadOverlay.style.display = 'flex';
         imageContainer.classList.remove('active');
         viaContainer.classList.remove('active');
-        console.log('✅ UI initialized - upload overlay is ready');
+        console.log(' UI initialized - upload overlay is ready');
       } else {
-        console.error('❌ Critical UI elements missing:', {
+        console.error(' Critical UI elements missing:', {
           uploadOverlay: !!uploadOverlay,
           imageContainer: !!imageContainer,
           viaContainer: !!viaContainer
@@ -2885,15 +3016,15 @@
     document.head.appendChild(toastStyles);
 
     // Simple keyboard shortcuts test
-    console.log('🔴 Script loaded, testing keyboard shortcuts...');
+    console.log(' Script loaded, testing keyboard shortcuts...');
     
     // Add universal keyboard shortcuts that work anywhere
     document.addEventListener('keydown', function(e) {
-      console.log('🔴 Key pressed:', e.key, 'Code:', e.code, 'Ctrl:', e.ctrlKey, 'Target:', e.target.tagName);
+      console.log(' Key pressed:', e.key, 'Code:', e.code, 'Ctrl:', e.ctrlKey, 'Target:', e.target.tagName);
       
       // Only proceed if not typing in an input field
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
-        console.log('🔴 Ignoring key in input field');
+        console.log(' Ignoring key in input field');
         return;
       }
       
@@ -2925,10 +3056,15 @@
               handled = true;
             }
           } catch (error) {
-            console.log('⚠️ Could not communicate with VIA for polygon cancel:', error);
+            console.log(' Could not communicate with VIA for polygon cancel:', error);
           }
         } else {
-          window.location.href = 'home-clean.html';
+          // Use Electron API if available, otherwise fallback to window.location
+          if (typeof window.electronAPI !== 'undefined' && window.electronAPI.navigate) {
+            window.electronAPI.navigate('home-clean.html');
+          } else {
+            window.location.href = 'home-clean.html';
+          }
           handled = true;
         }
       }
@@ -2948,7 +3084,7 @@
               handled = true;
             }
           } catch (error) {
-            console.log('⚠️ Could not communicate with VIA for polygon completion:', error);
+            console.log(' Could not communicate with VIA for polygon completion:', error);
             showToast('Press Enter in the VIA annotation area to complete polygon', 'info');
           }
         }

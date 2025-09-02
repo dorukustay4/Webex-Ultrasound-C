@@ -890,12 +890,12 @@
 
     // Manual refresh function for debugging
     async function manualRefresh() {
-      console.log('🔄 Manual refresh triggered');
+      console.log(' Manual refresh triggered');
       try {
         await loadSessionsFromDatabase();
-        console.log('✅ Manual refresh completed');
+        console.log(' Manual refresh completed');
       } catch (error) {
-        console.error('❌ Manual refresh failed:', error);
+        console.error(' Manual refresh failed:', error);
       }
     }
     
@@ -937,7 +937,7 @@
 
     // Debug function to check library state
     function debugLibrary() {
-      console.log('🔍 Library Debug Info:');
+      console.log(' Library Debug Info:');
       console.log('- All sessions count:', allSessions.length);
       console.log('- Filtered sessions count:', filteredSessions.length);
       console.log('- electronAPI available:', !!window.electronAPI);
@@ -945,7 +945,7 @@
       
       // Detailed session analysis
       if (allSessions.length > 0) {
-        console.log('📊 Session Details:');
+        console.log(' Session Details:');
         allSessions.forEach((session, index) => {
           console.log(`Session ${index + 1}: "${session.title}"`);
           console.log(`  - ID: ${session.id}`);
@@ -998,7 +998,7 @@
       };
       
       allSessions.push(testSession);
-      console.log('➕ Added test session:', testSession);
+      console.log(' Added test session:', testSession);
       showToast('Test session added!', 'success');
       applyFilters();
     }
@@ -1008,15 +1008,15 @@
 
     // Direct database check function
     async function checkDatabase() {
-      console.log('🔍 Direct database check...');
+      console.log(' Direct database check...');
       
       if (window.electronAPI && window.electronAPI.dbGetSessions) {
         try {
           const result = await window.electronAPI.dbGetSessions();
-          console.log('📊 Raw database result:', result);
+          console.log(' Raw database result:', result);
           
           if (result.success && result.sessions) {
-            console.log(`✅ Found ${result.sessions.length} sessions in database:`);
+            console.log(` Found ${result.sessions.length} sessions in database:`);
             result.sessions.forEach((session, index) => {
               console.log(`Session ${index + 1}:`, {
                 id: session.id,
@@ -1030,15 +1030,15 @@
             });
             return result.sessions;
           } else {
-            console.log('❌ No sessions or error:', result.error);
+            console.log(' No sessions or error:', result.error);
             return [];
           }
         } catch (error) {
-          console.error('❌ Database check error:', error);
+          console.error(' Database check error:', error);
           return [];
         }
       } else {
-        console.error('❌ electronAPI not available');
+        console.error(' electronAPI not available');
         return [];
       }
     }
@@ -1048,7 +1048,7 @@
 
     // Add debug function to create a test session for verification
     async function createTestSession() {
-      console.log('🧪 Creating test session for debugging...');
+      console.log(' Creating test session for debugging...');
       
       const testSession = {
         id: 'test_' + Date.now(),
@@ -1063,15 +1063,15 @@
         status: 'completed'
       };
       
-      console.log('🔄 Sending test session to database:', testSession);
+      console.log(' Sending test session to database:', testSession);
       
       if (window.electronAPI && window.electronAPI.dbSaveSession) {
         try {
           const result = await window.electronAPI.dbSaveSession(testSession);
-          console.log('📊 Test session save result:', result);
+          console.log(' Test session save result:', result);
           
           if (result.success) {
-            console.log('✅ Test session saved successfully!');
+            console.log(' Test session saved successfully!');
             showToast('Test session created successfully!', 'success');
             
             // Reload sessions to see if it appears
@@ -1080,17 +1080,17 @@
             
             return testSession.id;
           } else {
-            console.error('❌ Test session save failed:', result.error);
+            console.error(' Test session save failed:', result.error);
             showToast('Test session save failed: ' + result.error, 'error');
             return null;
           }
         } catch (error) {
-          console.error('❌ Test session creation error:', error);
+          console.error(' Test session creation error:', error);
           showToast('Test session creation error: ' + error.message, 'error');
           return null;
         }
       } else {
-        console.error('❌ Database API not available for test session');
+        console.error(' Database API not available for test session');
         showToast('Database API not available', 'error');
         return null;
       }
@@ -1101,12 +1101,12 @@
 
     // Comprehensive debug function to test the entire pipeline
     async function debugFullPipeline() {
-      console.log('🔍 ==========================================================');
-      console.log('🔍 STARTING COMPREHENSIVE DATABASE DEBUG');
-      console.log('🔍 ==========================================================');
+      console.log(' ==========================================================');
+      console.log(' STARTING COMPREHENSIVE DATABASE DEBUG');
+      console.log(' ==========================================================');
       
       // Step 1: Check API availability
-      console.log('📋 Step 1: Checking API availability...');
+      console.log(' Step 1: Checking API availability...');
       console.log('- window.electronAPI:', !!window.electronAPI);
       if (window.electronAPI) {
         console.log('- Available methods:', Object.keys(window.electronAPI));
@@ -1115,53 +1115,53 @@
       }
       
       // Step 2: Check current database contents
-      console.log('\n📋 Step 2: Checking current database contents...');
+      console.log('\n Step 2: Checking current database contents...');
       const existingSessions = await checkDatabase();
       console.log(`- Found ${existingSessions.length} existing sessions`);
       
       // Step 3: Create a test session
-      console.log('\n📋 Step 3: Creating test session...');
+      console.log('\n Step 3: Creating test session...');
       const testSessionId = await createTestSession();
       if (!testSessionId) {
-        console.error('❌ Test session creation failed, stopping debug');
+        console.error(' Test session creation failed, stopping debug');
         return;
       }
       
       // Step 4: Immediately check if it was saved
-      console.log('\n📋 Step 4: Verifying test session was saved...');
+      console.log('\n Step 4: Verifying test session was saved...');
       const updatedSessions = await checkDatabase();
       console.log(`- Found ${updatedSessions.length} sessions after test creation`);
       
       const testSession = updatedSessions.find(s => s.id === testSessionId);
       if (testSession) {
-        console.log('✅ Test session found in database:', testSession);
+        console.log(' Test session found in database:', testSession);
       } else {
-        console.error('❌ Test session NOT found in database!');
+        console.error(' Test session NOT found in database!');
       }
       
       // Step 5: Test the UI loading process
-      console.log('\n📋 Step 5: Testing UI loading process...');
+      console.log('\n Step 5: Testing UI loading process...');
       await loadSessionsFromDatabase();
       console.log(`- allSessions length after load: ${allSessions.length}`);
       console.log('- allSessions content:', allSessions);
       
       // Step 6: Test filtering
-      console.log('\n📋 Step 6: Testing filtering...');
+      console.log('\n Step 6: Testing filtering...');
       const filteredSessions = applyFilters();
       console.log(`- Filtered sessions length: ${filteredSessions.length}`);
       console.log('- Filtered sessions:', filteredSessions);
       
       // Step 7: Test rendering
-      console.log('\n📋 Step 7: Testing rendering...');
+      console.log('\n Step 7: Testing rendering...');
       await renderSessions();
       
       const tableBody = document.querySelector('.sessions-table tbody');
       const rows = tableBody ? tableBody.children.length : 0;
       console.log(`- Table rows rendered: ${rows}`);
       
-      console.log('🔍 ==========================================================');
-      console.log('🔍 DEBUG COMPLETE - Check the logs above for issues');
-      console.log('🔍 ==========================================================');
+      console.log(' ==========================================================');
+      console.log(' DEBUG COMPLETE - Check the logs above for issues');
+      console.log(' ==========================================================');
       
       return {
         apiAvailable: !!window.electronAPI,
@@ -1179,7 +1179,7 @@
 
     // Simple debug function to check what status values are actually in the database
     async function debugStatusValues() {
-      console.log('🔍 Checking actual status values in database...');
+      console.log(' Checking actual status values in database...');
       
       const sessions = await checkDatabase();
       if (sessions.length > 0) {
@@ -1189,19 +1189,19 @@
           statusCounts[status] = (statusCounts[status] || 0) + 1;
         });
         
-        console.log('📊 Status distribution in database:');
+        console.log(' Status distribution in database:');
         Object.entries(statusCounts).forEach(([status, count]) => {
           console.log(`  - "${status}": ${count} sessions`);
         });
         
-        console.log('\n📋 Sample sessions with status:');
+        console.log('\n Sample sessions with status:');
         sessions.slice(0, 5).forEach((session, index) => {
           console.log(`${index + 1}. "${session.title}" - status: "${session.status}"`);
         });
         
         return statusCounts;
       } else {
-        console.log('❌ No sessions found in database');
+        console.log(' No sessions found in database');
         return {};
       }
     }
@@ -1211,31 +1211,31 @@
 
     // Simple render function that shows ALL sessions without any filtering
     function renderAllSessions() {
-      console.log('🎨 renderAllSessions called - SHOWING ALL SESSIONS WITHOUT FILTERS');
-      console.log('🎨 allSessions.length:', allSessions.length);
+      console.log(' renderAllSessions called - SHOWING ALL SESSIONS WITHOUT FILTERS');
+      console.log(' allSessions.length:', allSessions.length);
       
       const tbody = document.getElementById('calls-tbody');
       const emptyState = document.getElementById('empty-state');
       const callsList = document.getElementById('calls-list');
 
       if (!tbody) {
-        console.error('❌ calls-tbody element not found');
+        console.error(' calls-tbody element not found');
         return;
       }
       
-      console.log('🎨 DOM elements found:', { tbody: !!tbody, emptyState: !!emptyState, callsList: !!callsList });
+      console.log(' DOM elements found:', { tbody: !!tbody, emptyState: !!emptyState, callsList: !!callsList });
 
       // Clear existing content
       tbody.innerHTML = '';
 
       if (allSessions.length === 0) {
-        console.log('🎨 No sessions in allSessions array, showing empty state');
+        console.log(' No sessions in allSessions array, showing empty state');
         if (callsList) callsList.style.display = 'none';
         if (emptyState) emptyState.style.display = 'block';
         return;
       }
 
-      console.log('🎨 Displaying ALL sessions in table WITHOUT filtering');
+      console.log(' Displaying ALL sessions in table WITHOUT filtering');
       if (callsList) callsList.style.display = 'block';
       if (emptyState) emptyState.style.display = 'none';
 
@@ -1244,7 +1244,7 @@
         new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date)
       );
 
-      console.log('🎨 Sorted ALL sessions:', sortedSessions.map(s => ({ 
+      console.log(' Sorted ALL sessions:', sortedSessions.map(s => ({ 
         id: s.id, 
         title: s.title, 
         date: s.date,
@@ -1253,7 +1253,7 @@
       })));
 
       sortedSessions.forEach((session, index) => {
-        console.log(`🎨 Creating row for session ${index + 1}:`, {
+        console.log(` Creating row for session ${index + 1}:`, {
           id: session.id,
           title: session.title,
           status: session.status,
@@ -1261,47 +1261,47 @@
           images: session.images
         });
         
-        console.log(`🎨 About to call createSessionRow for session:`, session);
+        console.log(` About to call createSessionRow for session:`, session);
         
         try {
           const row = createSessionRow(session);
-          console.log(`🎨 createSessionRow returned:`, row);
-          console.log(`🎨 Row type:`, typeof row);
-          console.log(`🎨 Row constructor:`, row ? row.constructor.name : 'null');
+          console.log(` createSessionRow returned:`, row);
+          console.log(` Row type:`, typeof row);
+          console.log(` Row constructor:`, row ? row.constructor.name : 'null');
           
           if (row && row.nodeType === Node.ELEMENT_NODE) {
             tbody.appendChild(row);
-            console.log(`✅ Row ${index + 1} added successfully`);
+            console.log(` Row ${index + 1} added successfully`);
           } else {
-            console.error(`❌ createSessionRow returned invalid node for session ${index + 1}:`, row);
-            console.error(`❌ Session data:`, session);
+            console.error(` createSessionRow returned invalid node for session ${index + 1}:`, row);
+            console.error(` Session data:`, session);
           }
         } catch (error) {
-          console.error(`❌ Error in row creation/append for session ${index + 1}:`, error);
-          console.error(`❌ Session data:`, session);
+          console.error(` Error in row creation/append for session ${index + 1}:`, error);
+          console.error(` Session data:`, session);
         }
       });
 
-      console.log(`📊 Rendered ALL ${sortedSessions.length} sessions in library (NO FILTERING)`);
+      console.log(` Rendered ALL ${sortedSessions.length} sessions in library (NO FILTERING)`);
     }
 
     // Load sessions from database
     async function loadSessionsFromDatabase() {
       try {
-        console.log('🔄 Loading sessions from SQLite database...');
+        console.log(' Loading sessions from SQLite database...');
         console.log('- electronAPI available:', !!window.electronAPI);
         console.log('- dbGetSessions available:', !!(window.electronAPI && window.electronAPI.dbGetSessions));
         
         if (window.electronAPI && window.electronAPI.dbGetSessions) {
           const result = await window.electronAPI.dbGetSessions();
           
-          console.log('📊 Database response:', result);
+          console.log(' Database response:', result);
           console.log('- Success:', result.success);
           console.log('- Sessions array:', result.sessions);
           console.log('- Sessions length:', result.sessions ? result.sessions.length : 'null');
           
           if (result.success && result.sessions && Array.isArray(result.sessions)) {
-            console.log(`✅ Raw sessions from database (${result.sessions.length} found):`, result.sessions);
+            console.log(` Raw sessions from database (${result.sessions.length} found):`, result.sessions);
             
             // Process each session with detailed logging
             allSessions = result.sessions.map((session, index) => {
@@ -1336,17 +1336,17 @@
               return processedSession;
             });
             
-            console.log(`✅ Final processed sessions (${allSessions.length}):`, allSessions);
+            console.log(` Final processed sessions (${allSessions.length}):`, allSessions);
             
             // Show success message
             showToast(`Loaded ${allSessions.length} sessions from database`, 'success');
             
             // Apply current filters and render sessions
-            console.log('� Applying filters and rendering sessions...');
+            console.log(' Applying filters and rendering sessions...');
             applyFilters();
             
           } else {
-            console.warn('⚠️ No sessions found or failed to load. Details:');
+            console.warn(' No sessions found or failed to load. Details:');
             console.warn('- result.success:', result.success);
             console.warn('- result.sessions exists:', !!result.sessions);
             console.warn('- result.sessions is array:', Array.isArray(result.sessions));
@@ -1356,7 +1356,7 @@
             showToast(result.error || 'No sessions found in database', 'info');
           }
         } else {
-          console.error('❌ Database API not available');
+          console.error(' Database API not available');
           console.error('- window.electronAPI:', !!window.electronAPI);
           if (window.electronAPI) {
             console.error('- Available methods:', Object.keys(window.electronAPI));
@@ -1365,13 +1365,13 @@
           allSessions = [];
         }
       } catch (error) {
-        console.error('❌ Error loading sessions:', error);
+        console.error(' Error loading sessions:', error);
         console.error('- Error details:', error.message, error.stack);
         showToast('Error loading sessions from database', 'error');
         allSessions = [];
       }
       
-      console.log('� SKIPPING ALL FILTERS - FINAL allSessions.length:', allSessions.length);
+      console.log(' SKIPPING ALL FILTERS - FINAL allSessions.length:', allSessions.length);
       
       // RENDER ALL SESSIONS WITHOUT ANY FILTERING
       renderAllSessions();
@@ -1415,15 +1415,15 @@
 
     // Initialize page
     document.addEventListener('DOMContentLoaded', async function() {
-      console.log('📚 Session Library page loading...');
-      console.log('📚 DOM fully loaded, starting initialization');
-      console.log('📚 Window.electronAPI available:', !!window.electronAPI);
+      console.log(' Session Library page loading...');
+      console.log(' DOM fully loaded, starting initialization');
+      console.log(' Window.electronAPI available:', !!window.electronAPI);
       
       // Check if essential DOM elements exist
       const tbody = document.getElementById('calls-tbody');
       const emptyState = document.getElementById('empty-state');
       const callsList = document.getElementById('calls-list');
-      console.log('📚 DOM elements check:', {
+      console.log(' DOM elements check:', {
         tbody: !!tbody,
         emptyState: !!emptyState, 
         callsList: !!callsList
@@ -1431,15 +1431,15 @@
       
       // Test database connectivity immediately
       if (window.electronAPI && window.electronAPI.dbGetSessions) {
-        console.log('📚 Testing database connection...');
+        console.log(' Testing database connection...');
         try {
           const testResult = await window.electronAPI.dbGetSessions();
-          console.log('📚 Database test result:', testResult);
+          console.log(' Database test result:', testResult);
         } catch (error) {
-          console.error('📚 Database test error:', error);
+          console.error(' Database test error:', error);
         }
       } else {
-        console.error('📚 Database API not available!');
+        console.error(' Database API not available!');
       }
       
       // Load authentication state
@@ -1449,16 +1449,16 @@
       setupEventListeners();
       
       // Load sessions from database
-      console.log('📚 About to call loadSessionsFromDatabase...');
+      console.log(' About to call loadSessionsFromDatabase...');
       try {
         await loadSessionsFromDatabase();
-        console.log('📚 loadSessionsFromDatabase completed');
+        console.log(' loadSessionsFromDatabase completed');
       } catch (error) {
-        console.error('📚 loadSessionsFromDatabase failed:', error);
+        console.error(' loadSessionsFromDatabase failed:', error);
       }
       
-      console.log('✅ Session Library initialized');
-      console.log('📚 Final state - allSessions.length:', allSessions.length);
+      console.log(' Session Library initialized');
+      console.log(' Final state - allSessions.length:', allSessions.length);
     });
 
     // Initialize authentication
@@ -1481,12 +1481,12 @@
 
     // Set up event listeners - DISABLED FOR DEBUGGING
     function setupEventListeners() {
-      console.log('� Setting up filter event listeners...');
+      console.log(' Setting up filter event listeners...');
       const searchFilter = document.getElementById('search-filter');
       const dateFilter = document.getElementById('date-filter');
       const categoryFilter = document.getElementById('category-filter');
 
-      console.log('🔧 Filter elements found:', {
+      console.log(' Filter elements found:', {
         searchFilter: !!searchFilter,
         dateFilter: !!dateFilter,
         categoryFilter: !!categoryFilter
@@ -1496,20 +1496,20 @@
         if (filter) {
           filter.addEventListener('change', applyFilters);
           filter.addEventListener('input', applyFilters);
-          console.log('🔧 Event listeners added to:', filter.id);
+          console.log(' Event listeners added to:', filter.id);
         }
       });
     }
 
     // Apply filters to sessions
     function applyFilters() {
-      console.log('🔧 applyFilters called. allSessions.length:', allSessions.length);
+      console.log(' applyFilters called. allSessions.length:', allSessions.length);
       
       const searchTerm = document.getElementById('search-filter')?.value?.toLowerCase() || '';
       const dateRange = document.getElementById('date-filter')?.value || 'all';
       const category = document.getElementById('category-filter')?.value || 'all';
 
-      console.log('🔧 Filter values:', { searchTerm, dateRange, category });
+      console.log(' Filter values:', { searchTerm, dateRange, category });
 
       filteredSessions = allSessions.filter(session => {
         // Search filter
@@ -1542,7 +1542,7 @@
         const matches = matchesSearch && matchesDate && matchesCategory;
         
         if (!matches) {
-          console.log(`🔧 Session "${session.title}" filtered out:`, {
+          console.log(` Session "${session.title}" filtered out:`, {
             matchesSearch, matchesDate, matchesCategory
           });
         }
@@ -1550,38 +1550,38 @@
         return matches;
       });
 
-      console.log(`🔧 After filtering: ${filteredSessions.length} of ${allSessions.length} sessions match`);
-      console.log('🔧 Filtered sessions:', filteredSessions);
+      console.log(` After filtering: ${filteredSessions.length} of ${allSessions.length} sessions match`);
+      console.log(' Filtered sessions:', filteredSessions);
 
       renderSessions();
     }
 
     // Render sessions in table
     function renderSessions() {
-      console.log('🎨 renderSessions called. filteredSessions.length:', filteredSessions.length);
+      console.log(' renderSessions called. filteredSessions.length:', filteredSessions.length);
       
       const tbody = document.getElementById('calls-tbody');
       const emptyState = document.getElementById('empty-state');
       const callsList = document.getElementById('calls-list');
 
       if (!tbody) {
-        console.error('❌ calls-tbody element not found');
+        console.error(' calls-tbody element not found');
         return;
       }
       
-      console.log('🎨 DOM elements found:', { tbody: !!tbody, emptyState: !!emptyState, callsList: !!callsList });
+      console.log(' DOM elements found:', { tbody: !!tbody, emptyState: !!emptyState, callsList: !!callsList });
 
       // Clear existing content
       tbody.innerHTML = '';
 
       if (filteredSessions.length === 0) {
-        console.log('🎨 No sessions to display, showing empty state');
+        console.log(' No sessions to display, showing empty state');
         if (callsList) callsList.style.display = 'none';
         if (emptyState) emptyState.style.display = 'block';
         return;
       }
 
-      console.log('🎨 Displaying sessions table');
+      console.log(' Displaying sessions table');
       if (callsList) callsList.style.display = 'block';
       if (emptyState) emptyState.style.display = 'none';
 
@@ -1590,21 +1590,21 @@
         new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date)
       );
 
-      console.log('🎨 Sorted sessions:', sortedSessions.map(s => ({ id: s.id, title: s.title, date: s.date })));
+      console.log(' Sorted sessions:', sortedSessions.map(s => ({ id: s.id, title: s.title, date: s.date })));
 
       sortedSessions.forEach((session, index) => {
-        console.log(`🎨 Creating row for session ${index + 1}:`, session);
+        console.log(` Creating row for session ${index + 1}:`, session);
         const row = createSessionRow(session);
         tbody.appendChild(row);
       });
 
-      console.log(`📊 Rendered ${sortedSessions.length} sessions in library`);
+      console.log(` Rendered ${sortedSessions.length} sessions in library`);
     }
 
     // Create session row HTML
     function createSessionRow(session) {
       try {
-        console.log('🎨 Creating row for:', session.id);
+        console.log(' Creating row for:', session.id);
         
         const row = document.createElement('tr');
         
@@ -1686,11 +1686,11 @@
           </td>
         `;
         
-        console.log('✅ Row created successfully for session:', session.id);
+        console.log(' Row created successfully for session:', session.id);
         return row;
         
       } catch (error) {
-        console.error('❌ Error creating row for session:', session.id, error);
+        console.error(' Error creating row for session:', session.id, error);
         console.error('Session data:', session);
         return null;
       }
@@ -1722,7 +1722,7 @@
     // View session details
     async function viewSessionDetails(sessionId) {
       try {
-        console.log(`🔍 Viewing details for session ${sessionId}`);
+        console.log(` Viewing details for session ${sessionId}`);
         
         if (window.electronAPI && window.electronAPI.dbGetSessionDetails) {
           const result = await window.electronAPI.dbGetSessionDetails(sessionId);
@@ -1855,7 +1855,7 @@
             if (annotationDetailsElement) {
               annotationDetailsElement.innerHTML = fullDetailsHtml;
             } else {
-              console.error('❌ Element with ID "annotation-details" not found');
+              console.error(' Element with ID "annotation-details" not found');
               showToast('Error: Modal structure not found', 'error');
               return;
             }
@@ -1864,21 +1864,21 @@
             if (annotationModalElement) {
               annotationModalElement.style.display = 'block';
             } else {
-              console.error('❌ Element with ID "annotation-modal" not found');
+              console.error(' Element with ID "annotation-modal" not found');
               showToast('Error: Modal not found', 'error');
               return;
             }
             
           } else {
-            console.error('❌ Failed to load session details:', result.error);
+            console.error(' Failed to load session details:', result.error);
             showToast('Failed to load session details', 'error');
           }
         } else {
-          console.error('❌ Database API not available');
+          console.error(' Database API not available');
           showToast('Database connection not available', 'error');
         }
       } catch (error) {
-        console.error('❌ Error viewing session details:', error);
+        console.error(' Error viewing session details:', error);
         showToast('Error loading session details', 'error');
       }
     }
@@ -1898,24 +1898,24 @@
       }
       
       try {
-        console.log(`🗑️ Deleting session ${sessionId}`);
-        console.log('🗑️ Session ID type:', typeof sessionId);
-        console.log('🗑️ Session ID value:', sessionId);
+        console.log(` Deleting session ${sessionId}`);
+        console.log(' Session ID type:', typeof sessionId);
+        console.log(' Session ID value:', sessionId);
         
         // Test database connectivity first
-        console.log('🔍 Testing database connectivity...');
+        console.log(' Testing database connectivity...');
         try {
           const testResult = await window.electronAPI.dbGetSessions();
-          console.log('🔍 Database test result:', testResult?.success ? 'Connected' : 'Failed');
+          console.log(' Database test result:', testResult?.success ? 'Connected' : 'Failed');
           
           // Skip health check for now to test basic functionality
-          console.log('⚠️ Skipping health check, proceeding with delete...');
+          console.log(' Skipping health check, proceeding with delete...');
         } catch (testError) {
-          console.error('🔍 Database test failed:', testError);
+          console.error(' Database test failed:', testError);
         }
         
         if (window.electronAPI && window.electronAPI.dbDeleteSession) {
-          console.log('🗑️ About to call electronAPI.dbDeleteSession...');
+          console.log(' About to call electronAPI.dbDeleteSession...');
           
           // Add timeout to catch hanging IPC calls
           const deletePromise = window.electronAPI.dbDeleteSession(sessionId);
@@ -1925,37 +1925,37 @@
           
           const result = await Promise.race([deletePromise, timeoutPromise]);
           
-          console.log('🗑️ Delete result received:', result);
-          console.log('🗑️ Result type:', typeof result);
-          console.log('🗑️ Result success property:', result?.success);
+          console.log(' Delete result received:', result);
+          console.log(' Result type:', typeof result);
+          console.log(' Result success property:', result?.success);
           
           if (result && result.success) {
-            console.log('🗑️ Delete was successful, showing toast and reloading...');
+            console.log(' Delete was successful, showing toast and reloading...');
             showToast('Session deleted successfully', 'success');
-            console.log('🔄 Reloading sessions after successful deletion...');
+            console.log(' Reloading sessions after successful deletion...');
             // Reload sessions from database
             await loadSessionsFromDatabase();
-            console.log('🔄 Session reload completed');
+            console.log(' Session reload completed');
           } else {
-            console.error('❌ Failed to delete session:', result?.error || result);
-            console.error('❌ Full result object:', result);
+            console.error(' Failed to delete session:', result?.error || result);
+            console.error(' Full result object:', result);
             showToast(`Failed to delete session: ${result?.error || 'Unknown error'}`, 'error');
           }
         } else {
-          console.error('❌ Database API not available');
-          console.error('❌ electronAPI exists:', !!window.electronAPI);
-          console.error('❌ dbDeleteSession exists:', !!(window.electronAPI && window.electronAPI.dbDeleteSession));
+          console.error(' Database API not available');
+          console.error(' electronAPI exists:', !!window.electronAPI);
+          console.error(' dbDeleteSession exists:', !!(window.electronAPI && window.electronAPI.dbDeleteSession));
           showToast('Database connection not available', 'error');
         }
       } catch (error) {
-        console.error('❌ Error deleting session:', error);
+        console.error(' Error deleting session:', error);
         showToast('Error deleting session', 'error');
       }
     }
 
     // Export session annotations (clean working version)
     async function exportSession(sessionId) {
-      console.log(`📤 Exporting session ${sessionId}`);
+      console.log(` Exporting session ${sessionId}`);
       
       if (!window.electronAPI || !window.electronAPI.dbGetSessionDetails) {
         showToast('Database not available', 'error');
@@ -1974,7 +1974,7 @@
         const annotations = result.annotations || [];
         const images = result.images || [];
         
-        console.log(`📊 Export data: ${annotations.length} annotations, ${images.length} images`);
+        console.log(` Export data: ${annotations.length} annotations, ${images.length} images`);
         
         const exportData = {
           sessionInfo: {
@@ -2066,54 +2066,54 @@
         showToast(`Exported ${annotations.length} annotations`, 'success');
         
       } catch (error) {
-        console.error('❌ Export error:', error);
+        console.error(' Export error:', error);
         showToast('Export failed', 'error');
       }
     }
 
     // Delete annotation function
     async function deleteAnnotation(annotationId, sessionId, annotationNumber) {
-      console.log(`🗑️ Deleting annotation ${annotationId} from session ${sessionId}`);
+      console.log(` Deleting annotation ${annotationId} from session ${sessionId}`);
       
       // Show confirmation dialog
       const confirmed = confirm(`Are you sure you want to delete Annotation ${annotationNumber}? This action cannot be undone.`);
       if (!confirmed) {
-        console.log('🚫 Annotation deletion cancelled by user');
+        console.log(' Annotation deletion cancelled by user');
         return;
       }
       
       if (!window.electronAPI || !window.electronAPI.dbDeleteAnnotation) {
         showToast('Database not available', 'error');
-        console.error('❌ electronAPI or dbDeleteAnnotation not available');
+        console.error(' electronAPI or dbDeleteAnnotation not available');
         return;
       }
       
       try {
         showToast('Deleting annotation...', 'info');
-        console.log('🗑️ Calling dbDeleteAnnotation...');
+        console.log(' Calling dbDeleteAnnotation...');
         
         const result = await window.electronAPI.dbDeleteAnnotation(annotationId);
-        console.log('🗑️ Delete annotation result:', result);
+        console.log(' Delete annotation result:', result);
         
         if (result && result.success) {
-          console.log('✅ Annotation deleted successfully');
+          console.log(' Annotation deleted successfully');
           showToast(`Annotation ${annotationNumber} deleted successfully`, 'success');
           
           // Refresh the session details to show updated annotation list
-          console.log('🔄 Refreshing session details view...');
+          console.log(' Refreshing session details view...');
           await viewSessionDetails(sessionId);
           
           // Also refresh the main sessions list to update statistics
-          console.log('🔄 Refreshing sessions list to update statistics...');
+          console.log(' Refreshing sessions list to update statistics...');
           await loadSessionsFromDatabase();
           
         } else {
-          console.error('❌ Failed to delete annotation:', result?.error || result);
+          console.error(' Failed to delete annotation:', result?.error || result);
           showToast(`Failed to delete annotation: ${result?.error || 'Unknown error'}`, 'error');
         }
         
       } catch (error) {
-        console.error('❌ Error deleting annotation:', error);
+        console.error(' Error deleting annotation:', error);
         showToast('Error deleting annotation', 'error');
       }
     }
@@ -2161,7 +2161,7 @@
 
     // Initialize the library when page loads
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('📚 Library page loaded, initializing...');
+      console.log(' Library page loaded, initializing...');
       loadSessionsFromDatabase();
       
       // Add click event listener to close modal when clicking outside
@@ -2190,8 +2190,8 @@
   </div>
 
   <script>
-    console.log('📚 Library page script initialized');
-    console.log('🔧 calls-tbody element exists:', !!document.getElementById('calls-tbody'));
+    console.log(' Library page script initialized');
+    console.log(' calls-tbody element exists:', !!document.getElementById('calls-tbody'));
   </script>
 </body>
 </html>

@@ -34,7 +34,7 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       enableRemoteModule: false,
-      webSecurity: true,
+      webSecurity: false, // Disable web security for file:// protocol in production
       allowRunningInsecureContent: false,
       preload: path.join(__dirname, 'preload.js')
     },
@@ -43,10 +43,20 @@ function createWindow() {
     icon: path.join(__dirname, 'assets/icon.png') // Optional: add an icon
   });
 
-  // Load the home page from the development server
-  const startUrl = 'http://localhost:3000/';
+  // Determine if we're in development or production
+  const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
+  
+  let startUrl;
+  if (isDev) {
+    // Development: use Vite dev server
+    startUrl = 'http://localhost:3000/';
+  } else {
+    // Production: use built files
+    startUrl = path.join(__dirname, 'src', 'pages', 'home-clean.html');
+  }
   
   console.log('Loading Regional Anesthesia Annotation Platform from:', startUrl);
+  console.log('Running in:', isDev ? 'Development' : 'Production', 'mode');
   
   // Enable basic permissions for local file access and notifications
   mainWindow.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
@@ -61,13 +71,13 @@ function createWindow() {
     }
   });
   
-  // Handle permission checks for local development
+  // Handle permission checks for local development and production
   mainWindow.webContents.session.setPermissionCheckHandler((webContents, permission, requestingOrigin) => {
     const allowedPermissions = ['notifications'];
     
-    // Allow basic permissions for localhost development
-    if (requestingOrigin === 'http://localhost:3000' && allowedPermissions.includes(permission)) {
-      console.log(`Allowing ${permission} access for localhost`);
+    // Allow basic permissions for localhost development and file:// protocol in production
+    if ((requestingOrigin === 'http://localhost:3000' || requestingOrigin.startsWith('file://')) && allowedPermissions.includes(permission)) {
+      console.log(`Allowing ${permission} access for ${requestingOrigin.startsWith('file://') ? 'production' : 'localhost'}`);
       return true;
     }
     
@@ -75,7 +85,7 @@ function createWindow() {
   });
   
   // Load the URL with detailed logging
-  console.log('🔄 Attempting to load URL:', startUrl);
+  console.log('🔄 Attempting to load:', startUrl);
   
   // Add navigation listeners for debugging
   mainWindow.webContents.on('did-start-loading', () => {
@@ -90,9 +100,19 @@ function createWindow() {
     console.log('🔄 Navigated to:', url);
   });
   
-  mainWindow.loadURL(startUrl).catch(error => {
-    console.error('❌ Failed to load URL:', error);
-  });
+  // Load either URL (development) or file path (production)
+  if (isDev) {
+    mainWindow.loadURL(startUrl).catch(error => {
+      console.error('❌ Failed to load development URL:', error);
+    });
+  } else {
+    // In production, use file:// URL for better compatibility
+    const fileUrl = `file://${startUrl.replace(/\\/g, '/')}`;
+    console.log('🔄 Loading production file URL:', fileUrl);
+    mainWindow.loadURL(fileUrl).catch(error => {
+      console.error('❌ Failed to load production file:', error);
+    });
+  }
   
   // Show window when ready
   mainWindow.once('ready-to-show', () => {
@@ -110,8 +130,10 @@ function createWindow() {
     console.error('❌ Failed to load:', validatedURL);
     console.error('❌ Error:', errorDescription);
     
-    // Show error page with instructions
-    const errorHtml = `
+    // Only show development server error in development mode
+    if (isDev) {
+      // Show error page with instructions for development
+      const errorHtml = `
       <!DOCTYPE html>
       <html>
         <head>
@@ -223,6 +245,11 @@ function createWindow() {
     
     mainWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(errorHtml)}`);
     mainWindow.show();
+    } else {
+      // In production mode, show a simpler error or try to recover
+      console.error('❌ Production mode: Failed to load file');
+      // You could try loading a backup file here or show a simple error
+    }
   });
   
   // Handle window closed
@@ -248,18 +275,28 @@ function setupIPCHandlers() {
   ipcMain.handle('navigate', async (event, page) => {
     try {
       let targetUrl;
+      const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
       
-      // Construct the proper URL for the development server
       if (page.startsWith('http')) {
         targetUrl = page;
+        await mainWindow.loadURL(targetUrl);
       } else {
-        // Remove .html extension if present and build the localhost URL
+        // Remove .html extension if present
         const pageName = page.replace('.html', '');
-        targetUrl = `http://localhost:3000/src/pages/${pageName}.html`;
+        
+        if (isDev) {
+          // Development: use localhost URL
+          targetUrl = `http://localhost:3000/src/pages/${pageName}.html`;
+          await mainWindow.loadURL(targetUrl);
+        } else {
+          // Production: use file:// protocol with absolute path
+          const filePath = path.join(__dirname, 'src', 'pages', `${pageName}.html`);
+          targetUrl = `file://${filePath.replace(/\\/g, '/')}`;
+          await mainWindow.loadURL(targetUrl);
+        }
       }
       
       console.log('🔄 Navigating to:', targetUrl);
-      await mainWindow.loadURL(targetUrl);
       
       return { success: true, url: targetUrl };
     } catch (error) {
@@ -569,6 +606,67 @@ function setupIPCHandlers() {
     }
   });
 
+  // Session data management for production mode (localStorage replacement)
+  let currentSessionData = null;
+  
+  // Set current session data
+  ipcMain.handle('session-set-data', async (event, sessionData) => {
+    console.log('📨 IPC: Setting session data:', sessionData);
+    currentSessionData = sessionData;
+    return { success: true };
+  });
+
+  // Get current session data
+  ipcMain.handle('session-get-data', async (event) => {
+    console.log('📨 IPC: Getting session data:', currentSessionData);
+    return { success: true, sessionData: currentSessionData };
+  });
+
+  // Clear current session data
+  ipcMain.handle('session-clear-data', async (event) => {
+    console.log('📨 IPC: Clearing session data');
+    currentSessionData = null;
+    return { success: true };
+  });
+
+  // Get VIA annotator path for production mode
+  ipcMain.handle('get-via-path', async (event) => {
+    const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
+    let viaPath;
+    
+    if (isDev) {
+      viaPath = '/via/via-simple.html';
+    } else {
+      // Production: construct absolute file path
+      viaPath = `file://${path.join(__dirname, 'public', 'via', 'via-simple.html').replace(/\\/g, '/')}`;
+    }
+    
+    console.log('📨 IPC: Returning VIA path:', viaPath);
+    return { success: true, viaPath };
+  });
+
+  // Get next session ID from database
+  ipcMain.handle('get-next-session-id', async (event) => {
+    try {
+      if (!dbManager) {
+        throw new Error('Database not initialized');
+      }
+      
+      // Get the highest session ID from the database
+      const result = await dbManager.getLastSessionId();
+      const lastSessionId = result || 0;
+      const nextSessionId = (lastSessionId + 1).toString().padStart(3, '0');
+      
+      console.log('📨 IPC: Last session ID from DB:', lastSessionId);
+      console.log('📨 IPC: Next session ID:', nextSessionId);
+      
+      return { success: true, sessionId: nextSessionId };
+    } catch (error) {
+      console.error('❌ IPC: Failed to get next session ID:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
   console.log('🔧 IPC handlers set up for annotation platform with database support');
 }
 
@@ -625,8 +723,8 @@ app.on('web-contents-created', (event, contents) => {
   contents.on('will-navigate', (navigationEvent, navigationUrl) => {
     const parsedUrl = new URL(navigationUrl);
     
-    // Allow navigation within localhost
-    if (parsedUrl.origin === 'http://localhost:3000') {
+    // Allow navigation within localhost (development) or file:// protocol (production)
+    if (parsedUrl.origin === 'http://localhost:3000' || parsedUrl.protocol === 'file:') {
       console.log('✅ Allowing navigation to:', navigationUrl);
       return;
     }

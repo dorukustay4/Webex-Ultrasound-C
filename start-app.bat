@@ -1,5 +1,5 @@
 @echo off
-echo Starting Ultrasound Webex Electron App...
+echo Starting Ultrasound Annotation Electron App...
 echo.
 
 REM Check if Node.js is available

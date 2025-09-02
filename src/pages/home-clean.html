@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="../../node_modules/chart.js/dist/chart.umd.js"></script>
   <script src="../js/statistics-manager.js"></script>
   <style>
     * {
@@ -732,14 +732,46 @@
     // JavaScript functions for annotation platform
     
     // Start Annotation Session
-    function startAnnotationSession() {
-      // Generate next session ID
-      const lastSessionId = parseInt(localStorage.getItem('lastSessionId') || '0');
-      const nextSessionId = (lastSessionId + 1).toString().padStart(3, '0');
-      document.getElementById('sessionId').value = nextSessionId;
-      
-      // Show the session configuration modal
-      document.getElementById('startSessionModal').classList.add('active');
+    async function startAnnotationSession() {
+      try {
+        console.log('🔢 Getting next session ID from database...');
+        
+        // Generate next session ID from database
+        let nextSessionId;
+        if (typeof window.electronAPI !== 'undefined' && window.electronAPI.getNextSessionId) {
+          // Production: Use database-based session ID
+          console.log('📊 Using database to get next session ID...');
+          const response = await window.electronAPI.getNextSessionId();
+          console.log('📊 Got response from database:', response);
+          
+          if (response && response.success && response.sessionId) {
+            nextSessionId = response.sessionId;
+            console.log('📊 Extracted session ID from database:', nextSessionId);
+          } else {
+            throw new Error('Invalid response from database: ' + JSON.stringify(response));
+          }
+        } else {
+          // Development: Fallback to localStorage
+          console.log('📊 Using localStorage fallback for session ID...');
+          const lastSessionId = parseInt(localStorage.getItem('lastSessionId') || '0');
+          nextSessionId = (lastSessionId + 1).toString().padStart(3, '0');
+          console.log('📊 Generated session ID from localStorage:', nextSessionId);
+        }
+        
+        document.getElementById('sessionId').value = nextSessionId;
+        
+        // Show the session configuration modal
+        document.getElementById('startSessionModal').classList.add('active');
+      } catch (error) {
+        console.error('❌ Error getting next session ID:', error);
+        showToast('Error generating session ID. Please try again.', 'error');
+        
+        // Fallback to simple incremental ID
+        const lastSessionId = parseInt(localStorage.getItem('lastSessionId') || '0');
+        const nextSessionId = (lastSessionId + 1).toString().padStart(3, '0');
+        document.getElementById('sessionId').value = nextSessionId;
+        document.getElementById('startSessionModal').classList.add('active');
+      }
     }
 
     // Close Start Session Modal
@@ -750,49 +782,91 @@
 
     // Create and Start Session
     async function createAndStartSession() {
+      console.log('🚀 Starting session creation process...');
+      
       const title = document.getElementById('sessionTitle').value.trim();
       const doctorName = document.getElementById('doctorName').value.trim();
       const category = document.getElementById('sessionCategory').value;
       const sessionId = document.getElementById('sessionId').value;
       
+      console.log('📝 Session form data:', { title, doctorName, category, sessionId });
+      
       if (!title || !doctorName || !category) {
+        console.error('❌ Validation failed: Missing required fields');
         showToast('Please fill in all required fields', 'error');
         return;
       }
       
-      // Create session object
-      const currentSession = {
-        id: sessionId,
-        title: title,
-        doctor_name: doctorName,
-        category: category,
-        startTime: new Date().toISOString(),
-        endTime: null,
-        annotations: [],
-        images: [],
-        status: 'active'
-      };
-      
-      // Save session data to localStorage for the annotation room
-      localStorage.setItem('currentSession', JSON.stringify(currentSession));
-      localStorage.setItem('sessionStartTime', Date.now().toString());
-      localStorage.setItem('lastSessionId', sessionId);
-      
-      closeStartSessionModal();
-      showToast(`Session #${sessionId} created! Navigating to annotation room...`, 'success');
-      
-      console.log('🚀 Session created:', currentSession);
-      
-      // Navigate to annotation room
       try {
-        if (typeof window.electronAPI !== 'undefined' && window.electronAPI.navigateTo) {
-          await window.electronAPI.navigateTo('annotation-room.html');
+        // Create session object
+        const currentSession = {
+          id: sessionId,
+          title: title,
+          doctor_name: doctorName,
+          category: category,
+          startTime: new Date().toISOString(),
+          sessionStartTime: Date.now(), // Add this for IPC compatibility
+          endTime: null,
+          annotations: [],
+          images: [],
+          status: 'active'
+        };
+        
+        console.log('📊 Created session object:', currentSession);
+        
+        // Save session data using Electron IPC (for production) or localStorage (for development)
+        if (typeof window.electronAPI !== 'undefined' && window.electronAPI.sessionSetData) {
+          // Production: Use Electron IPC
+          console.log('📊 Using Electron IPC to save session data...');
+          const result = await window.electronAPI.sessionSetData(currentSession);
+          console.log('📊 IPC result:', result);
+          if (!result.success) {
+            throw new Error('Failed to save session data via IPC');
+          }
+          console.log('✅ Session data saved via Electron IPC');
         } else {
-          window.location.href = 'annotation-room.html';
+          // Development: Use localStorage
+          console.log('📊 Using localStorage to save session data...');
+          localStorage.setItem('currentSession', JSON.stringify(currentSession));
+          localStorage.setItem('sessionStartTime', Date.now().toString());
+          localStorage.setItem('lastSessionId', sessionId);
+          console.log('✅ Session data saved via localStorage');
+        }
+        
+        closeStartSessionModal();
+        showToast(`Session #${sessionId} created! Navigating to annotation room...`, 'success');
+        
+        console.log('🚀 Session created successfully, starting navigation...');
+        
+        // Navigate to annotation room
+        try {
+          console.log('🔄 Attempting navigation to annotation room...');
+          if (typeof window.electronAPI !== 'undefined' && window.electronAPI.navigateTo) {
+            console.log('🔄 Using navigateTo API...');
+            const navResult = await window.electronAPI.navigateTo('annotation-room.html');
+            console.log('🔄 Navigation result:', navResult);
+          } else if (typeof window.electronAPI !== 'undefined' && window.electronAPI.navigate) {
+            console.log('🔄 Using navigate API...');
+            const navResult = await window.electronAPI.navigate('annotation-room.html');
+            console.log('🔄 Navigation result:', navResult);
+          } else {
+            console.log('🔄 Using window.location fallback...');
+            window.location.href = 'annotation-room.html';
+          }
+        } catch (error) {
+          console.error('❌ Navigation error:', error);
+          // Try direct navigation as fallback
+          if (typeof window.electronAPI !== 'undefined' && window.electronAPI.navigate) {
+            console.log('🔄 Trying navigate fallback...');
+            await window.electronAPI.navigate('annotation-room.html');
+          } else {
+            console.log('🔄 Using window.location as final fallback...');
+            window.location.href = 'annotation-room.html';
+          }
         }
       } catch (error) {
-        console.error('Navigation error:', error);
-        window.location.href = 'annotation-room.html';
+        console.error('❌ Session creation failed:', error);
+        showToast(`Failed to create session: ${error.message}`, 'error');
       }
     }
 

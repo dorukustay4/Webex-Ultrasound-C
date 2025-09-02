@@ -133,7 +133,7 @@ class DatabaseManager {
           console.error('Error updating existing sessions:', err.message);
           reject(err);
         } else {
-          console.log('✅ Updated existing sessions with default category');
+          console.log(' Updated existing sessions with default category');
           resolve();
         }
       });
@@ -154,7 +154,7 @@ class DatabaseManager {
         const hasImageDataColumn = columns.some(col => col.name === 'image_data');
         
         if (!hasImageDataColumn) {
-          console.log('🔧 Adding image_data column to images table...');
+          console.log(' Adding image_data column to images table...');
           this.db.run(`
             ALTER TABLE images 
             ADD COLUMN image_data TEXT
@@ -163,12 +163,12 @@ class DatabaseManager {
               console.error('Error adding image_data column:', err.message);
               reject(err);
             } else {
-              console.log('✅ Successfully added image_data column to images table');
+              console.log(' Successfully added image_data column to images table');
               resolve();
             }
           });
         } else {
-          console.log('✅ image_data column already exists in images table');
+          console.log(' image_data column already exists in images table');
           resolve();
         }
       });
@@ -189,7 +189,7 @@ class DatabaseManager {
         const hasScanRegionColumn = columns.some(col => col.name === 'scan_region');
         
         if (!hasScanRegionColumn) {
-          console.log('🔧 Adding scan_region column to annotations table...');
+          console.log(' Adding scan_region column to annotations table...');
           this.db.run(`
             ALTER TABLE annotations 
             ADD COLUMN scan_region TEXT
@@ -198,12 +198,12 @@ class DatabaseManager {
               console.error('Error adding scan_region column:', err.message);
               reject(err);
             } else {
-              console.log('✅ Successfully added scan_region column to annotations table');
+              console.log(' Successfully added scan_region column to annotations table');
               resolve();
             }
           });
         } else {
-          console.log('✅ scan_region column already exists in annotations table');
+          console.log(' scan_region column already exists in annotations table');
           resolve();
         }
       });
@@ -213,10 +213,9 @@ class DatabaseManager {
   // Save session to database
   async saveSession(sessionData) {
     return new Promise((resolve, reject) => {
-      console.log('🔍 DatabaseManager.saveSession received data:', sessionData);
+      console.log(' DatabaseManager.saveSession received data:', sessionData);
       
-      // Handle both camelCase (frontend) and snake_case (database) field names
-      const {
+      
         id, title, attendees, category, 
         startTime, start_time, 
         endTime, end_time,
@@ -226,13 +225,13 @@ class DatabaseManager {
         status
       } = sessionData;
 
-      // Use camelCase first, fallback to snake_case
+      
       const dbStartTime = startTime || start_time;
       const dbEndTime = endTime || end_time;
       const dbTotalAnnotations = totalAnnotations || total_annotations || 0;
       const dbTotalImages = totalImages || total_images || 0;
 
-      console.log('🔍 Mapped database values:', {
+      console.log(' Mapped database values:', {
         id, title, attendees, category,
         start_time: dbStartTime,
         end_time: dbEndTime,
@@ -254,13 +253,13 @@ class DatabaseManager {
         duration, dbTotalAnnotations, dbTotalImages, status
       ], function(err) {
         if (err) {
-          console.error('❌ Error saving session to database:', err.message);
-          console.error('❌ SQL:', sql);
-          console.error('❌ Parameters:', [id, title, attendees, category, dbStartTime, dbEndTime, duration, dbTotalAnnotations, dbTotalImages, status]);
+          console.error(' Error saving session to database:', err.message);
+          console.error(' SQL:', sql);
+          console.error(' Parameters:', [id, title, attendees, category, dbStartTime, dbEndTime, duration, dbTotalAnnotations, dbTotalImages, status]);
           reject(err);
         } else {
-          console.log('✅ Session saved to database with ID:', id);
-          console.log('✅ Database changes:', this.changes);
+          console.log(' Session saved to database with ID:', id);
+          console.log(' Database changes:', this.changes);
           resolve({ id, changes: this.changes });
         }
       });
@@ -270,11 +269,11 @@ class DatabaseManager {
   // Save image to database
   async saveImage(imageData) {
     return new Promise((resolve, reject) => {
-      console.log('🔍 DatabaseManager.saveImage received data:', imageData);
+      console.log(' DatabaseManager.saveImage received data:', imageData);
       
       const { id, sessionId, filename, filePath, fileSize, fileType, uploadedAt, imageDataBase64 } = imageData;
 
-      console.log('🔍 Image data mapping:', {
+      console.log(' Image data mapping:', {
         id, sessionId, filename, filePath, fileSize, fileType, uploadedAt,
         hasImageData: !!imageDataBase64
       });
@@ -287,14 +286,14 @@ class DatabaseManager {
 
       this.db.run(sql, [id, sessionId, filename, filePath, fileSize, fileType, uploadedAt, imageDataBase64], function(err) {
         if (err) {
-          console.error('❌ Error saving image to database:', err.message);
-          console.error('❌ SQL:', sql);
-          console.error('❌ Parameters:', [id, sessionId, filename, filePath, fileSize, fileType, uploadedAt, imageDataBase64 ? 'BASE64_DATA_PROVIDED' : 'NO_BASE64_DATA']);
+          console.error(' Error saving image to database:', err.message);
+          console.error(' SQL:', sql);
+          console.error(' Parameters:', [id, sessionId, filename, filePath, fileSize, fileType, uploadedAt, imageDataBase64 ? 'BASE64_DATA_PROVIDED' : 'NO_BASE64_DATA']);
           reject(err);
         } else {
-          console.log('✅ Image saved to database with ID:', id);
-          console.log('✅ Database changes:', this.changes);
-          console.log('✅ Image data included:', !!imageDataBase64);
+          console.log(' Image saved to database with ID:', id);
+          console.log(' Database changes:', this.changes);
+          console.log(' Image data included:', !!imageDataBase64);
           resolve({ id, changes: this.changes });
         }
       });
@@ -304,7 +303,7 @@ class DatabaseManager {
   // Save annotation to database
   async saveAnnotation(annotationData) {
     return new Promise((resolve, reject) => {
-      console.log('🔍 DatabaseManager.saveAnnotation received data:', annotationData);
+      console.log(' DatabaseManager.saveAnnotation received data:', annotationData);
       
       const {
         id, sessionId, imageId, annotationType, points, nerveType,
@@ -312,7 +311,7 @@ class DatabaseManager {
         needleApproach, clinicalNotes, timestamp
       } = annotationData;
 
-      console.log('🔍 Annotation data mapping:', {
+      console.log(' Annotation data mapping:', {
         id, sessionId, imageId, annotationType, 
         pointsType: typeof points,
         pointsValue: points,
@@ -337,13 +336,13 @@ class DatabaseManager {
         needleApproach, clinicalNotes, timestamp
       ], function(err) {
         if (err) {
-          console.error('❌ Error saving annotation to database:', err.message);
-          console.error('❌ SQL:', sql);
-          console.error('❌ Parameters:', [id, sessionId, imageId, annotationType, serializedPoints, nerveType, sideOfBody, patientPosition, scanRegion, visibility, patientAgeGroup, needleApproach, clinicalNotes, timestamp]);
+          console.error(' Error saving annotation to database:', err.message);
+          console.error(' SQL:', sql);
+          console.error(' Parameters:', [id, sessionId, imageId, annotationType, serializedPoints, nerveType, sideOfBody, patientPosition, scanRegion, visibility, patientAgeGroup, needleApproach, clinicalNotes, timestamp]);
           reject(err);
         } else {
-          console.log('✅ Annotation saved to database with ID:', id);
-          console.log('✅ Database changes:', this.changes);
+          console.log(' Annotation saved to database with ID:', id);
+          console.log(' Database changes:', this.changes);
           resolve({ id, changes: this.changes });
         }
       });
@@ -391,6 +390,51 @@ class DatabaseManager {
           reject(err);
         } else {
           resolve(row);
+        }
+      });
+    });
+  }
+
+  // Get the highest numeric session ID from the database
+  async getLastSessionId() {
+    return new Promise((resolve, reject) => {
+      // Use a more compatible approach for finding numeric session IDs
+      const sql = `
+        SELECT id FROM sessions 
+        ORDER BY 
+          CASE 
+            WHEN id GLOB '[0-9]*' THEN CAST(id AS INTEGER)
+            ELSE 0
+          END DESC,
+          created_at DESC
+        LIMIT 1
+      `;
+
+      this.db.get(sql, [], (err, row) => {
+        if (err) {
+          console.error('Error getting last session ID:', err.message);
+          // Fallback to getting all sessions and finding max ID manually
+          const fallbackSql = `SELECT id FROM sessions ORDER BY created_at DESC`;
+          this.db.all(fallbackSql, [], (fallbackErr, rows) => {
+            if (fallbackErr) {
+              console.error('Fallback query also failed:', fallbackErr.message);
+              resolve(0); // Return 0 if no sessions exist
+            } else {
+              let maxId = 0;
+              rows.forEach(row => {
+                const numericId = parseInt(row.id);
+                if (!isNaN(numericId) && numericId > maxId) {
+                  maxId = numericId;
+                }
+              });
+              console.log(' Last session ID from fallback search:', maxId);
+              resolve(maxId);
+            }
+          });
+        } else {
+          const lastId = row ? parseInt(row.id) || 0 : 0;
+          console.log(' Last session ID from database:', lastId);
+          resolve(lastId);
         }
       });
     });
@@ -458,17 +502,17 @@ class DatabaseManager {
     return new Promise((resolve, reject) => {
       const db = this.db;
       
-      console.log('🏥 Running database health check...');
+      console.log(' Running database health check...');
       
       // Check if we can perform basic operations
       db.get('SELECT COUNT(*) as count FROM sessions', (err, result) => {
         if (err) {
-          console.error('❌ Database health check failed:', err);
+          console.error(' Database health check failed:', err);
           reject(err);
           return;
         }
         
-        console.log('✅ Database health check passed, session count:', result.count);
+        console.log(' Database health check passed, session count:', result.count);
         resolve({ healthy: true, sessionCount: result.count });
       });
     });
@@ -479,12 +523,12 @@ class DatabaseManager {
     return new Promise((resolve, reject) => {
       const db = this.db; // Capture db reference to avoid 'this' context issues
       
-      console.log('🗑️ Starting delete operation for session:', sessionId);
-      console.log('🗑️ Session ID type:', typeof sessionId);
+      console.log(' Starting delete operation for session:', sessionId);
+      console.log(' Session ID type:', typeof sessionId);
       
       // Add a timeout to prevent hanging
       const timeoutId = setTimeout(() => {
-        console.error('❌ Database delete operation timed out after 3 seconds');
+        console.error(' Database delete operation timed out after 3 seconds');
         reject(new Error('Database operation timed out'));
       }, 3000);
       
@@ -499,18 +543,18 @@ class DatabaseManager {
       };
       
       // Try a simple approach: delete in reverse order without transactions first
-      console.log('🗑️ Attempting simple delete without transaction...');
+      console.log(' Attempting simple delete without transaction...');
       
       // First, check if the session exists
       db.get('SELECT id FROM sessions WHERE id = ?', [sessionId], (err, row) => {
         if (err) {
-          console.error('❌ Error checking if session exists:', err);
+          console.error(' Error checking if session exists:', err);
           cleanupAndReject(err);
           return;
         }
         
         if (!row) {
-          console.log('⚠️ Session not found in database:', sessionId);
+          console.log(' Session not found in database:', sessionId);
           cleanupAndResolve({ 
             success: false, 
             error: 'Session not found',
@@ -519,46 +563,46 @@ class DatabaseManager {
           return;
         }
         
-        console.log('✅ Session found:', sessionId);
+        console.log(' Session found:', sessionId);
         
         // Delete annotations (no foreign key constraints assumed)
         db.run('DELETE FROM annotations WHERE session_id = ?', [sessionId], function(annotationErr) {
           if (annotationErr) {
-            console.error('❌ Failed to delete annotations:', annotationErr);
+            console.error(' Failed to delete annotations:', annotationErr);
             cleanupAndReject(annotationErr);
             return;
           }
-          console.log(`✅ Deleted ${this.changes} annotations`);
+          console.log(` Deleted ${this.changes} annotations`);
 
           // Delete images
           db.run('DELETE FROM images WHERE session_id = ?', [sessionId], function(imageErr) {
             if (imageErr) {
-              console.error('❌ Failed to delete images:', imageErr);
+              console.error(' Failed to delete images:', imageErr);
               cleanupAndReject(imageErr);
               return;
             }
-            console.log(`✅ Deleted ${this.changes} images`);
+            console.log(` Deleted ${this.changes} images`);
 
             // Delete session
             db.run('DELETE FROM sessions WHERE id = ?', [sessionId], function(sessionErr) {
               if (sessionErr) {
-                console.error('❌ Failed to delete session:', sessionErr);
+                console.error(' Failed to delete session:', sessionErr);
                 cleanupAndReject(sessionErr);
                 return;
               }
               
               const deletedRows = this.changes;
-              console.log(`✅ Deleted ${deletedRows} session record(s)`);
+              console.log(` Deleted ${deletedRows} session record(s)`);
               
               if (deletedRows > 0) {
-                console.log('✅ Session deletion completed successfully');
+                console.log(' Session deletion completed successfully');
                 cleanupAndResolve({ 
                   success: true, 
                   deletedSessionId: sessionId,
                   deletedRows: deletedRows
                 });
               } else {
-                console.log('⚠️ No session was deleted (already deleted?)');
+                console.log(' No session was deleted (already deleted?)');
                 cleanupAndResolve({ 
                   success: false, 
                   error: 'Session was not found or already deleted',
@@ -575,11 +619,11 @@ class DatabaseManager {
   // Delete a single annotation from the database
   async deleteAnnotation(annotationId) {
     return new Promise((resolve, reject) => {
-      console.log('🗑️ Starting delete operation for annotation:', annotationId);
+      console.log(' Starting delete operation for annotation:', annotationId);
       
       // Add a timeout to prevent hanging
       const timeoutId = setTimeout(() => {
-        console.error('❌ Annotation delete operation timed out after 3 seconds');
+        console.error(' Annotation delete operation timed out after 3 seconds');
         reject(new Error('Database operation timed out'));
       }, 3000);
       
@@ -596,13 +640,13 @@ class DatabaseManager {
       // First, check if the annotation exists and get session info
       this.db.get('SELECT id, session_id FROM annotations WHERE id = ?', [annotationId], (err, row) => {
         if (err) {
-          console.error('❌ Error checking if annotation exists:', err);
+          console.error(' Error checking if annotation exists:', err);
           cleanupAndReject(err);
           return;
         }
         
         if (!row) {
-          console.log('⚠️ Annotation not found in database:', annotationId);
+          console.log(' Annotation not found in database:', annotationId);
           cleanupAndResolve({ 
             success: false, 
             error: 'Annotation not found',
@@ -612,7 +656,7 @@ class DatabaseManager {
         }
         
         const sessionId = row.session_id;
-        console.log('✅ Annotation found:', annotationId, 'in session:', sessionId);
+        console.log(' Annotation found:', annotationId, 'in session:', sessionId);
         
         // Capture database reference to avoid 'this' context issues
         const db = this.db;
@@ -620,19 +664,19 @@ class DatabaseManager {
         // Delete the annotation
         db.run('DELETE FROM annotations WHERE id = ?', [annotationId], function(deleteErr) {
           if (deleteErr) {
-            console.error('❌ Failed to delete annotation:', deleteErr);
+            console.error(' Failed to delete annotation:', deleteErr);
             cleanupAndReject(deleteErr);
             return;
           }
           
           const deletedRows = this.changes;
-          console.log('✅ Annotation deleted successfully. Rows affected:', deletedRows);
+          console.log(' Annotation deleted successfully. Rows affected:', deletedRows);
           
           if (deletedRows > 0) {
             // Update session statistics - get new count of annotations for this session
             db.get('SELECT COUNT(*) as count FROM annotations WHERE session_id = ?', [sessionId], (countErr, countRow) => {
               if (countErr) {
-                console.error('❌ Error updating session statistics:', countErr);
+                console.error(' Error updating session statistics:', countErr);
                 // Still return success for annotation deletion even if count update fails
                 cleanupAndResolve({ 
                   success: true, 
@@ -649,7 +693,7 @@ class DatabaseManager {
               // Update the session's total_annotations count
               db.run('UPDATE sessions SET total_annotations = ? WHERE id = ?', [newAnnotationCount, sessionId], function(updateErr) {
                 if (updateErr) {
-                  console.error('❌ Error updating session total_annotations:', updateErr);
+                  console.error(' Error updating session total_annotations:', updateErr);
                   // Still return success for annotation deletion
                   cleanupAndResolve({ 
                     success: true, 
@@ -662,7 +706,7 @@ class DatabaseManager {
                   return;
                 }
                 
-                console.log('✅ Session statistics updated. New annotation count:', newAnnotationCount);
+                console.log(' Session statistics updated. New annotation count:', newAnnotationCount);
                 cleanupAndResolve({ 
                   success: true, 
                   annotationId: annotationId,
@@ -673,7 +717,7 @@ class DatabaseManager {
               });
             });
           } else {
-            console.log('⚠️ No annotation was deleted (already deleted?)');
+            console.log(' No annotation was deleted (already deleted?)');
             cleanupAndResolve({ 
               success: false, 
               error: 'Annotation was not found or already deleted',
@@ -744,7 +788,7 @@ class DatabaseManager {
                 scanRegionStats[row.scan_region] = row.count;
               });
               
-              console.log('📊 Chart stats retrieved:', {
+              console.log(' Chart stats retrieved:', {
                 nerveTypes: nerveTypeStats,
                 ageGroups: ageGroupStats,
                 scanRegions: scanRegionStats
@@ -765,7 +809,7 @@ class DatabaseManager {
   // Get unique doctors/attendees from sessions
   async getUniqueDoctors() {
     return new Promise((resolve, reject) => {
-      console.log('📊 Getting unique doctors from database...');
+      console.log(' Getting unique doctors from database...');
       
       const query = `
         SELECT DISTINCT attendees 
@@ -777,11 +821,11 @@ class DatabaseManager {
       
       this.db.all(query, [], (err, rows) => {
         if (err) {
-          console.error('❌ Error getting unique doctors:', err.message);
+          console.error(' Error getting unique doctors:', err.message);
           reject(err);
         } else {
           const doctors = rows.map(row => row.attendees).filter(Boolean);
-          console.log('✅ Found unique doctors:', doctors);
+          console.log(' Found unique doctors:', doctors);
           resolve(doctors);
         }
       });

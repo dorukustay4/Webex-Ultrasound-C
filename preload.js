@@ -5,7 +5,25 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('electronAPI', {
   // Navigation
   navigate: (page) => ipcRenderer.invoke('navigate', page),
+  navigateTo: (page) => ipcRenderer.invoke('navigate', page), // Alias for compatibility
   
+  // Helper function to safely navigate
+  safeNavigate: async (page) => {
+    try {
+      return await ipcRenderer.invoke('navigate', page);
+    } catch (error) {
+      console.error('Navigation failed:', error);
+      return { success: false, error: error.message };
+    }
+  },
+  
+  // Session data management (replacement for localStorage in production)
+  sessionSetData: (sessionData) => ipcRenderer.invoke('session-set-data', sessionData),
+  sessionGetData: () => ipcRenderer.invoke('session-get-data'),
+  sessionClearData: () => ipcRenderer.invoke('session-clear-data'),
+  
+  // Get VIA annotator path for production mode
+  getViaPath: () => ipcRenderer.invoke('get-via-path'),
   
   // System info
   getSystemInfo: () => ipcRenderer.invoke('get-system-info'),
@@ -34,6 +52,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   dbHealthCheck: () => ipcRenderer.invoke('db-health-check'),
   dbGetUniqueDoctors: () => ipcRenderer.invoke('db-get-unique-doctors'),
   
+  // Session ID management
+  getNextSessionId: () => ipcRenderer.invoke('get-next-session-id'),
+  
   // App lifecycle
   onAppReady: (callback) => ipcRenderer.on('app-ready', callback),
   onBeforeUnload: (callback) => ipcRenderer.on('before-unload', callback)
@@ -48,4 +69,4 @@ if (process.env.NODE_ENV === 'development') {
   });
 }
 
-console.log('🔗 Preload script loaded - Enhanced IPC bridge ready for Webex integration');
+console.log('🔗 Preload script loaded - Enhanced IPC bridge ready for annotation platform');

@@ -25,10 +25,35 @@
   "license": "ISC",
   "description": "Ultrasound Annotation Platform - Advanced medical image annotation tool with VGG Image Annotator integration",
   "dependencies": {
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "chart.js": "^4.4.0"
   },
   "devDependencies": {
     "electron": "^37.2.4",
+    "electron-builder": "^26.0.12",
     "vite": "^7.0.5"
+  },
+  "build": {
+    "appId": "com.ucl.neurotate",
+    "productName": "Neurotate",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "public/**/*",
+      "package.json",
+      "LICENSE"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }

@@ -40,8 +40,8 @@ export default defineConfig({
   
   // Handle dependencies
   optimizeDeps: {
-    include: ['webex'],
-    exclude: ['@webex/internal-plugin-device']
+    include: [],
+    exclude: []
   },
   
   // Resolve configuration for Node.js modules
