@@ -1,9 +1,20 @@
 <!DOCTYPE html>
+<!-- CSS and HTML styling assisted by GitHub Copilot extension -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VGG Image Annotator - Medical Edition</title>
+    <!-- 
+    This file is a simplified custom implementation inspired by and based on:
+    VGG Image Annotator (VIA) - https://www.robots.ox.ac.uk/~vgg/software/via/
+    Original VIA developed by: Visual Geometry Group, University of Oxford
+    VIA GitHub Repository: https://github.com/ox-vgg/via
+    License: BSD 2-Clause License
+    
+    Core annotation algorithms, polygon drawing logic, and canvas handling
+    techniques are adapted from the original VIA implementation.
+    -->
     <style>
         * {
             margin: 0;
@@ -211,6 +222,18 @@
     </div>
 
     <script>
+        /*
+         * Core annotation logic and algorithms adapted from VGG Image Annotator (VIA)
+         * Original source: https://github.com/ox-vgg/via
+         * VIA developed by Visual Geometry Group, University of Oxford
+         * 
+         * The following functions and concepts are based on VIA's implementation:
+         * - Polygon drawing and completion algorithms
+         * - Canvas coordinate mapping and scaling
+         * - Annotation data structure and management
+         * - History/undo system architecture
+         */
+        
         let canvas, ctx, img;
         let isDrawing = false;
         let currentTool = 'polygon';
@@ -218,7 +241,7 @@
         let allPolygons = [];
         let selectedPolygon = null;
         
-        // History management
+        // History management - based on VIA's undo/redo system
         let history = [];
         let historyStep = -1;
         
@@ -266,7 +289,7 @@
             window.addEventListener('message', handleParentMessage);
         }
         
-        // Handle keyboard shortcuts
+        // Handle keyboard shortcuts - keyboard mapping adapted from VIA
         function handleKeyDown(e) {
             // Only handle if canvas/VIA is focused or no input elements are focused
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
@@ -276,6 +299,7 @@
             // Prevent default for handled shortcuts
             let handled = false;
             
+            // Keyboard shortcuts based on VIA's standard key bindings
             switch (e.key) {
                 case 'Enter':
                     if (currentPolygon.length >= 3) {
@@ -388,7 +412,7 @@
             }
         }
         
-        // Load image
+        // Load image function - canvas scaling algorithm adapted from VIA
         function loadImage(src) {
             img.src = src;
             img.onload = function() {
@@ -441,7 +465,7 @@
             updateStatus(`Tool: ${tool.charAt(0).toUpperCase() + tool.slice(1)}`);
         }
         
-        // Handle canvas click
+        // Canvas click handling - polygon point addition algorithm based on VIA
         function handleCanvasClick(e) {
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
@@ -514,7 +538,7 @@
             updateStatus(selectedPolygon !== null ? `Selected polygon ${selectedPolygon + 1}` : 'No polygon selected');
         }
         
-        // Check if point is inside polygon
+        // Polygon point-in-polygon test - ray casting algorithm from VIA
         function isPointInPolygon(point, polygon) {
             let inside = false;
             for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
@@ -538,7 +562,7 @@
             }
         }
         
-        // History management
+        // History management system - undo/redo architecture adapted from VIA
         function saveToHistory() {
             historyStep++;
             if (historyStep < history.length) {
@@ -603,6 +627,7 @@
             }
         }
         
+        // Image filtering functions - brightness/contrast controls adapted from VIA
         function updateBrightness() {
             brightness = document.getElementById('brightnessSlider').value;
             applyImageFilters();
@@ -630,7 +655,7 @@
             }
         }
         
-        // Redraw canvas
+        // Canvas redraw function - rendering algorithm adapted from VIA
         function redrawCanvas() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
@@ -646,7 +671,7 @@
             }
         }
         
-        // Draw polygon
+        // Polygon drawing function - canvas rendering techniques from VIA
         function drawPolygon(points, color, isActive, label = null) {
             if (points.length === 0) return;
             
@@ -705,7 +730,7 @@
             return { x: x / points.length, y: y / points.length };
         }
         
-        // Handle mouse move
+        // Mouse movement tracking - coordinate display adapted from VIA
         function handleMouseMove(e) {
             const rect = canvas.getBoundingClientRect();
             const x = Math.round(e.clientX - rect.left);
@@ -767,6 +792,23 @@
                 loadImage(img.src);
             }
         });
+        
+        /*
+         * End of VIA-based implementation
+         * 
+         * This simplified annotation interface incorporates core algorithms and concepts
+         * from the VGG Image Annotator (VIA) project:
+         * - Polygon drawing and completion logic
+         * - Canvas coordinate mapping and scaling
+         * - Point-in-polygon testing using ray casting
+         * - History management with undo/redo functionality
+         * - Image filtering and display controls
+         * - Keyboard shortcut handling
+         * 
+         * Original VIA project: https://github.com/ox-vgg/via
+         * Developed by Visual Geometry Group, University of Oxford
+         * Licensed under the BSD 2-Clause License
+         */
     </script>
 </body>
 </html>

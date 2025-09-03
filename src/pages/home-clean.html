@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- CSS and HTML styling assisted by GitHub Copilot extension -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -734,28 +735,28 @@
     // Start Annotation Session
     async function startAnnotationSession() {
       try {
-        console.log('🔢 Getting next session ID from database...');
+        console.log(' Getting next session ID from database...');
         
         // Generate next session ID from database
         let nextSessionId;
         if (typeof window.electronAPI !== 'undefined' && window.electronAPI.getNextSessionId) {
           // Production: Use database-based session ID
-          console.log('📊 Using database to get next session ID...');
+          console.log(' Using database to get next session ID...');
           const response = await window.electronAPI.getNextSessionId();
-          console.log('📊 Got response from database:', response);
+          console.log(' Got response from database:', response);
           
           if (response && response.success && response.sessionId) {
             nextSessionId = response.sessionId;
-            console.log('📊 Extracted session ID from database:', nextSessionId);
+            console.log(' Extracted session ID from database:', nextSessionId);
           } else {
             throw new Error('Invalid response from database: ' + JSON.stringify(response));
           }
         } else {
           // Development: Fallback to localStorage
-          console.log('📊 Using localStorage fallback for session ID...');
+          console.log(' Using localStorage fallback for session ID...');
           const lastSessionId = parseInt(localStorage.getItem('lastSessionId') || '0');
           nextSessionId = (lastSessionId + 1).toString().padStart(3, '0');
-          console.log('📊 Generated session ID from localStorage:', nextSessionId);
+          console.log(' Generated session ID from localStorage:', nextSessionId);
         }
         
         document.getElementById('sessionId').value = nextSessionId;
@@ -763,7 +764,7 @@
         // Show the session configuration modal
         document.getElementById('startSessionModal').classList.add('active');
       } catch (error) {
-        console.error('❌ Error getting next session ID:', error);
+        console.error(' Error getting next session ID:', error);
         showToast('Error generating session ID. Please try again.', 'error');
         
         // Fallback to simple incremental ID
@@ -782,17 +783,17 @@
 
     // Create and Start Session
     async function createAndStartSession() {
-      console.log('🚀 Starting session creation process...');
+      console.log(' Starting session creation process...');
       
       const title = document.getElementById('sessionTitle').value.trim();
       const doctorName = document.getElementById('doctorName').value.trim();
       const category = document.getElementById('sessionCategory').value;
       const sessionId = document.getElementById('sessionId').value;
       
-      console.log('📝 Session form data:', { title, doctorName, category, sessionId });
+      console.log(' Session form data:', { title, doctorName, category, sessionId });
       
       if (!title || !doctorName || !category) {
-        console.error('❌ Validation failed: Missing required fields');
+        console.error(' Validation failed: Missing required fields');
         showToast('Please fill in all required fields', 'error');
         return;
       }
@@ -812,60 +813,60 @@
           status: 'active'
         };
         
-        console.log('📊 Created session object:', currentSession);
+        console.log(' Created session object:', currentSession);
         
         // Save session data using Electron IPC (for production) or localStorage (for development)
         if (typeof window.electronAPI !== 'undefined' && window.electronAPI.sessionSetData) {
           // Production: Use Electron IPC
-          console.log('📊 Using Electron IPC to save session data...');
+          console.log(' Using Electron IPC to save session data...');
           const result = await window.electronAPI.sessionSetData(currentSession);
-          console.log('📊 IPC result:', result);
+          console.log(' IPC result:', result);
           if (!result.success) {
             throw new Error('Failed to save session data via IPC');
           }
-          console.log('✅ Session data saved via Electron IPC');
+          console.log(' Session data saved via Electron IPC');
         } else {
           // Development: Use localStorage
-          console.log('📊 Using localStorage to save session data...');
+          console.log(' Using localStorage to save session data...');
           localStorage.setItem('currentSession', JSON.stringify(currentSession));
           localStorage.setItem('sessionStartTime', Date.now().toString());
           localStorage.setItem('lastSessionId', sessionId);
-          console.log('✅ Session data saved via localStorage');
+          console.log(' Session data saved via localStorage');
         }
         
         closeStartSessionModal();
         showToast(`Session #${sessionId} created! Navigating to annotation room...`, 'success');
         
-        console.log('🚀 Session created successfully, starting navigation...');
+        console.log(' Session created successfully, starting navigation...');
         
         // Navigate to annotation room
         try {
-          console.log('🔄 Attempting navigation to annotation room...');
+          console.log(' Attempting navigation to annotation room...');
           if (typeof window.electronAPI !== 'undefined' && window.electronAPI.navigateTo) {
-            console.log('🔄 Using navigateTo API...');
+            console.log(' Using navigateTo API...');
             const navResult = await window.electronAPI.navigateTo('annotation-room.html');
-            console.log('🔄 Navigation result:', navResult);
+            console.log(' Navigation result:', navResult);
           } else if (typeof window.electronAPI !== 'undefined' && window.electronAPI.navigate) {
-            console.log('🔄 Using navigate API...');
+            console.log(' Using navigate API...');
             const navResult = await window.electronAPI.navigate('annotation-room.html');
-            console.log('🔄 Navigation result:', navResult);
+            console.log(' Navigation result:', navResult);
           } else {
-            console.log('🔄 Using window.location fallback...');
+            console.log(' Using window.location fallback...');
             window.location.href = 'annotation-room.html';
           }
         } catch (error) {
-          console.error('❌ Navigation error:', error);
+          console.error(' Navigation error:', error);
           // Try direct navigation as fallback
           if (typeof window.electronAPI !== 'undefined' && window.electronAPI.navigate) {
-            console.log('🔄 Trying navigate fallback...');
+            console.log(' Trying navigate fallback...');
             await window.electronAPI.navigate('annotation-room.html');
           } else {
-            console.log('🔄 Using window.location as final fallback...');
+            console.log(' Using window.location as final fallback...');
             window.location.href = 'annotation-room.html';
           }
         }
       } catch (error) {
-        console.error('❌ Session creation failed:', error);
+        console.error(' Session creation failed:', error);
         showToast(`Failed to create session: ${error.message}`, 'error');
       }
     }
@@ -932,11 +933,11 @@
 
     // Statistics Management Functions
     async function loadStatistics() {
-      console.log('📊 Loading real statistics from database...');
+      console.log(' Loading real statistics from database...');
       
       try {
         const stats = await window.statisticsManager.loadStatsFromDatabase();
-        console.log('📊 Statistics loaded:', stats);
+        console.log(' Statistics loaded:', stats);
         
         // Update the display
         window.statisticsManager.updateStatsDisplay(stats);
@@ -959,11 +960,11 @@
 
     // Load unique doctors for dropdown
     async function loadUniqueDoctors() {
-      console.log('👨‍⚕️ Loading unique doctors for dropdown...');
+      console.log(' Loading unique doctors for dropdown...');
       
       try {
         if (!window.electronAPI || !window.electronAPI.dbGetUniqueDoctors) {
-          console.warn('👨‍⚕️ Database API not available for doctors');
+          console.warn(' Database API not available for doctors');
           return;
         }
 
@@ -982,13 +983,13 @@
               doctorsList.appendChild(option);
             });
             
-            console.log(`👨‍⚕️ Loaded ${result.doctors.length} unique doctors:`, result.doctors);
+            console.log(` Loaded ${result.doctors.length} unique doctors:`, result.doctors);
           }
         } else {
-          console.warn('👨‍⚕️ No doctors found or failed to load');
+          console.warn(' No doctors found or failed to load');
         }
       } catch (error) {
-        console.error('❌ Failed to load unique doctors:', error);
+        console.error(' Failed to load unique doctors:', error);
       }
     }
 
@@ -999,7 +1000,7 @@
       // Refresh statistics every 5 minutes while page is active
       setInterval(async () => {
         if (!document.hidden) {
-          console.log('📊 Auto-refreshing statistics...');
+          console.log(' Auto-refreshing statistics...');
           await loadStatistics();
         }
       }, 5 * 60 * 1000); // 5 minutes
@@ -1013,7 +1014,7 @@
 
     // Function to handle session completion
     async function handleSessionCompletion(sessionData) {
-      console.log('📊 Session completed, updating statistics...', sessionData);
+      console.log(' Session completed, updating statistics...', sessionData);
       
       // Trigger statistics refresh
       await loadStatistics();
@@ -1173,7 +1174,7 @@
     // Load and update charts
     async function loadChartData() {
       try {
-        console.log('📊 Loading chart data...');
+        console.log(' Loading chart data...');
         
         if (!window.electronAPI || !window.electronAPI.dbGetAnnotationStats) {
           console.warn('Chart data API not available');
@@ -1181,12 +1182,12 @@
           return;
         }
 
-        console.log('📊 Calling dbGetAnnotationStats...');
+        console.log(' Calling dbGetAnnotationStats...');
         const response = await window.electronAPI.dbGetAnnotationStats();
-        console.log('📊 Chart data response:', response);
+        console.log(' Chart data response:', response);
         
         if (response.success && response.stats) {
-          console.log('📊 Updating charts with stats:', response.stats);
+          console.log(' Updating charts with stats:', response.stats);
           updateCharts(response.stats);
         } else {
           console.error('Failed to load chart data:', response.error);
@@ -1200,9 +1201,9 @@
 
     // Update charts with new data
     function updateCharts(stats) {
-      console.log('📊 updateCharts called with stats:', stats);
-      console.log('📊 stats keys:', Object.keys(stats));
-      console.log('📊 stats.scanRegions specifically:', stats.scanRegions);
+      console.log(' updateCharts called with stats:', stats);
+      console.log(' stats keys:', Object.keys(stats));
+      console.log(' stats.scanRegions specifically:', stats.scanRegions);
       
       // Update nerve type chart
       const nerveTypes = stats.nerveTypes || {};
@@ -1241,7 +1242,7 @@
       const scanRegionLabels = Object.keys(scanRegions);
       const scanRegionData = Object.values(scanRegions);
 
-      console.log('🔍 Scan Region Chart Debug:');
+      console.log(' Scan Region Chart Debug:');
       console.log('- stats.scanRegions:', stats.scanRegions);
       console.log('- scanRegions object:', scanRegions);
       console.log('- scanRegionLabels:', scanRegionLabels);
@@ -1250,19 +1251,19 @@
       console.log('- scanRegionChart object:', scanRegionChart);
 
       if (scanRegionLabels.length > 0) {
-        console.log('✅ Updating scan region chart with data');
+        console.log(' Updating scan region chart with data');
         if (scanRegionChart) {
           scanRegionChart.data.labels = scanRegionLabels;
           scanRegionChart.data.datasets[0].data = scanRegionData;
           scanRegionChart.update();
           document.getElementById('scanRegionChart').style.display = 'block';
           document.getElementById('scanRegionNoData').style.display = 'none';
-          console.log('✅ Scan region chart updated successfully');
+          console.log(' Scan region chart updated successfully');
         } else {
-          console.error('❌ scanRegionChart is null or undefined!');
+          console.error(' scanRegionChart is null or undefined!');
         }
       } else {
-        console.log('❌ No scan region data found, showing empty state');
+        console.log(' No scan region data found, showing empty state');
         document.getElementById('scanRegionChart').style.display = 'none';
         document.getElementById('scanRegionNoData').style.display = 'flex';
       }
@@ -1280,7 +1281,7 @@
 
     // Refresh charts data
     async function refreshCharts() {
-      console.log('📊 Refreshing chart data...');
+      console.log(' Refreshing chart data...');
       await loadChartData();
     }
 
@@ -1295,14 +1296,14 @@
 
     // Check for completed sessions when page loads/becomes visible
     window.addEventListener('focus', async () => {
-      console.log('📊 Window focused, checking for session updates...');
+      console.log(' Window focused, checking for session updates...');
       await loadStatistics();
       await refreshCharts();
     });
 
     // Simple authentication check (no authentication required for local use)
     window.addEventListener('load', async () => {
-      console.log('🎯 Neurotate Platform loaded successfully');
+      console.log(' Neurotate Platform loaded successfully');
       
       // Initialize charts first
       initializeCharts();
