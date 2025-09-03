@@ -1,6 +1,7 @@
 /**
  * Statistics Manager
  * Centralized statistics calculation and management for the annotation platform
+ * Data computed here is used for Chart.js visualizations in the home dashboard
  */
 
 class StatisticsManager {

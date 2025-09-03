@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js library for data visualization - https://www.chartjs.org/ -->
   <script src="../../node_modules/chart.js/dist/chart.umd.js"></script>
   <script src="../js/statistics-manager.js"></script>
   <style>
@@ -1032,13 +1033,14 @@
     let ageGroupChart = null;
     let scanRegionChart = null;
 
-    // Initialize charts
+    // Initialize charts - Chart.js implementation for data visualization
+    // Chart.js: https://www.chartjs.org/ - Open source HTML5 charts library
     function initializeCharts() {
       const nerveTypeCtx = document.getElementById('nerveTypeChart').getContext('2d');
       const ageGroupCtx = document.getElementById('ageGroupChart').getContext('2d');
       const scanRegionCtx = document.getElementById('scanRegionChart').getContext('2d');
 
-      // Nerve Type Chart
+      // Nerve Type Chart - Chart.js pie chart implementation
       nerveTypeChart = new Chart(nerveTypeCtx, {
         type: 'pie',
         data: {
@@ -1082,7 +1084,7 @@
         }
       });
 
-      // Age Group Chart
+      // Age Group Chart - Chart.js pie chart implementation
       ageGroupChart = new Chart(ageGroupCtx, {
         type: 'pie',
         data: {
@@ -1126,7 +1128,7 @@
         }
       });
 
-      // Scan Region Chart
+      // Scan Region Chart - Chart.js pie chart implementation
       scanRegionChart = new Chart(scanRegionCtx, {
         type: 'pie',
         data: {
@@ -1199,7 +1201,7 @@
       }
     }
 
-    // Update charts with new data
+    // Update charts with new data - Chart.js data updating methods
     function updateCharts(stats) {
       console.log(' updateCharts called with stats:', stats);
       console.log(' stats keys:', Object.keys(stats));
